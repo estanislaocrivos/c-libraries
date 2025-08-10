@@ -84,12 +84,6 @@ To run a specific test file, you can run:
 ceedling test:your_test_file
 ```
 
-You can also run all the tests inside `test/` and generate a coverage report by running the provided `run-tests.sh` script:
-
-```bash
-./run-tests.sh
-```
-
 ## Generating documentation
 
 Doxygen is the default chosen tool for generating documentation from annotated source code. To install Doxygen, follow the instructions on the [Doxygen website](https://www.doxygen.nl/download.html) or use your package manager. For example, on Ubuntu:
