@@ -1,0 +1,4 @@
+build/
+docs/
+.cache/
+deploy.sh

@@ -1,0 +1,56 @@
+name: common-c-libs [CI pipeline]
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Static Analysis (cppcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Run cppcheck
+        run: cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem src/
+
+  build:
+    name: Build with GCC (CMake)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake
+
+      - name: Configure and Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          make
+
+      - name: Show built artifacts
+        run: ls -lh build/
+
+  test:
+    name: Unit Tests with Ceedling
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Install Ceedling
+        run: gem install ceedling
+
+      - name: Run Unit Tests
+        run: ceedling test:all
