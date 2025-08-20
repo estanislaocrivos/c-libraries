@@ -530,15 +530,19 @@ static uint8_t calc_enc_data_size(uint8_t data_size)
 
 /* ============================================================================================== */
 
-hamming_codec_t hamming_create(void)
+int8_t hamming_codec_create(hamming_codec_t* self)
 {
-    hamming_codec_t encoder;
-    encoder.encode_bytestream  = hamming_encode_bytestream;
-    encoder.decode_bytestream  = hamming_decode_bytestream;
-    encoder.encode_word        = hamming_encode_word;
-    encoder.decode_word        = hamming_decode_word;
-    encoder.calc_enc_data_size = calc_enc_data_size;
-    return encoder;
+    if (!self)
+    {
+        return -EINVAL;
+    }
+    memset(self, 0, sizeof(hamming_codec_t));
+    self->encode_word        = hamming_encode_word;
+    self->decode_word        = hamming_decode_word;
+    self->encode_bytestream  = hamming_encode_bytestream;
+    self->decode_bytestream  = hamming_decode_bytestream;
+    self->calc_enc_data_size = calc_enc_data_size;
+    return 0;
 }
 
 /* ============================================================================================== */

@@ -599,8 +599,10 @@ void test_calc_enc_data_size(void)
 void test_hamming_encode_decode_2(void)
 {
     printf("\ntest_hamming_encode_decode_2()");
-    hamming_codec_t codec  = hamming_create();
-    uint8_t         data[] = {0xF0, 0xff, 0xfe};
+    hamming_codec_t codec;
+    hamming_codec_create(&codec);
+
+    uint8_t data[] = {0xF0, 0xff, 0xfe};
     printf("\nData: ");
     for (int i = 0; i < sizeof(data); i++)
     {
@@ -624,3 +626,5 @@ void test_hamming_encode_decode_2(void)
         printf("%#x ", decoded_data[i]);
     }
 }
+
+/* ============================================================================================== */
