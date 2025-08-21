@@ -10,8 +10,8 @@
 
 /* ============================================================================================== */
 
-#include "../inc/hamming-codec/hamming.h"
-#include "../src/hamming-codec/hamming.c"
+#include "../hamming-codec/hamming-codec.h"
+#include "../hamming-codec/hamming-codec.c"
 
 /* ============================================================================================== */
 
