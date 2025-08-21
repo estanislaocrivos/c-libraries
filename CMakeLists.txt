@@ -44,3 +44,5 @@ if(BUILD_DEMO)
     target_include_directories(demo PRIVATE ${INCLUDE_DIR})
     target_link_libraries(demo PRIVATE ${PROJECT_NAME})
 endif()
+
+add_subdirectory(hamming_codec)
