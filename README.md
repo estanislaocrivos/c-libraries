@@ -53,15 +53,19 @@ This project includes a `.vscode` directory with a `c_cpp_properties.json` file 
 To build the libraries, you can run the following command in the root directory of the project:
 
 ```bash
-cmake -B build -DBUILD_DEMO=OFF
-cmake --build build
+mkdir -p build
+cd build
+cmake -DBUILD_DEMO=OFF ..
+make
 ```
 
-To build the `main.c` file, you can run:
+To build the `main.c` file as a demo, you can run:
 
 ```bash
-cmake -B build -DBUILD_DEMO=ON
-cmake --build build
+mkdir -p build
+cd build
+cmake -DBUILD_DEMO=ON ..
+make
 ```
 
 ## Testing environment
