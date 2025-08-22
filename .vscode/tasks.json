@@ -1,0 +1,98 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run cppcheck",
+            "type": "shell",
+            "command": "cppcheck",
+            "args": [
+                "--enable=all",
+                "--inconclusive",
+                "--suppress=missingIncludeSystem",
+                "--check-level=exhaustive",
+                "--language=c",
+                "--std=c99",
+                "src/",
+                "inc/",
+                "hamming_codec/",
+                "--checkers-report=checkers.txt",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run cppcheck (+ MISRA-C)",
+            "type": "shell",
+            "command": "cppcheck",
+            "args": [
+                "--enable=all",
+                "--inconclusive",
+                "--suppress=missingIncludeSystem",
+                "--check-level=exhaustive",
+                "--language=c",
+                "--std=c99",
+                "src/",
+                "inc/",
+                "--checkers-report=checkers.txt",
+                "--addon=misra",
+                "-i",
+                "src/adcc.c",
+                "-i",
+                "src/eeprom.c",
+                "-i",
+                "src/i2c1.c",
+                "-i",
+                "src/spi1.c",
+                "-i",
+                "src/mcu_manager.c"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run all tests",
+            "type": "shell",
+            "command": "ceedling",
+            "args": [
+                "test:all",
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate cov. report from all tests",
+            "type": "shell",
+            "command": "ceedling",
+            "args": [
+                "gcov:all",
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate documentation",
+            "type": "shell",
+            "command": "doxygen",
+            "args": [
+                "Doxyfile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        }
+    ]
+}

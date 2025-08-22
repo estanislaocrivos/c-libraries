@@ -1,23 +1,23 @@
-/**
- * @file main.h
- * @author Estanislao Crivos (estanislaocrivos@gmail.com)
- * @brief Common C libraries main header file.
- */
-
-/* ============================================================================================== */
-
-#ifndef MAIN_H
-#define MAIN_H
-
-/* ============================================================================================== */
-
-#include <stdio.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+/* ============================================================================================== */
+
+#include "support/unity.h"
 
 /* ============================================================================================== */
 
 #include "../hamming_codec/hamming_codec.h"
+#include "../hamming_codec/hamming_codec.c"
 
 /* ============================================================================================== */
 
-#endif  // MAIN_H
+void test(void)
+{
+    TEST_ASSERT_TRUE(true);
+}
+
+/* ============================================================================================== */
