@@ -15,6 +15,7 @@
                 "src/",
                 "inc/",
                 "hamming_codec/",
+                "spi/",
                 "--checkers-report=checkers.txt",
             ],
             "group": {

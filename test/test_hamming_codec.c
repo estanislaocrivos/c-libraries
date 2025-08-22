@@ -1,3 +1,10 @@
+/**
+ * @file
+ * @brief This file contains the unit tests for the hamming_codec module.
+ */
+
+/* ============================================================================================== */
+
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>

@@ -9,5 +9,4 @@ target_include_directories(hamming_codec
 
 target_compile_features(hamming_codec PRIVATE c_std_99)
 
-# Flags opcionales
 target_compile_options(hamming_codec PRIVATE -Wall -Wextra -Wpedantic)
