@@ -12,27 +12,14 @@
 
 /* ============================================================================================== */
 
-#define DI1    0
-#define DI2    1
-#define DI3    2
-#define DI4    3
-#define PGRXUA 4
-#define PGRXUB 5
-#define PGEXP1 6
-#define PGEXP2 7
-#define PGEXP3 8
-#define PGEXP4 9
-#define DO1    10
-#define DO2    11
-#define DO3    12
-#define DO4    13
+#define GPIO1 1
+#define GPIO2 2
+#define GPIO3 3
+#define GPIO4 4
 
 /* ============================================================================================== */
 
-typedef void (*mcu_tmr0_timeout_callback_t)(void);
-typedef void (*mcu_tmr2_timeout_callback_t)(void);
-typedef void (*mcu_tmr4_timeout_callback_t)(void);
-typedef void (*mcu_tmr6_timeout_callback_t)(void);
+typedef void (*mcu_tmr_timeout_callback_t)(void);
 
 /* ============================================================================================== */
 
@@ -40,31 +27,23 @@ void mcu_mngr_initialize(void);
 
 /* ============================================================================================== */
 
-int8_t mcu_mngr_set_pin_state(uint8_t pin, bool state);
+void mcu_mngr_set_pin_state(uint8_t pin, bool state);
 
 /* ============================================================================================== */
 
-int8_t mcu_mngr_get_pin_state(uint8_t pin, bool* state);
+void mcu_mngr_get_pin_state(uint8_t pin, bool* state);
 
 /* ============================================================================================== */
 
-void mcu_mngr_stat_led_toggle(void);
+void mcu_mngr_led_toggle(void);
 
 /* ============================================================================================== */
 
-void mcu_mngr_stat_led_turn_on(void);
+void mcu_mngr_led_turn_on(void);
 
 /* ============================================================================================== */
 
-void mcu_mngr_stat_led_turn_off(void);
-
-/* ============================================================================================== */
-
-void mcu_mngr_comms_led_turn_on(void);
-
-/* ============================================================================================== */
-
-void mcu_mngr_comms_led_turn_off(void);
+void mcu_mngr_led_turn_off(void);
 
 /* ============================================================================================== */
 
@@ -80,7 +59,7 @@ void mcu_mngr_enable_interrupts(void);
 
 /* ============================================================================================== */
 
-int8_t mcu_mngr_tmr0_set_timeout_callback(mcu_tmr0_timeout_callback_t callback);
+int8_t mcu_mngr_tmr0_set_timeout_callback(mcu_tmr_timeout_callback_t callback);
 
 /* ============================================================================================== */
 
@@ -88,55 +67,11 @@ void mcu_mngr_tmr0_deactivate_timeout(void);
 
 /* ============================================================================================== */
 
+void mcu_mngr_tmr0_reset_timeout(void);
+
+/* ============================================================================================== */
+
 int8_t mcu_mngr_tmr0_set_timeout_ms(uint16_t timeout_ms);
-
-/* ============================================================================================== */
-
-/* TMR2 */
-
-/* ============================================================================================== */
-
-int8_t mcu_mngr_tmr2_set_timeout_callback(mcu_tmr2_timeout_callback_t callback);
-
-/* ============================================================================================== */
-
-void mcu_mngr_tmr2_deactivate_timeout(void);
-
-/* ============================================================================================== */
-
-int8_t mcu_mngr_tmr2_set_timeout_ms(uint16_t timeout_ms);
-
-/* ============================================================================================== */
-
-/* TMR4 */
-
-/* ============================================================================================== */
-
-int8_t mcu_mngr_tmr4_set_timeout_callback(mcu_tmr4_timeout_callback_t callback);
-
-/* ============================================================================================== */
-
-void mcu_mngr_tmr4_deactivate_timeout(void);
-
-/* ============================================================================================== */
-
-int8_t mcu_mngr_tmr4_set_timeout_ms(uint16_t timeout_ms);
-
-/* ============================================================================================== */
-
-/* TMR6 */
-
-/* ============================================================================================== */
-
-int8_t mcu_mngr_tmr6_set_timeout_callback(mcu_tmr6_timeout_callback_t callback);
-
-/* ============================================================================================== */
-
-void mcu_mngr_tmr6_reset_timeout(void);
-
-/* ============================================================================================== */
-
-int8_t mcu_mngr_tmr6_set_timeout_ms(uint16_t timeout_s);
 
 /* ============================================================================================== */
 

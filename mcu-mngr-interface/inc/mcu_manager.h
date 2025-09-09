@@ -23,6 +23,7 @@ typedef void (*led_toggle_t)(void);
 typedef void (*gpio_high_t)(void);
 typedef void (*gpio_low_t)(void);
 typedef void (*gpio_set_state_t)(uint8_t, bool);
+typedef void (*gpio_get_state_t)(uint8_t, bool*);
 typedef void (*gpio_toggle_t)(void);
 typedef void (*disable_interrupts_t)(void);
 typedef void (*enable_interrupts_t)(void);
@@ -31,30 +32,32 @@ typedef void (*enable_interrupts_t)(void);
 
 typedef struct
 {
-    disable_interrupts_t disable_interrupts;
-    enable_interrupts_t  enable_interrupts;
+    disable_interrupts_t disable;
+    enable_interrupts_t  enable;
 } interrupt_ctrl_interface_t;
 
 typedef struct
 {
     tmr_set_timeout_t          set_timeout;
     tmr_reset_timeout_t        reset_timeout;
+    tmr_deact_timeout_t        deactivate_timeout;
     tmr_set_timeout_callback_t set_callback;
 } timer_interface_t;
 
 typedef struct
 {
-    led_on_t     led_on;
-    led_off_t    led_off;
-    led_toggle_t led_toggle;
+    led_on_t     on;
+    led_off_t    off;
+    led_toggle_t toggle;
 } led_interface_t;
 
 typedef struct
 {
-    gpio_high_t      gpio_set_high;
-    gpio_low_t       gpio_set_low;
-    gpio_set_state_t gpio_set_state;
-    gpio_toggle_t    gpio_toggle;
+    gpio_high_t      set_high;
+    gpio_low_t       set_low;
+    gpio_set_state_t set_state;
+    gpio_get_state_t get_state;
+    gpio_toggle_t    toggle;
 } gpio_interface_t;
 
 /* ============================================================================================== */
