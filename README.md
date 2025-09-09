@@ -113,6 +113,14 @@ To add a new library to the project, follow these steps:
 
 5. If you have unit tests, you must add the path to the new library inside the `project.yml`, under the `:paths:` section, so that Ceedling can find the library when running the tests. You may also add the new headers files path to the `vscode/c_cpp_properties.json` file for better IntelliSense support in Visual Studio Code.
 
+6. Finally, update the root `CMakeLists.txt` file to include your new library. You can do this by adding the following line:
+
+   ```cmake
+   add_subdirectory(my_library)
+   ```
+
+   Replace `my_library` with the name of your library directory.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
