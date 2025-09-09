@@ -101,12 +101,15 @@
     - -:test/support
     - +:spi-interface/test/**
     - +:hamming-codec/test/**
+    - +:mcu-mngr-interface/test/**
   :source:
     - spi-interface/src/**
     - hamming-codec/src/**
+    - mcu-mngr-interface/src/**
   :include:
     - spi-interface/inc/**
     - hamming-codec/inc/**
+    - mcu-mngr-interface/inc/**
   :support:
     - test/support
 
