@@ -7,9 +7,8 @@
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64",
             "includePath": [
-                "${workspaceFolder}/inc",
-                "${workspaceFolder}/src",
-                "${workspaceFolder}/hamming_codec"
+                "${workspaceFolder}/spi-interface/inc",
+                "${workspaceFolder}/hamming-codec/inc"
             ]
         }
     ],

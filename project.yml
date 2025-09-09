@@ -99,12 +99,14 @@
   :test:
     - +:test/**
     - -:test/support
+    - +:spi-interface/test/**
+    - +:hamming-codec/test/**
   :source:
-    - ./**
-    - src/**
+    - spi-interface/src/**
+    - hamming-codec/src/**
   :include:
-    - ./**
-    - inc/**
+    - spi-interface/inc/**
+    - hamming-codec/inc/**
   :support:
     - test/support
 
