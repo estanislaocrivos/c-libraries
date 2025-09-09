@@ -5,12 +5,12 @@
 
 /* ============================================================================================== */
 
-#include "support/unity.h"
+#include "../../test/support/unity.h"
 
 /* ============================================================================================== */
 
-#include "../spi/spi.h"
-#include "../spi/spi.c"
+#include "../inc/spi.h"
+#include "../src/spi.c"
 
 /* Mocked interfaces */
 #include "mock_spi_driver.h"

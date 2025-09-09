@@ -55,16 +55,7 @@ To build the libraries, you can run the following command in the root directory 
 ```bash
 mkdir -p build
 cd build
-cmake -DBUILD_DEMO=OFF ..
-make
-```
-
-To build the `main.c` file as a demo, you can run:
-
-```bash
-mkdir -p build
-cd build
-cmake -DBUILD_DEMO=ON ..
+cmake ..
 make
 ```
 
@@ -107,6 +98,20 @@ Or you may use the provided `generate-docs.sh` script, which will run Doxygen an
 ```bash
 ./generate-docs.sh
 ```
+
+## Adding a new library to the project
+
+To add a new library to the project, follow these steps:
+
+1. Create a new directory for your library in the root directory of the project. For example, if you want to add a library called `my_library`, create a directory called `my_library`.
+
+2. Inside the new directory, create two subdirectories: `src` for the source files and `inc` for the header files. You may also create a `test` directory for the unit tests files if needed.
+
+3. Add your source files to the `src` directory and your header files to the `inc` directory.
+
+4. Create a `CMakeLists.txt` file in the root directory of your library. This file should contain the necessary CMake commands to build your library. You can refer to the existing `CMakeLists.txt` files in other libraries for guidance.
+
+5. If you have unit tests, you must add the path to the new library inside the `project.yml`, under the `:paths:` section, so that Ceedling can find the library when running the tests. You may also add the new headers files path to the `vscode/c_cpp_properties.json` file for better IntelliSense support in Visual Studio Code.
 
 ## License
 

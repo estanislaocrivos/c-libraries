@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief This file contains the unit tests for the hamming_codec module.
+ * @brief This file contains the unit tests for the hamming-codec module.
  */
 
 /* ============================================================================================== */
@@ -13,12 +13,12 @@
 
 /* ============================================================================================== */
 
-#include "support/unity.h"
+#include "../../test/support/unity.h"
 
 /* ============================================================================================== */
 
-#include "../hamming_codec/hamming_codec.h"
-#include "../hamming_codec/hamming_codec.c"
+#include "../inc/hamming_codec.h"
+#include "../src/hamming_codec.c"
 
 /* ============================================================================================== */
 
