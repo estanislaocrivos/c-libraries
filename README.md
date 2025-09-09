@@ -101,25 +101,23 @@ Or you may use the provided `generate-docs.sh` script, which will run Doxygen an
 
 ## Adding a new library to the project
 
-To add a new library to the project, follow these steps:
+To add a new library to the project, you may use the `new-lib-template` folder as a template. Follow these steps:
 
-1. Create a new directory for your library in the root directory of the project. For example, if you want to add a library called `my_library`, create a directory called `my_library`.
+1. Copy the `new-lib-template` folder and rename it to your library name.
 
-2. Inside the new directory, create two subdirectories: `src` for the source files and `inc` for the header files. You may also create a `test` directory for the unit tests files if needed.
-
-3. Add your source files to the `src` directory and your header files to the `inc` directory.
-
-4. Create a `CMakeLists.txt` file in the root directory of your library. This file should contain the necessary CMake commands to build your library. You can refer to the existing `CMakeLists.txt` files in other libraries for guidance.
-
-5. If you have unit tests, you must add the path to the new library inside the `project.yml`, under the `:paths:` section, so that Ceedling can find the library when running the tests. You may also add the new headers files path to the `vscode/c_cpp_properties.json` file for better IntelliSense support in Visual Studio Code.
-
-6. Finally, update the root `CMakeLists.txt` file to include your new library. You can do this by adding the following line:
+2. Update the `CMakeLists.txt` file in the root directory of your library to match your library name and source files:
 
    ```cmake
    add_subdirectory(my_library)
    ```
 
-   Replace `my_library` with the name of your library directory.
+3. Add your source files to the `src` directory, your header files to the `inc` directory (if any), and your test files to the `test` directory (if any).
+
+4. Update the `CMakeLists.txt` file inside your library folder to include your source files, replacing the template library identifiers (`NEW_LIB_TEMPLATE_SOURCES` and `new-lib-template`) with the proper ones.
+
+5. If you added tests to the `test` directory, you must add the path to the new library inside the `project.yml`, under the `:paths:` section, so that Ceedling can find the library when running the tests.
+
+6. You may also add the new headers files path to the `vscode/c_cpp_properties.json` file for better IntelliSense support in Visual Studio Code.
 
 ## License
 
