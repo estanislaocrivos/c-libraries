@@ -139,3 +139,78 @@ void test_lcd_data_assert_seq(void)
 }
 
 /* ============================================================================================== */
+
+void test_lcd_send_nibble(void)
+{
+    mcu_manager_interface_t mcu_mngr = {0};
+    helper_mcu_mngr_init(&mcu_mngr);
+
+    lcd_t lcd;
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+
+    gpio2_set_pin_state_Expect(1);
+    gpio3_set_pin_state_Expect(0);
+    gpio4_set_pin_state_Expect(1);
+    gpio5_set_pin_state_Expect(0);
+    _lcd_send_nibble(&lcd, 0x05);
+}
+
+/* ============================================================================================== */
+
+void test_lcd_send_command(void)
+{
+    mcu_manager_interface_t mcu_mngr = {0};
+    helper_mcu_mngr_init(&mcu_mngr);
+
+    lcd_t lcd;
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+
+    gpio2_set_pin_state_Expect(1);
+    gpio3_set_pin_state_Expect(0);
+    gpio4_set_pin_state_Expect(1);
+    gpio5_set_pin_state_Expect(0);
+    gpio0_set_low_Expect();
+    gpio1_set_high_Expect();
+    delay_ms_ExpectAndReturn(10, 0);
+    gpio1_set_low_Expect();
+
+    gpio2_set_pin_state_Expect(1);
+    gpio3_set_pin_state_Expect(1);
+    gpio4_set_pin_state_Expect(1);
+    gpio5_set_pin_state_Expect(1);
+    gpio0_set_low_Expect();
+    gpio1_set_high_Expect();
+    delay_ms_ExpectAndReturn(10, 0);
+    gpio1_set_low_Expect();
+
+    _lcd_send_command(&lcd, 0x5F);
+}
+
+void test_lcd_send_char(void)
+{
+    mcu_manager_interface_t mcu_mngr = {0};
+    helper_mcu_mngr_init(&mcu_mngr);
+
+    lcd_t lcd;
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+
+    gpio2_set_pin_state_Expect(0);
+    gpio3_set_pin_state_Expect(0);
+    gpio4_set_pin_state_Expect(1);
+    gpio5_set_pin_state_Expect(0);
+    gpio0_set_high_Expect();
+    gpio1_set_high_Expect();
+    delay_ms_ExpectAndReturn(10, 0);
+    gpio1_set_low_Expect();
+
+    gpio2_set_pin_state_Expect(1);
+    gpio3_set_pin_state_Expect(0);
+    gpio4_set_pin_state_Expect(0);
+    gpio5_set_pin_state_Expect(0);
+    gpio0_set_high_Expect();
+    gpio1_set_high_Expect();
+    delay_ms_ExpectAndReturn(10, 0);
+    gpio1_set_low_Expect();
+
+    _lcd_send_char(&lcd, 'A');
+}
