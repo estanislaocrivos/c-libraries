@@ -8,10 +8,6 @@
 
 /* ============================================================================================== */
 
-#include "errno.h"
-
-/* ============================================================================================== */
-
 typedef void (*tmr_timeout_callback_t)(void);
 typedef int8_t (*tmr_set_timeout_t)(uint16_t);
 typedef void (*tmr_deact_timeout_t)(void);

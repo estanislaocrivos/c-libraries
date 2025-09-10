@@ -10,8 +10,18 @@
 
 /* ============================================================================================== */
 
+static interrupt_ctrl_interface_t fake_interrupt_ctrl;
+static timer_interface_t          fake_timer0;
+static led_interface_t            fake_led_0;
+static gpio_interface_t           fake_gpio_0;
+
 void helper_mcu_mngr_init(mcu_manager_interface_t* mcu_mngr)
 {
+    mcu_mngr->interrupt_ctrl = &fake_interrupt_ctrl;
+    mcu_mngr->timer0         = &fake_timer0;
+    mcu_mngr->led_0          = &fake_led_0;
+    mcu_mngr->gpio_0         = &fake_gpio_0;
+
     mcu_mngr->interrupt_ctrl->disable    = mcu_mngr_disable_interrupts;
     mcu_mngr->interrupt_ctrl->enable     = mcu_mngr_enable_interrupts;
     mcu_mngr->timer0->set_timeout        = mcu_mngr_tmr0_set_timeout_ms;
