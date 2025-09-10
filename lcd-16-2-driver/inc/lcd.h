@@ -14,6 +14,10 @@ typedef struct
     delay_interface_t*       delay;
     gpio_interface_t*        rs;
     gpio_interface_t*        en;
+    gpio_interface_t*        d0;
+    gpio_interface_t*        d1;
+    gpio_interface_t*        d2;
+    gpio_interface_t*        d3;
     gpio_interface_t*        d4;
     gpio_interface_t*        d5;
     gpio_interface_t*        d6;
@@ -22,7 +26,7 @@ typedef struct
 
 /* ============================================================================================== */
 
-int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr);
+int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr, bool eight_bit_mode);
 
 /* ============================================================================================== */
 

@@ -3,6 +3,7 @@
 /* ============================================================================================== */
 
 #include <stdio.h>
+#include <string.h>
 
 /* ============================================================================================== */
 
@@ -67,12 +68,13 @@ static void _lcd_send_char(lcd_t* self, char character)
 
 /* ============================================================================================== */
 
-int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr)
+int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr, bool eight_bit_mode)
 {
     if (self == NULL || mcu_mngr == NULL)
     {
         return -EFAULT;
     }
+    memset(self, 0, sizeof(lcd_t));
     self->_mcu_mngr = mcu_mngr;
     self->rs        = mcu_mngr->gpio_0;
     self->en        = mcu_mngr->gpio_1;
@@ -81,6 +83,13 @@ int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr)
     self->d6        = mcu_mngr->gpio_4;
     self->d7        = mcu_mngr->gpio_5;
     self->delay     = mcu_mngr->delay;
+    if (eight_bit_mode)
+    {
+        self->d0 = mcu_mngr->gpio_6;
+        self->d1 = mcu_mngr->gpio_7;
+        self->d2 = mcu_mngr->gpio_8;
+        self->d3 = mcu_mngr->gpio_9;
+    }
     return 0;
 }
 

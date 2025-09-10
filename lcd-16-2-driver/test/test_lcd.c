@@ -70,7 +70,7 @@ void test_lcd_creation(void)
     helper_mcu_mngr_init(&mcu_mngr);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
 
     TEST_ASSERT_EQUAL_PTR(gpio0_set_high, lcd.rs->set_high);
     TEST_ASSERT_EQUAL_PTR(gpio1_set_high, lcd.en->set_high);
@@ -112,7 +112,7 @@ void test_lcd_command_assert_seq(void)
     helper_mcu_mngr_init(&mcu_mngr);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
 
     gpio0_set_low_Expect();
     gpio1_set_high_Expect();
@@ -129,7 +129,7 @@ void test_lcd_data_assert_seq(void)
     helper_mcu_mngr_init(&mcu_mngr);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
 
     gpio0_set_high_Expect();
     gpio1_set_high_Expect();
@@ -146,7 +146,7 @@ void test_lcd_send_nibble(void)
     helper_mcu_mngr_init(&mcu_mngr);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
 
     gpio2_set_pin_state_Expect(1);
     gpio3_set_pin_state_Expect(0);
@@ -163,7 +163,7 @@ void test_lcd_send_command(void)
     helper_mcu_mngr_init(&mcu_mngr);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
 
     gpio2_set_pin_state_Expect(1);
     gpio3_set_pin_state_Expect(0);
@@ -186,13 +186,15 @@ void test_lcd_send_command(void)
     _lcd_send_command(&lcd, 0x5F);
 }
 
+/* ============================================================================================== */
+
 void test_lcd_send_char(void)
 {
     mcu_manager_interface_t mcu_mngr = {0};
     helper_mcu_mngr_init(&mcu_mngr);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr));
+    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
 
     gpio2_set_pin_state_Expect(0);
     gpio3_set_pin_state_Expect(0);
@@ -214,3 +216,5 @@ void test_lcd_send_char(void)
 
     _lcd_send_char(&lcd, 'A');
 }
+
+/* ============================================================================================== */
