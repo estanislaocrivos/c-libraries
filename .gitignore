@@ -3,3 +3,4 @@ docs/
 .cache/
 deploy.sh
 checkers.txt
+build.sh

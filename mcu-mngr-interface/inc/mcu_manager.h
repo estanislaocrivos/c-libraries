@@ -8,6 +8,8 @@
 
 /* ============================================================================================== */
 
+typedef int8_t (*delay_ms_t)(uint16_t);
+typedef int8_t (*delay_us_t)(uint16_t);
 typedef void (*tmr_timeout_callback_t)(void);
 typedef int8_t (*tmr_set_timeout_t)(uint16_t);
 typedef void (*tmr_deact_timeout_t)(void);
@@ -18,8 +20,8 @@ typedef void (*led_off_t)(void);
 typedef void (*led_toggle_t)(void);
 typedef void (*gpio_high_t)(void);
 typedef void (*gpio_low_t)(void);
-typedef void (*gpio_set_state_t)(uint8_t, bool);
-typedef void (*gpio_get_state_t)(uint8_t, bool*);
+typedef void (*gpio_set_state_t)(bool);
+typedef void (*gpio_get_state_t)(bool*);
 typedef void (*gpio_toggle_t)(void);
 typedef void (*disable_interrupts_t)(void);
 typedef void (*enable_interrupts_t)(void);
@@ -39,6 +41,12 @@ typedef struct
     tmr_deact_timeout_t        deactivate_timeout;
     tmr_set_timeout_callback_t set_callback;
 } timer_interface_t;
+
+typedef struct
+{
+    delay_ms_t set_ms;
+    delay_us_t set_us;
+} delay_interface_t;
 
 typedef struct
 {
@@ -65,6 +73,7 @@ typedef struct
     timer_interface_t*          timer1;
     timer_interface_t*          timer2;
     timer_interface_t*          timer3;
+    delay_interface_t*          delay;
     led_interface_t*            led_0;
     led_interface_t*            led_1;
     led_interface_t*            led_2;
