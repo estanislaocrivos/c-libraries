@@ -3,7 +3,7 @@
 
 /* Definition of the error codes returned by all functions/methods across the project */
 
-#define EACCESS   1 /* Permission denied */
+#define EACCES    1 /* Permission denied */
 #define EIO       2 /* Input/output error */
 #define ENOENT    3 /* Resource not found */
 #define EAGAIN    4 /* Resource temporarily unavailable */
