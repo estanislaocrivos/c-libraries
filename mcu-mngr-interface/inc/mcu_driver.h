@@ -3,6 +3,10 @@
 
 /* ============================================================================================== */
 
+/* Mock driver functions for unit testing the mcu manager interface */
+
+/* ============================================================================================== */
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -12,62 +16,95 @@
 
 /* ============================================================================================== */
 
-#define GPIO1 1
-#define GPIO2 2
-#define GPIO3 3
-#define GPIO4 4
+void led_toggle(void);
+
+void led_turn_on(void);
+
+void led_turn_off(void);
+
+/* ============================================================================================== */
+
+void disable_interrupts(void);
+
+void enable_interrupts(void);
 
 /* ============================================================================================== */
 
 typedef void (*mcu_tmr_timeout_callback_t)(void);
 
-/* ============================================================================================== */
+int8_t tmr0_set_timeout_callback(mcu_tmr_timeout_callback_t callback);
 
-void mcu_mngr_initialize(void);
+void tmr0_deactivate_timeout(void);
 
-/* ============================================================================================== */
+void tmr0_reset_timeout(void);
 
-void mcu_mngr_set_pin_state(bool state);
-
-/* ============================================================================================== */
-
-void mcu_mngr_get_pin_state(bool* state);
+int8_t tmr0_set_timeout_ms(uint16_t timeout_ms);
 
 /* ============================================================================================== */
 
-void mcu_mngr_led_toggle(void);
+void gpio0_set_high(void);
+
+void gpio0_set_low(void);
+
+void gpio0_set_pin_state(bool state);
+
+void gpio0_get_pin_state(bool* state);
 
 /* ============================================================================================== */
 
-void mcu_mngr_led_turn_on(void);
+void gpio1_set_high(void);
+
+void gpio1_set_low(void);
+
+void gpio1_set_pin_state(bool state);
+
+void gpio1_get_pin_state(bool* state);
 
 /* ============================================================================================== */
 
-void mcu_mngr_led_turn_off(void);
+void gpio2_set_high(void);
+
+void gpio2_set_low(void);
+
+void gpio2_set_pin_state(bool state);
+
+void gpio2_get_pin_state(bool* state);
 
 /* ============================================================================================== */
 
-void mcu_mngr_disable_interrupts(void);
+void gpio3_set_high(void);
+
+void gpio3_set_low(void);
+
+void gpio3_set_pin_state(bool state);
+
+void gpio3_get_pin_state(bool* state);
 
 /* ============================================================================================== */
 
-void mcu_mngr_enable_interrupts(void);
+void gpio4_set_high(void);
+
+void gpio4_set_low(void);
+
+void gpio4_set_pin_state(bool state);
+
+void gpio4_get_pin_state(bool* state);
 
 /* ============================================================================================== */
 
-int8_t mcu_mngr_tmr0_set_timeout_callback(mcu_tmr_timeout_callback_t callback);
+void gpio5_set_high(void);
+
+void gpio5_set_low(void);
+
+void gpio5_set_pin_state(bool state);
+
+void gpio5_get_pin_state(bool* state);
 
 /* ============================================================================================== */
 
-void mcu_mngr_tmr0_deactivate_timeout(void);
+int8_t delay_ms(uint16_t ms);
 
-/* ============================================================================================== */
-
-void mcu_mngr_tmr0_reset_timeout(void);
-
-/* ============================================================================================== */
-
-int8_t mcu_mngr_tmr0_set_timeout_ms(uint16_t timeout_ms);
+int8_t delay_us(uint16_t us);
 
 /* ============================================================================================== */
 

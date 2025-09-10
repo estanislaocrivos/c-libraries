@@ -80,6 +80,7 @@ int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr)
     self->d5        = mcu_mngr->gpio_3;
     self->d6        = mcu_mngr->gpio_4;
     self->d7        = mcu_mngr->gpio_5;
+    self->delay     = mcu_mngr->delay;
     return 0;
 }
 
