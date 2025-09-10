@@ -5,6 +5,6 @@ project(common-c-libs
     DESCRIPTION "Common portable C libraries module"
 )
 
-# Add modules/libraries
-add_subdirectory(hamming-codec hamming_codec.c)
-add_subdirectory(spi-interface spi.c)
+add_subdirectory(hamming-codec)
+add_subdirectory(spi-interface)
+add_subdirectory(mcu-mngr-interface)

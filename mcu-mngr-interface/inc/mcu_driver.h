@@ -27,11 +27,11 @@ void mcu_mngr_initialize(void);
 
 /* ============================================================================================== */
 
-void mcu_mngr_set_pin_state(uint8_t pin, bool state);
+void mcu_mngr_set_pin_state(bool state);
 
 /* ============================================================================================== */
 
-void mcu_mngr_get_pin_state(uint8_t pin, bool* state);
+void mcu_mngr_get_pin_state(bool* state);
 
 /* ============================================================================================== */
 
