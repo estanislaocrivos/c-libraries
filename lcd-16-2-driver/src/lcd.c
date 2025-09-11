@@ -7,43 +7,32 @@
 
 /* ============================================================================================== */
 
-/*
-GPIO-0 => PB7 => RS
-GPIO-1 => PB6 => EN
-GPIO-2 => PB5 => D4
-GPIO-3 => PB4 => D5
-GPIO-4 => PH6 => D6
-GPIO-5 => PH5 => D7
-*/
-
-/* ============================================================================================== */
-
 static void _lcd_command_assert_seq(lcd_t* self)
 {
-    self->rs->set_low();
-    self->en->set_high();
+    self->bus->rs.set_state(false);
+    self->bus->en.set_state(true);
     self->delay->set_ms(10);
-    self->en->set_low();
+    self->bus->en.set_state(false);
 }
 
 /* ============================================================================================== */
 
 static void _lcd_data_assert_seq(lcd_t* self)
 {
-    self->rs->set_high();
-    self->en->set_high();
+    self->bus->rs.set_state(true);
+    self->bus->en.set_state(true);
     self->delay->set_ms(10);
-    self->en->set_low();
+    self->bus->en.set_state(false);
 }
 
 /* ============================================================================================== */
 
 static void _lcd_send_nibble(lcd_t* self, uint8_t nibble)
 {
-    self->d4->set_state((nibble >> 0) & 0x01);
-    self->d5->set_state((nibble >> 1) & 0x01);
-    self->d6->set_state((nibble >> 2) & 0x01);
-    self->d7->set_state((nibble >> 3) & 0x01);
+    self->bus->d4.set_state((nibble >> 0) & 0x01);
+    self->bus->d5.set_state((nibble >> 1) & 0x01);
+    self->bus->d6.set_state((nibble >> 2) & 0x01);
+    self->bus->d7.set_state((nibble >> 3) & 0x01);
 }
 
 /* ============================================================================================== */
@@ -68,28 +57,15 @@ static void _lcd_send_char(lcd_t* self, char character)
 
 /* ============================================================================================== */
 
-int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr, bool eight_bit_mode)
+int8_t lcd_create(lcd_t* self, bool eight_bit_mode)
 {
-    if (self == NULL || mcu_mngr == NULL)
+    if (self == NULL)
     {
         return -EFAULT;
     }
     memset(self, 0, sizeof(lcd_t));
-    self->_mcu_mngr = mcu_mngr;
-    self->rs        = mcu_mngr->gpio_0;
-    self->en        = mcu_mngr->gpio_1;
-    self->d4        = mcu_mngr->gpio_2;
-    self->d5        = mcu_mngr->gpio_3;
-    self->d6        = mcu_mngr->gpio_4;
-    self->d7        = mcu_mngr->gpio_5;
-    self->delay     = mcu_mngr->delay;
-    if (eight_bit_mode)
-    {
-        self->d0 = mcu_mngr->gpio_6;
-        self->d1 = mcu_mngr->gpio_7;
-        self->d2 = mcu_mngr->gpio_8;
-        self->d3 = mcu_mngr->gpio_9;
-    }
+    self->initialized    = false;
+    self->eight_bit_mode = eight_bit_mode;
     return 0;
 }
 
@@ -101,8 +77,10 @@ int8_t lcd_initialize(lcd_t* self)
     {
         return -EFAULT;
     }
-    self->rs->set_low();
-    self->en->set_low();
+    self->initialized = true;
+
+    self->bus->rs.set_state(false);
+    self->bus->en.set_state(false);
 
     /* Init. routine. First send only nibbles (4-bit mode not active yet) */
     _lcd_send_nibble(self, 0x03);

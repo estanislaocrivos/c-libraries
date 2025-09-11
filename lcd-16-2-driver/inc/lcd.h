@@ -10,23 +10,29 @@
 
 typedef struct
 {
-    mcu_manager_interface_t* _mcu_mngr;
-    delay_interface_t*       delay;
-    gpio_interface_t*        rs;
-    gpio_interface_t*        en;
-    gpio_interface_t*        d0;
-    gpio_interface_t*        d1;
-    gpio_interface_t*        d2;
-    gpio_interface_t*        d3;
-    gpio_interface_t*        d4;
-    gpio_interface_t*        d5;
-    gpio_interface_t*        d6;
-    gpio_interface_t*        d7;
+    gpio_interface_t rs;
+    gpio_interface_t en;
+    gpio_interface_t d0;
+    gpio_interface_t d1;
+    gpio_interface_t d2;
+    gpio_interface_t d3;
+    gpio_interface_t d4;
+    gpio_interface_t d5;
+    gpio_interface_t d6;
+    gpio_interface_t d7;
+} lcd_bus_interface_t;
+
+typedef struct
+{
+    bool                 initialized;
+    bool                 eight_bit_mode;
+    delay_interface_t*   delay;
+    lcd_bus_interface_t* bus;
 } lcd_t;
 
 /* ============================================================================================== */
 
-int8_t lcd_create(lcd_t* self, mcu_manager_interface_t* mcu_mngr, bool eight_bit_mode);
+int8_t lcd_create(lcd_t* self, bool eight_bit_mode);
 
 /* ============================================================================================== */
 
@@ -46,4 +52,4 @@ int8_t lcd_print_string(lcd_t* self, char* string);
 
 /* ============================================================================================== */
 
-#endif
+#endif  // LCD_H
