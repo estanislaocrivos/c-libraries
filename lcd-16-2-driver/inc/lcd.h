@@ -24,15 +24,20 @@ typedef struct
 
 typedef struct
 {
-    bool                 initialized;
-    bool                 eight_bit_mode;
-    delay_interface_t*   delay;
     lcd_bus_interface_t* bus;
+    delay_interface_t*   delay;
+} lcd_interface_t;
+
+typedef struct
+{
+    bool             initialized;
+    bool             eight_bit_mode;
+    lcd_interface_t* iface;
 } lcd_t;
 
 /* ============================================================================================== */
 
-int8_t lcd_create(lcd_t* self, bool eight_bit_mode);
+int8_t lcd_create(lcd_t* self, lcd_interface_t* iface, bool eight_bit_mode);
 
 /* ============================================================================================== */
 
