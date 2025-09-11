@@ -114,7 +114,7 @@ int8_t lcd_initialize(lcd_t* self)
 
 /* ============================================================================================== */
 
-int8_t lcd_go_to_index(lcd_t* self, uint8_t x, uint8_t y)
+int8_t lcd_go_to_index(const lcd_t* self, uint8_t x, uint8_t y)
 {
     if (self == NULL)
     {
@@ -131,7 +131,7 @@ int8_t lcd_go_to_index(lcd_t* self, uint8_t x, uint8_t y)
 
 /* ============================================================================================== */
 
-int8_t lcd_clear_display(lcd_t* self)
+int8_t lcd_clear_display(const lcd_t* self)
 {
     if (self == NULL)
     {
@@ -143,7 +143,7 @@ int8_t lcd_clear_display(lcd_t* self)
 
 /* ============================================================================================== */
 
-int8_t lcd_print_string(lcd_t* self, char* string)
+int8_t lcd_print_string(const lcd_t* self, char* string)
 {
     if (self == NULL || string == NULL)
     {
