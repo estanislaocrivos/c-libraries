@@ -31,8 +31,8 @@ void helper_mcu_mngr_init(mcu_manager_interface_t* mcu_mngr)
     mcu_mngr->led_0->on                  = led_turn_on;
     mcu_mngr->led_0->off                 = led_turn_off;
     mcu_mngr->led_0->toggle              = led_toggle;
-    mcu_mngr->gpio_0->set_state          = gpio0_set_pin_state;
-    mcu_mngr->gpio_0->get_state          = gpio0_get_pin_state;
+    mcu_mngr->gpio_0->set_state          = gpio0_set_state;
+    mcu_mngr->gpio_0->get_state          = gpio0_get_state;
 }
 
 /* ============================================================================================== */
@@ -50,8 +50,8 @@ void test_mcu_mngr_creation(void)
     TEST_ASSERT_EQUAL_PTR(led_turn_on, mcu_mngr.led_0->on);
     TEST_ASSERT_EQUAL_PTR(led_turn_off, mcu_mngr.led_0->off);
     TEST_ASSERT_EQUAL_PTR(led_toggle, mcu_mngr.led_0->toggle);
-    TEST_ASSERT_EQUAL_PTR(gpio0_set_pin_state, mcu_mngr.gpio_0->set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio0_get_pin_state, mcu_mngr.gpio_0->get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio0_set_state, mcu_mngr.gpio_0->set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio0_get_state, mcu_mngr.gpio_0->get_state);
 }
 
 /* ============================================================================================== */
