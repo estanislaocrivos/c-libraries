@@ -59,11 +59,11 @@ static void _lcd_send_char(const lcd_t* self, char character)
 
 int8_t lcd_create(lcd_t* self, lcd_interface_t* iface, bool eight_bit_mode)
 {
-    if (self == NULL)
+    if (self == NULL || iface == NULL)
     {
         return -EFAULT;
     }
-    memset(self, 0, sizeof(lcd_t));
+    self->iface          = iface;
     self->initialized    = false;
     self->eight_bit_mode = eight_bit_mode;
     return 0;
@@ -73,12 +73,11 @@ int8_t lcd_create(lcd_t* self, lcd_interface_t* iface, bool eight_bit_mode)
 
 int8_t lcd_initialize(lcd_t* self)
 {
-    if (self == NULL)
+    if (self == NULL || self->iface == NULL)
     {
         return -EFAULT;
     }
     self->initialized = true;
-
     self->iface->bus->rs.set_state(false);
     self->iface->bus->en.set_state(false);
 
@@ -116,13 +115,17 @@ int8_t lcd_initialize(lcd_t* self)
 
 int8_t lcd_go_to_index(const lcd_t* self, uint8_t x, uint8_t y)
 {
-    if (self == NULL)
+    if (self == NULL || self->iface == NULL)
     {
         return -EFAULT;
     }
     if (x > 15 || y > 1)
     {
         return -EINVAL;
+    }
+    if (!self->initialized)
+    {
+        return -ENOENT;
     }
     const uint8_t start[] = {0x80, 0x80 | 0xC0};
     _lcd_send_command(self, start[y] + x);
@@ -133,9 +136,13 @@ int8_t lcd_go_to_index(const lcd_t* self, uint8_t x, uint8_t y)
 
 int8_t lcd_clear_display(const lcd_t* self)
 {
-    if (self == NULL)
+    if (self == NULL || self->iface == NULL)
     {
         return -EFAULT;
+    }
+    if (!self->initialized)
+    {
+        return -ENOENT;
     }
     _lcd_send_command(self, 0x01);
     return 0;
@@ -145,9 +152,13 @@ int8_t lcd_clear_display(const lcd_t* self)
 
 int8_t lcd_print_string(const lcd_t* self, char* string)
 {
-    if (self == NULL || string == NULL)
+    if (self == NULL || self->iface == NULL || string == NULL)
     {
         return -EFAULT;
+    }
+    if (!self->initialized)
+    {
+        return -ENOENT;
     }
     uint8_t char_index = 0;
     lcd_clear_display(self);
