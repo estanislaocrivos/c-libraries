@@ -46,9 +46,9 @@ void gpio0_set_high(void);
 
 void gpio0_set_low(void);
 
-void gpio0_set_pin_state(bool state);
+void gpio0_set_state(bool state);
 
-void gpio0_get_pin_state(bool* state);
+void gpio0_get_state(bool* state);
 
 /* ============================================================================================== */
 
@@ -56,9 +56,9 @@ void gpio1_set_high(void);
 
 void gpio1_set_low(void);
 
-void gpio1_set_pin_state(bool state);
+void gpio1_set_state(bool state);
 
-void gpio1_get_pin_state(bool* state);
+void gpio1_get_state(bool* state);
 
 /* ============================================================================================== */
 
@@ -66,9 +66,9 @@ void gpio2_set_high(void);
 
 void gpio2_set_low(void);
 
-void gpio2_set_pin_state(bool state);
+void gpio2_set_state(bool state);
 
-void gpio2_get_pin_state(bool* state);
+void gpio2_get_state(bool* state);
 
 /* ============================================================================================== */
 
@@ -76,9 +76,9 @@ void gpio3_set_high(void);
 
 void gpio3_set_low(void);
 
-void gpio3_set_pin_state(bool state);
+void gpio3_set_state(bool state);
 
-void gpio3_get_pin_state(bool* state);
+void gpio3_get_state(bool* state);
 
 /* ============================================================================================== */
 
@@ -86,9 +86,9 @@ void gpio4_set_high(void);
 
 void gpio4_set_low(void);
 
-void gpio4_set_pin_state(bool state);
+void gpio4_set_state(bool state);
 
-void gpio4_get_pin_state(bool* state);
+void gpio4_get_state(bool* state);
 
 /* ============================================================================================== */
 
@@ -96,9 +96,49 @@ void gpio5_set_high(void);
 
 void gpio5_set_low(void);
 
-void gpio5_set_pin_state(bool state);
+void gpio5_set_state(bool state);
 
-void gpio5_get_pin_state(bool* state);
+void gpio5_get_state(bool* state);
+
+/* ============================================================================================== */
+
+void gpio6_set_high(void);
+
+void gpio6_set_low(void);
+
+void gpio6_set_state(bool state);
+
+void gpio6_get_state(bool* state);
+
+/* ============================================================================================== */
+
+void gpio7_set_high(void);
+
+void gpio7_set_low(void);
+
+void gpio7_set_state(bool state);
+
+void gpio7_get_state(bool* state);
+
+/* ============================================================================================== */
+
+void gpio8_set_high(void);
+
+void gpio8_set_low(void);
+
+void gpio8_set_state(bool state);
+
+void gpio8_get_state(bool* state);
+
+/* ============================================================================================== */
+
+void gpio9_set_high(void);
+
+void gpio9_set_low(void);
+
+void gpio9_set_state(bool state);
+
+void gpio9_get_state(bool* state);
 
 /* ============================================================================================== */
 

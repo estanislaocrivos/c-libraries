@@ -2,6 +2,8 @@
 
 /* ============================================================================================== */
 
+#include <string.h>
+
 #include "../inc/lcd.h"
 #include "../src/lcd.c"
 
@@ -10,114 +12,93 @@
 
 /* ============================================================================================== */
 
-static delay_interface_t fake_delay;
-static gpio_interface_t  fake_gpio_0;
-static gpio_interface_t  fake_gpio_1;
-static gpio_interface_t  fake_gpio_2;
-static gpio_interface_t  fake_gpio_3;
-static gpio_interface_t  fake_gpio_4;
-static gpio_interface_t  fake_gpio_5;
-
-void helper_mcu_mngr_init(mcu_manager_interface_t* mcu_mngr)
+void helper_lcd_init(lcd_bus_interface_t* lcd_bus,
+                     delay_interface_t*   lcd_delay,
+                     lcd_interface_t*     lcd_iface)
 {
-    mcu_mngr->delay  = &fake_delay;
-    mcu_mngr->gpio_0 = &fake_gpio_0;
-    mcu_mngr->gpio_1 = &fake_gpio_1;
-    mcu_mngr->gpio_2 = &fake_gpio_2;
-    mcu_mngr->gpio_3 = &fake_gpio_3;
-    mcu_mngr->gpio_4 = &fake_gpio_4;
-    mcu_mngr->gpio_5 = &fake_gpio_5;
+    memset(lcd_bus, 0, sizeof(lcd_bus_interface_t));
+    memset(lcd_delay, 0, sizeof(delay_interface_t));
+    memset(lcd_iface, 0, sizeof(lcd_interface_t));
+    lcd_bus->rs.set_state = gpio0_set_state;
+    lcd_bus->rs.get_state = gpio0_get_state;
+    lcd_bus->en.set_state = gpio1_set_state;
+    lcd_bus->en.get_state = gpio1_get_state;
+    lcd_bus->d0.set_state = gpio6_set_state;
+    lcd_bus->d0.get_state = gpio6_get_state;
+    lcd_bus->d1.set_state = gpio7_set_state;
+    lcd_bus->d1.get_state = gpio7_get_state;
+    lcd_bus->d2.set_state = gpio8_set_state;
+    lcd_bus->d2.get_state = gpio8_get_state;
+    lcd_bus->d3.set_state = gpio9_set_state;
+    lcd_bus->d3.get_state = gpio9_get_state;
+    lcd_bus->d4.set_state = gpio2_set_state;
+    lcd_bus->d4.get_state = gpio2_get_state;
+    lcd_bus->d5.set_state = gpio3_set_state;
+    lcd_bus->d5.get_state = gpio3_get_state;
+    lcd_bus->d6.set_state = gpio4_set_state;
+    lcd_bus->d6.get_state = gpio4_get_state;
+    lcd_bus->d7.set_state = gpio5_set_state;
+    lcd_bus->d7.get_state = gpio5_get_state;
+    lcd_delay->set_ms     = delay_ms;
+    lcd_delay->set_us     = delay_us;
 
-    mcu_mngr->gpio_0->set_high  = gpio0_set_high;
-    mcu_mngr->gpio_0->set_low   = gpio0_set_low;
-    mcu_mngr->gpio_0->set_state = gpio0_set_pin_state;
-    mcu_mngr->gpio_0->get_state = gpio0_get_pin_state;
-
-    mcu_mngr->gpio_1->set_high  = gpio1_set_high;
-    mcu_mngr->gpio_1->set_low   = gpio1_set_low;
-    mcu_mngr->gpio_1->set_state = gpio1_set_pin_state;
-    mcu_mngr->gpio_1->get_state = gpio1_get_pin_state;
-
-    mcu_mngr->gpio_2->set_high  = gpio2_set_high;
-    mcu_mngr->gpio_2->set_low   = gpio2_set_low;
-    mcu_mngr->gpio_2->set_state = gpio2_set_pin_state;
-    mcu_mngr->gpio_2->get_state = gpio2_get_pin_state;
-
-    mcu_mngr->gpio_3->set_high  = gpio3_set_high;
-    mcu_mngr->gpio_3->set_low   = gpio3_set_low;
-    mcu_mngr->gpio_3->set_state = gpio3_set_pin_state;
-    mcu_mngr->gpio_3->get_state = gpio3_get_pin_state;
-
-    mcu_mngr->gpio_4->set_high  = gpio4_set_high;
-    mcu_mngr->gpio_4->set_low   = gpio4_set_low;
-    mcu_mngr->gpio_4->set_state = gpio4_set_pin_state;
-    mcu_mngr->gpio_4->get_state = gpio4_get_pin_state;
-
-    mcu_mngr->gpio_5->set_high  = gpio5_set_high;
-    mcu_mngr->gpio_5->set_low   = gpio5_set_low;
-    mcu_mngr->gpio_5->set_state = gpio5_set_pin_state;
-    mcu_mngr->gpio_5->get_state = gpio5_get_pin_state;
-
-    mcu_mngr->delay->set_ms = delay_ms;
-    mcu_mngr->delay->set_us = delay_us;
+    lcd_iface->bus   = lcd_bus;
+    lcd_iface->delay = lcd_delay;
 }
 
 /* ============================================================================================== */
 
 void test_lcd_creation(void)
 {
-    mcu_manager_interface_t mcu_mngr = {0};
-    helper_mcu_mngr_init(&mcu_mngr);
+    lcd_bus_interface_t lcd_bus;
+    delay_interface_t   lcd_delay;
+    lcd_interface_t     lcd_iface;
+    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
+    lcd_create(&lcd, &lcd_iface, false);
 
-    TEST_ASSERT_EQUAL_PTR(gpio0_set_high, lcd.rs->set_high);
-    TEST_ASSERT_EQUAL_PTR(gpio1_set_high, lcd.en->set_high);
-    TEST_ASSERT_EQUAL_PTR(gpio2_set_high, lcd.d4->set_high);
-    TEST_ASSERT_EQUAL_PTR(gpio3_set_high, lcd.d5->set_high);
-    TEST_ASSERT_EQUAL_PTR(gpio4_set_high, lcd.d6->set_high);
-    TEST_ASSERT_EQUAL_PTR(gpio5_set_high, lcd.d7->set_high);
+    TEST_ASSERT_EQUAL_PTR(gpio0_set_state, lcd.iface->bus->rs.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio1_set_state, lcd.iface->bus->en.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio2_set_state, lcd.iface->bus->d4.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio3_set_state, lcd.iface->bus->d5.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio4_set_state, lcd.iface->bus->d6.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio5_set_state, lcd.iface->bus->d7.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio6_set_state, lcd.iface->bus->d0.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio7_set_state, lcd.iface->bus->d1.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio8_set_state, lcd.iface->bus->d2.set_state);
+    TEST_ASSERT_EQUAL_PTR(gpio9_set_state, lcd.iface->bus->d3.set_state);
 
-    TEST_ASSERT_EQUAL_PTR(gpio0_set_low, lcd.rs->set_low);
-    TEST_ASSERT_EQUAL_PTR(gpio1_set_low, lcd.en->set_low);
-    TEST_ASSERT_EQUAL_PTR(gpio2_set_low, lcd.d4->set_low);
-    TEST_ASSERT_EQUAL_PTR(gpio3_set_low, lcd.d5->set_low);
-    TEST_ASSERT_EQUAL_PTR(gpio4_set_low, lcd.d6->set_low);
-    TEST_ASSERT_EQUAL_PTR(gpio5_set_low, lcd.d7->set_low);
-
-    TEST_ASSERT_EQUAL_PTR(gpio0_set_pin_state, lcd.rs->set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio1_set_pin_state, lcd.en->set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio2_set_pin_state, lcd.d4->set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio3_set_pin_state, lcd.d5->set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio4_set_pin_state, lcd.d6->set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio5_set_pin_state, lcd.d7->set_state);
-
-    TEST_ASSERT_EQUAL_PTR(gpio0_get_pin_state, lcd.rs->get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio1_get_pin_state, lcd.en->get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio2_get_pin_state, lcd.d4->get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio3_get_pin_state, lcd.d5->get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio4_get_pin_state, lcd.d6->get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio5_get_pin_state, lcd.d7->get_state);
-
-    TEST_ASSERT_EQUAL_PTR(delay_ms, lcd.delay->set_ms);
-    TEST_ASSERT_EQUAL_PTR(delay_us, lcd.delay->set_us);
+    TEST_ASSERT_EQUAL_PTR(gpio0_get_state, lcd.iface->bus->rs.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio1_get_state, lcd.iface->bus->en.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio2_get_state, lcd.iface->bus->d4.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio3_get_state, lcd.iface->bus->d5.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio4_get_state, lcd.iface->bus->d6.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio5_get_state, lcd.iface->bus->d7.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio6_get_state, lcd.iface->bus->d0.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio7_get_state, lcd.iface->bus->d1.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio8_get_state, lcd.iface->bus->d2.get_state);
+    TEST_ASSERT_EQUAL_PTR(gpio9_get_state, lcd.iface->bus->d3.get_state);
+    TEST_ASSERT_EQUAL_PTR(delay_ms, lcd.iface->delay->set_ms);
+    TEST_ASSERT_EQUAL_PTR(delay_us, lcd.iface->delay->set_us);
 }
 
 /* ============================================================================================== */
 
 void test_lcd_command_assert_seq(void)
 {
-    mcu_manager_interface_t mcu_mngr = {0};
-    helper_mcu_mngr_init(&mcu_mngr);
+    lcd_bus_interface_t lcd_bus;
+    delay_interface_t   lcd_delay;
+    lcd_interface_t     lcd_iface;
+    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
+    lcd_create(&lcd, &lcd_iface, false);
 
-    gpio0_set_low_Expect();
-    gpio1_set_high_Expect();
+    gpio0_set_state_Expect(false);
+    gpio1_set_state_Expect(true);
     delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_low_Expect();
+    gpio1_set_state_Expect(false);
     _lcd_command_assert_seq(&lcd);
 }
 
@@ -125,16 +106,18 @@ void test_lcd_command_assert_seq(void)
 
 void test_lcd_data_assert_seq(void)
 {
-    mcu_manager_interface_t mcu_mngr = {0};
-    helper_mcu_mngr_init(&mcu_mngr);
+    lcd_bus_interface_t lcd_bus;
+    delay_interface_t   lcd_delay;
+    lcd_interface_t     lcd_iface;
+    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
+    lcd_create(&lcd, &lcd_iface, false);
 
-    gpio0_set_high_Expect();
-    gpio1_set_high_Expect();
+    gpio0_set_state_Expect(true);
+    gpio1_set_state_Expect(true);
     delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_low_Expect();
+    gpio1_set_state_Expect(false);
     _lcd_data_assert_seq(&lcd);
 }
 
@@ -142,16 +125,18 @@ void test_lcd_data_assert_seq(void)
 
 void test_lcd_send_nibble(void)
 {
-    mcu_manager_interface_t mcu_mngr = {0};
-    helper_mcu_mngr_init(&mcu_mngr);
+    lcd_bus_interface_t lcd_bus;
+    delay_interface_t   lcd_delay;
+    lcd_interface_t     lcd_iface;
+    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
+    lcd_create(&lcd, &lcd_iface, false);
 
-    gpio2_set_pin_state_Expect(1);
-    gpio3_set_pin_state_Expect(0);
-    gpio4_set_pin_state_Expect(1);
-    gpio5_set_pin_state_Expect(0);
+    gpio2_set_state_Expect(1);
+    gpio3_set_state_Expect(0);
+    gpio4_set_state_Expect(1);
+    gpio5_set_state_Expect(0);
     _lcd_send_nibble(&lcd, 0x05);
 }
 
@@ -159,29 +144,31 @@ void test_lcd_send_nibble(void)
 
 void test_lcd_send_command(void)
 {
-    mcu_manager_interface_t mcu_mngr = {0};
-    helper_mcu_mngr_init(&mcu_mngr);
+    lcd_bus_interface_t lcd_bus;
+    delay_interface_t   lcd_delay;
+    lcd_interface_t     lcd_iface;
+    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
+    lcd_create(&lcd, &lcd_iface, false);
 
-    gpio2_set_pin_state_Expect(1);
-    gpio3_set_pin_state_Expect(0);
-    gpio4_set_pin_state_Expect(1);
-    gpio5_set_pin_state_Expect(0);
-    gpio0_set_low_Expect();
-    gpio1_set_high_Expect();
+    gpio2_set_state_Expect(1);
+    gpio3_set_state_Expect(0);
+    gpio4_set_state_Expect(1);
+    gpio5_set_state_Expect(0);
+    gpio0_set_state_Expect(false);
+    gpio1_set_state_Expect(true);
     delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_low_Expect();
+    gpio1_set_state_Expect(false);
 
-    gpio2_set_pin_state_Expect(1);
-    gpio3_set_pin_state_Expect(1);
-    gpio4_set_pin_state_Expect(1);
-    gpio5_set_pin_state_Expect(1);
-    gpio0_set_low_Expect();
-    gpio1_set_high_Expect();
+    gpio2_set_state_Expect(1);
+    gpio3_set_state_Expect(1);
+    gpio4_set_state_Expect(1);
+    gpio5_set_state_Expect(1);
+    gpio0_set_state_Expect(false);
+    gpio1_set_state_Expect(true);
     delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_low_Expect();
+    gpio1_set_state_Expect(false);
 
     _lcd_send_command(&lcd, 0x5F);
 }
@@ -190,29 +177,31 @@ void test_lcd_send_command(void)
 
 void test_lcd_send_char(void)
 {
-    mcu_manager_interface_t mcu_mngr = {0};
-    helper_mcu_mngr_init(&mcu_mngr);
+    lcd_bus_interface_t lcd_bus;
+    delay_interface_t   lcd_delay;
+    lcd_interface_t     lcd_iface;
+    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
 
     lcd_t lcd;
-    TEST_ASSERT_EQUAL(0, lcd_create(&lcd, &mcu_mngr, false));
+    lcd_create(&lcd, &lcd_iface, false);
 
-    gpio2_set_pin_state_Expect(0);
-    gpio3_set_pin_state_Expect(0);
-    gpio4_set_pin_state_Expect(1);
-    gpio5_set_pin_state_Expect(0);
-    gpio0_set_high_Expect();
-    gpio1_set_high_Expect();
+    gpio2_set_state_Expect(0);
+    gpio3_set_state_Expect(0);
+    gpio4_set_state_Expect(1);
+    gpio5_set_state_Expect(0);
+    gpio0_set_state_Expect(true);
+    gpio1_set_state_Expect(true);
     delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_low_Expect();
+    gpio1_set_state_Expect(false);
 
-    gpio2_set_pin_state_Expect(1);
-    gpio3_set_pin_state_Expect(0);
-    gpio4_set_pin_state_Expect(0);
-    gpio5_set_pin_state_Expect(0);
-    gpio0_set_high_Expect();
-    gpio1_set_high_Expect();
+    gpio2_set_state_Expect(1);
+    gpio3_set_state_Expect(0);
+    gpio4_set_state_Expect(0);
+    gpio5_set_state_Expect(0);
+    gpio0_set_state_Expect(true);
+    gpio1_set_state_Expect(true);
     delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_low_Expect();
+    gpio1_set_state_Expect(false);
 
     _lcd_send_char(&lcd, 'A');
 }

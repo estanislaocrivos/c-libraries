@@ -57,11 +57,8 @@ typedef struct
 
 typedef struct
 {
-    gpio_high_t      set_high;
-    gpio_low_t       set_low;
     gpio_set_state_t set_state;
     gpio_get_state_t get_state;
-    gpio_toggle_t    toggle;
 } gpio_interface_t;
 
 /* ============================================================================================== */

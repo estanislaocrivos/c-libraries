@@ -1,0 +1,11 @@
+[spi_interface]
+version = "0.1.0"
+
+[mcu-mngr-interface]
+version = "0.2.0"
+
+[hamming-codec]
+version = "0.1.0"
+
+[lcd-16-2-driver]
+version = "0.2.0"
