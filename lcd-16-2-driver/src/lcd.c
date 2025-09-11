@@ -7,7 +7,7 @@
 
 /* ============================================================================================== */
 
-static void _lcd_command_assert_seq(lcd_t* self)
+static void _lcd_command_assert_seq(const lcd_t* self)
 {
     self->bus->rs.set_state(false);
     self->bus->en.set_state(true);
@@ -17,7 +17,7 @@ static void _lcd_command_assert_seq(lcd_t* self)
 
 /* ============================================================================================== */
 
-static void _lcd_data_assert_seq(lcd_t* self)
+static void _lcd_data_assert_seq(const lcd_t* self)
 {
     self->bus->rs.set_state(true);
     self->bus->en.set_state(true);
@@ -27,7 +27,7 @@ static void _lcd_data_assert_seq(lcd_t* self)
 
 /* ============================================================================================== */
 
-static void _lcd_send_nibble(lcd_t* self, uint8_t nibble)
+static void _lcd_send_nibble(const lcd_t* self, uint8_t nibble)
 {
     self->bus->d4.set_state((nibble >> 0) & 0x01);
     self->bus->d5.set_state((nibble >> 1) & 0x01);
@@ -37,7 +37,7 @@ static void _lcd_send_nibble(lcd_t* self, uint8_t nibble)
 
 /* ============================================================================================== */
 
-static void _lcd_send_command(lcd_t* self, uint8_t command)
+static void _lcd_send_command(const lcd_t* self, uint8_t command)
 {
     _lcd_send_nibble(self, (command >> 4) & 0x0F);
     _lcd_command_assert_seq(self);
@@ -47,7 +47,7 @@ static void _lcd_send_command(lcd_t* self, uint8_t command)
 
 /* ============================================================================================== */
 
-static void _lcd_send_char(lcd_t* self, char character)
+static void _lcd_send_char(const lcd_t* self, char character)
 {
     _lcd_send_nibble(self, (character >> 4) & 0x0F);
     _lcd_data_assert_seq(self);
