@@ -120,7 +120,11 @@ int8_t lcd_go_to_index(lcd_t* self, uint8_t x, uint8_t y)
     {
         return -EFAULT;
     }
-    const uint8_t start[] = {0x80 | 0x00, 0x80 | 0xC0};
+    if (x > 15 || y > 1)
+    {
+        return -EINVAL;
+    }
+    const uint8_t start[] = {0x80, 0x80 | 0xC0};
     _lcd_send_command(self, start[y] + x);
     return 0;
 }
