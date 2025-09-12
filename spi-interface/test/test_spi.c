@@ -10,21 +10,15 @@
 
 /* ============================================================================================== */
 
-#define TEST_SPI_WORD 0x1234
-
-/* ============================================================================================== */
-
 void helper_spi_create(spi_t* spi)
 {
-    static const spi_drivers_t spi_drivers = {.initialize      = spi1_initialize,
-                                              .write_word      = spi1_write_word,
-                                              .read_word       = spi1_read_word,
-                                              .set_rx_callback = spi1_set_rx_callback,
-                                              .clear_buffers   = spi1_clear_buffers};
-    spi_create(spi, &spi_drivers);
+    spi->initialize      = spi1_initialize;
+    spi->transfer        = spi1_transfer;
+    spi->set_rx_callback = spi1_set_rx_callback;
+    spi->clear_buffers   = spi1_clear_buffers;
 }
 
-void mock_spi_callback(uint16_t data)
+void mock_spi_callback(const uint8_t* buffer, size_t length)
 {
     // Mock implementation of the SPI callback function
 }
@@ -33,26 +27,17 @@ void mock_spi_callback(uint16_t data)
 
 void test_spi_creation(void)
 {
-    static const spi_drivers_t spi_drivers = {.initialize      = spi1_initialize,
-                                              .write_word      = spi1_write_word,
-                                              .read_word       = spi1_read_word,
-                                              .set_rx_callback = spi1_set_rx_callback,
-                                              .clear_buffers   = spi1_clear_buffers};
-    spi_t                      spi;
-    TEST_ASSERT_EQUAL(0, spi_create(&spi, &spi_drivers));
+    spi_t spi;
+    helper_spi_create(&spi);
 
     TEST_ASSERT_NOT_NULL(spi.initialize);
-    TEST_ASSERT_NOT_NULL(spi.write_word);
-    TEST_ASSERT_NOT_NULL(spi.read_word);
+    TEST_ASSERT_NOT_NULL(spi.transfer);
     TEST_ASSERT_NOT_NULL(spi.set_rx_callback);
     TEST_ASSERT_NOT_NULL(spi.clear_buffers);
     TEST_ASSERT_EQUAL_PTR(spi.initialize, spi1_initialize);
-    TEST_ASSERT_EQUAL_PTR(spi.write_word, spi1_write_word);
-    TEST_ASSERT_EQUAL_PTR(spi.read_word, spi1_read_word);
+    TEST_ASSERT_EQUAL_PTR(spi.transfer, spi1_transfer);
     TEST_ASSERT_EQUAL_PTR(spi.set_rx_callback, spi1_set_rx_callback);
     TEST_ASSERT_EQUAL_PTR(spi.clear_buffers, spi1_clear_buffers);
-    TEST_ASSERT_EQUAL(-EFAULT, spi_create(NULL, &spi_drivers));
-    TEST_ASSERT_EQUAL(-EFAULT, spi_create(&spi, NULL));
 }
 
 /* ============================================================================================== */
@@ -76,19 +61,30 @@ void test_spi_methods(void)
     spi1_initialize_ExpectAndReturn(0);
     TEST_ASSERT_EQUAL(0, spi.initialize());
 
-    spi1_write_word_ExpectAndReturn(TEST_SPI_WORD, 0);
-    TEST_ASSERT_EQUAL(0, spi.write_word(TEST_SPI_WORD));
-
-    uint16_t read_word = 0;
-    spi1_read_word_ExpectAndReturn(&read_word, 0);
-    TEST_ASSERT_EQUAL(0, spi.read_word(&read_word));
-    TEST_ASSERT_EQUAL(0, read_word);
+    uint8_t tx_buffer[2] = {0x12, 0x34};
+    uint8_t rx_buffer[2] = {0};
+    spi1_transfer_ExpectAndReturn(tx_buffer, rx_buffer, 2, 0);
+    TEST_ASSERT_EQUAL(0, spi.transfer(tx_buffer, rx_buffer, 2));
 
     spi1_set_rx_callback_ExpectAndReturn(mock_spi_callback, 0);
     TEST_ASSERT_EQUAL(0, spi.set_rx_callback(mock_spi_callback));
 
     spi1_clear_buffers_Expect();
     spi.clear_buffers();
+}
+
+/* ============================================================================================== */
+
+void test_spi_transfer(void)
+{
+    spi_t spi;
+    helper_spi_create(&spi);
+
+    uint8_t tx_buffer[2] = {0x12, 0x34};
+    uint8_t rx_buffer[2] = {0};
+
+    spi1_transfer_ExpectAndReturn(tx_buffer, rx_buffer, 2, 0);
+    TEST_ASSERT_EQUAL(0, spi.transfer(tx_buffer, rx_buffer, 2));
 }
 
 /* ============================================================================================== */

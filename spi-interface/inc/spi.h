@@ -1,19 +1,10 @@
-/**
- * @file
- * @brief This library contains the spi interface implementation. This interface allows
- * communication with SPI devices through a standardized API. Functionality can be injected through
- * the use of driver function pointers.
- */
-
-/* ============================================================================================== */
-
 #ifndef SPI_H
 #define SPI_H
 
 /* ============================================================================================== */
 
 #include <stdint.h>
-#include <stdio.h>
+#include <stddef.h>
 
 /* ============================================================================================== */
 
@@ -21,35 +12,18 @@
 
 /* ============================================================================================== */
 
-/* Callback function prototype */
-typedef void (*spi_rx_callback_t)(uint16_t);
+/* RX callback prototype. Receives a pointer to the received buffer and its length */
+typedef void (*spi_rx_callback_t)(const uint8_t* buffer, size_t length);
 
 /* ============================================================================================== */
 
 typedef int8_t (*spi_initialize_t)(void);
-typedef int8_t (*spi_write_word_t)(uint16_t);
-typedef int8_t (*spi_read_word_t)(uint16_t*);
-typedef int8_t (*spi_set_rx_callback_t)(spi_rx_callback_t);
+typedef int8_t (*spi_transfer_t)(const uint8_t* tx_buffer, uint8_t* rx_buffer, size_t length);
+typedef int8_t (*spi_set_rx_callback_t)(spi_rx_callback_t callback);
 typedef void (*spi_clear_buffers_t)(void);
 
 /* ============================================================================================== */
 
-/**
- * @brief This structure contains the driver function pointers for the SPI driver.
- */
-typedef struct
-{
-    spi_initialize_t      initialize;
-    spi_write_word_t      write_word;
-    spi_read_word_t       read_word;
-    spi_set_rx_callback_t set_rx_callback;
-    spi_clear_buffers_t   clear_buffers;
-} spi_drivers_t;
-
-/**
- * @brief This structure contains the definition of the class SPI. All SPI objects created will
- * be instances of this class.
- */
 typedef struct
 {
     /**
@@ -59,18 +33,14 @@ typedef struct
     spi_initialize_t initialize;
 
     /**
-     * @brief Transmits a 16-bit word through the SPI interface.
-     * @param word The 16-bit word to transmit.
+     * @brief Transmits and receives a generic length 'length' 8-bit buffer through the SPI
+     * interface.
+     * @param tx_buffer Pointer to the 8-bit buffer to be transmitted.
+     * @param rx_buffer Pointer to the 8-bit buffer where the received data will be stored.
+     * @param length Length of the buffers to be transmitted and received.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    spi_write_word_t write_word;
-
-    /**
-     * @brief Receives a 16-bit word from the SPI interface.
-     * @param word Pointer to the 16-bit variable where the received word will be stored.
-     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
-     */
-    spi_read_word_t read_word;
+    spi_transfer_t transfer;
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
@@ -88,34 +58,15 @@ typedef struct
 
 /* ============================================================================================== */
 
-/**
- * @brief This function creates a new instance of the spi_t. It also initializes
- * the object attributes and methods.
- * @return Returns a new instance already initialized of the spi_t.
- */
-int8_t spi_create(spi_t* self, const spi_drivers_t* drivers);
-
-/* ============================================================================================== */
-
 /*
- * Usage example:
- *
- * int main(void)
- * {
- *  spi_t spi;
- *  spi_drivers_t drivers = {
- *      .initialize = spi_initialize,
- *      .write_word = spi_write_word,
- *      .read_word = spi_read_word,
- *      .set_rx_callback = spi_set_rx_callback,
- *      .clear_buffers = spi_clear_buffers
- *  };
- *  spi_create(&spi, &drivers);
- *  spi.initialize();
- *  return 0;
- * }
- */
+int main(void)
+{
+    const spi_t spi = {spi1_initialize, spi1_transfer, spi1_set_rx_callback, spi1_clear_buffers};
+    spi.initialize();
+    return 0;
+}
+*/
 
 /* ============================================================================================== */
 
-#endif /* SPI_H */
+#endif  // SPI_H
