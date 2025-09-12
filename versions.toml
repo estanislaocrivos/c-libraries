@@ -1,4 +1,4 @@
-[spi_interface]
+[spi-interface]
 version = "0.1.0"
 
 [mcu-mngr-interface]
@@ -8,4 +8,4 @@ version = "0.2.0"
 version = "0.1.0"
 
 [lcd-16x2-driver]
-version = "0.2.0"
+version = "0.2.1"
