@@ -7,5 +7,5 @@ version = "0.2.0"
 [hamming-codec]
 version = "0.1.0"
 
-[lcd-16-2-driver]
+[lcd-16x2-driver]
 version = "0.2.0"
