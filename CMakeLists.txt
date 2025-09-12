@@ -8,4 +8,4 @@ project(common-c-libs
 add_subdirectory(hamming-codec)
 add_subdirectory(spi-interface)
 add_subdirectory(mcu-mngr-interface)
-add_subdirectory(lcd-16-2-driver)
+add_subdirectory(lcd-16x2-driver)
