@@ -59,6 +59,8 @@ typedef struct
 /* ============================================================================================== */
 
 /*
+Usage:
+
 int main(void)
 {
     const spi_t spi = {spi1_initialize, spi1_transfer, spi1_set_rx_callback, spi1_clear_buffers};

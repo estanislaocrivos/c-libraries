@@ -66,6 +66,8 @@ typedef struct
 /* ============================================================================================== */
 
 /*
+Usage:
+
 int main(void)
 {
     const uart_t uart = {uart1_initialize, uart1_transmit, uart1_receive, uart1_set_rx_callback,
