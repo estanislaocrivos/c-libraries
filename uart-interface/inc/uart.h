@@ -16,9 +16,8 @@
  * @brief Prototype for the UART receive callback function.
  * @param buffer Pointer to the received data buffer.
  * @param length Length of the received data.
- * @param context Pointer to user-defined context data (can be NULL).
  */
-typedef void (*uart_rx_callback_t)(const uint8_t*, size_t, void*);
+typedef void (*uart_rx_callback_t)(const uint8_t*, size_t);
 
 /* ============================================================================================== */
 
