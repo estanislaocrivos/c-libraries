@@ -8,10 +8,14 @@
 
 /* ============================================================================================== */
 
+#include "errno.h"
 #include "../../uart-interface/inc/uart.h"
 #include "../../mcu-mngr-interface/inc/mcu_manager.h"
 
 /* ============================================================================================== */
+
+#define MAX_PAYLOAD_SIZE  16
+#define MAX_OVERHEAD_SIZE 5
 
 typedef enum
 {
@@ -25,21 +29,30 @@ typedef enum
 
 typedef struct
 {
-    uart_t*            _uart;
-    timer_interface_t* _timer;
-
-    uint8_t* rx_buffer;
-    uint8_t* tx_buffer;
-    uint8_t  buffer_size;
-
+    uart_t*              _uart;
+    timer_interface_t*   _timer;
     frame_parser_state_t _state;
-    bool                 receiving_frame;
-    uint8_t              lost_frames;
-    uint8_t              stx_byte;
-    uint8_t              etx_byte;
+    uint8_t              _rx_buffer[MAX_PAYLOAD_SIZE + MAX_OVERHEAD_SIZE];
+    uint8_t              _tx_buffer[MAX_PAYLOAD_SIZE + MAX_OVERHEAD_SIZE];
+    uint8_t              _rx_buffer_index;
+    uint8_t              _tx_buffer_index;
+    uint8_t              _retransmission_counter;
+    uint8_t              _frame_bcc_buffer[2];
+    uint8_t              _frame_bcc_index;
+    bool                 _waiting_for_ack;
 
-    void (*on_frame_received)(uint8_t* data, uint8_t length);  // Callback
-    void (*on_frame_error)(void);                              // Callback opcional
+    uint8_t* rx_payload;
+    uint8_t  rx_payload_index;
+
+    uint8_t* tx_payload;
+    uint8_t  payload_size;
+
+    bool    receiving_frame;
+    uint8_t lost_frames;
+    uint8_t stx_byte;
+    uint8_t etx_byte;
+
+    uint16_t (*checksum_calculator)(const uint8_t*, uint8_t);
 
 } framing_protocol_t;
 

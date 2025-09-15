@@ -12,15 +12,29 @@
 
 /* ============================================================================================== */
 
-/* RX callback prototype. Receives a pointer to the received buffer and its length */
-typedef void (*uart_rx_callback_t)(const uint8_t* buffer, size_t length);
+/**
+ * @brief Prototype for the UART receive callback function.
+ * @param buffer Pointer to the received data buffer.
+ * @param length Length of the received data.
+ * @param context Pointer to user-defined context data (can be NULL).
+ */
+typedef void (*uart_rx_callback_t)(const uint8_t*, size_t, void*);
 
 /* ============================================================================================== */
 
-typedef int8_t (*uart_initialize_t)(void);
-typedef int8_t (*uart_transmit_t)(const uint8_t* tx_buffer, size_t length);
-typedef int8_t (*uart_receive_t)(uint8_t* rx_buffer, size_t length);
-typedef int8_t (*uart_set_rx_callback_t)(uart_rx_callback_t callback);
+typedef struct
+{
+    uint32_t baud_rate;
+    uint8_t* rx_buffer;
+    size_t   rx_buffer_size;
+} uart_config_t;
+
+/* ============================================================================================== */
+
+typedef int8_t (*uart_initialize_t)(uart_config_t*);
+typedef int8_t (*uart_transmit_t)(const uint8_t*, size_t);
+typedef int8_t (*uart_receive_t)(uint8_t*, size_t);
+typedef int8_t (*uart_set_rx_callback_t)(uart_rx_callback_t);
 typedef void (*uart_clear_buffers_t)(void);
 
 /* ============================================================================================== */

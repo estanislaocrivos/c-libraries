@@ -10,7 +10,7 @@
 
 typedef int8_t (*delay_ms_t)(uint16_t);
 typedef int8_t (*delay_us_t)(uint16_t);
-typedef void (*tmr_timeout_callback_t)(void);
+typedef void (*tmr_timeout_callback_t)(void*);
 typedef int8_t (*tmr_set_timeout_t)(uint16_t);
 typedef void (*tmr_deact_timeout_t)(void);
 typedef void (*tmr_reset_timeout_t)(void);
