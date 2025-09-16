@@ -310,7 +310,8 @@ static void framing_protocol_transmit(framing_protocol_t* self)
 
 int8_t framing_protocol_initialize(framing_protocol_t* self)
 {
-    self->_uart->set_rx_callback(uart_rx_byte_callback, self);
+    self->_uart->ops->uart_initialize_t(self->_uart);
+    self->_uart->ops->uart_set_rx_callback_t(uart_rx_byte_callback, self);
     self->_timer->set_callback(tmr_timeout_callback);
     return 0;
 }

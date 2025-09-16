@@ -30,9 +30,9 @@ typedef enum
 
 typedef struct
 {
-    uart_t*              _uart;
-    timer_interface_t*   _timer;
-    frame_parser_state_t _state;
+    const struct uart_port* _uart;
+    timer_interface_t*      _timer;
+    frame_parser_state_t    _state;
 
     uint8_t _rx_buffer[MAX_FRAME_SIZE];
     uint8_t _rx_buffer_index;
