@@ -16,8 +16,11 @@
  * @brief Prototype for the UART receive callback function.
  * @param buffer Pointer to the received data buffer.
  * @param length Length of the received data.
+ * @param callback_context Pointer to user-defined callback_context data (can be NULL).
  */
-typedef void (*uart_rx_callback_t)(const uint8_t*, size_t);
+typedef void (*uart_rx_callback_t)(const uint8_t* buffer,
+                                   size_t         buffer_size,
+                                   void*          callback_context);
 
 /* ============================================================================================== */
 
@@ -26,14 +29,16 @@ typedef struct
     uint32_t baud_rate;
     uint8_t* rx_buffer;
     size_t   rx_buffer_size;
+    void*    callback_context;
 } uart_config_t;
 
 /* ============================================================================================== */
 
-typedef int8_t (*uart_initialize_t)(uart_config_t*);
-typedef int8_t (*uart_transmit_t)(const uint8_t*, size_t);
-typedef int8_t (*uart_receive_t)(uint8_t*, size_t);
-typedef int8_t (*uart_set_rx_callback_t)(uart_rx_callback_t);
+typedef int8_t (*uart_initialize_t)(uart_config_t* config);
+typedef int8_t (*uart_transmit_t)(const uint8_t* buffer, size_t buffer_size);
+typedef int8_t (*uart_receive_t)(uint8_t* buffer, size_t buffer_size);
+typedef int8_t (*uart_set_rx_callback_t)(uart_rx_callback_t callback, void* callback_context);
+typedef void (*uart_enable_rx_interrupt_t)(bool enable);
 typedef void (*uart_clear_buffers_t)(void);
 
 /* ============================================================================================== */
@@ -69,6 +74,12 @@ typedef struct
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
     uart_set_rx_callback_t set_rx_callback;
+
+    /**
+     * @brief Enables or disables the UART receive interrupt.
+     * @param enable Set to true to enable the interrupt, false to disable it.
+     */
+    uart_enable_rx_interrupt_t enable_rx_interrupt;
 
     /**
      * @brief Clears the UART buffers.
