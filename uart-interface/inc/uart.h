@@ -26,25 +26,6 @@ typedef void (*uart_rx_callback_t)(const uint8_t* buffer,
 
 typedef struct
 {
-    uint32_t baud_rate;
-    uint8_t* rx_buffer;
-    size_t   rx_buffer_size;
-    void*    callback_context;
-} uart_config_t;
-
-/* ============================================================================================== */
-
-typedef int8_t (*uart_initialize_t)(uart_config_t* config);
-typedef int8_t (*uart_transmit_t)(const uint8_t* buffer, size_t buffer_size);
-typedef int8_t (*uart_receive_t)(uint8_t* buffer, size_t buffer_size);
-typedef int8_t (*uart_set_rx_callback_t)(uart_rx_callback_t callback, void* callback_context);
-typedef void (*uart_enable_rx_interrupt_t)(bool enable);
-typedef void (*uart_clear_buffers_t)(void);
-
-/* ============================================================================================== */
-
-typedef struct
-{
     /**
      * @brief Initializes the UART interface.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
@@ -85,7 +66,29 @@ typedef struct
      * @brief Clears the UART buffers.
      */
     uart_clear_buffers_t clear_buffers;
-} uart_t;
+} uart_ops_t;
+
+/* ============================================================================================== */
+
+typedef struct
+{
+    uart_ops_t* ops;
+    uint32_t    baud_rate;
+    uint8_t*    rx_buffer;
+    size_t      rx_buffer_size;
+    void*       callback_context;
+} uart_port_t;
+
+/* ============================================================================================== */
+
+typedef int8_t (*uart_initialize_t)(uart_port_t* p);
+typedef int8_t (*uart_transmit_t)(uart_port_t* p, const uint8_t* buffer, size_t buffer_size);
+typedef int8_t (*uart_receive_t)(uart_port_t* p, uint8_t* buffer, size_t buffer_size);
+typedef int8_t (*uart_set_rx_callback_t)(uart_port_t*       p,
+                                         uart_rx_callback_t callback,
+                                         void*              callback_context);
+typedef void (*uart_enable_rx_interrupt_t)(uart_port_t* p, bool enable);
+typedef void (*uart_clear_buffers_t)(uart_port_t* p);
 
 /* ============================================================================================== */
 
