@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 /* ============================================================================================== */
 
@@ -24,82 +25,99 @@ typedef void (*uart_rx_callback_t)(const uint8_t* buffer,
 
 /* ============================================================================================== */
 
-typedef struct
+struct uart_port;  // Forward declaration. Declared later.
+
+/* ============================================================================================== */
+
+struct uart_ops
 {
     /**
      * @brief Initializes the UART interface.
+     * @param p Pointer to the UART port structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    uart_initialize_t initialize;
+    int8_t (*uart_initialize_t)(struct uart_port* port);
 
     /**
      * @brief Transmits data through the UART interface.
-     * @param tx_buffer Pointer to the 8-bit buffer to be transmitted.
-     * @param length Length of the buffer to be transmitted.
+     * @param port Pointer to the UART port structure.
+     * @param buffer Pointer to the 8-bit buffer to be transmitted.
+     * @param size Size of the buffer to be transmitted.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    uart_transmit_t transmit;
+    int8_t (*uart_transmit_t)(struct uart_port* port, const uint8_t* buffer, size_t size);
 
     /**
      * @brief Receives data through the UART interface.
-     * @param rx_buffer Pointer to the 8-bit buffer where the received data will be stored.
-     * @param length Length of the buffer to be received.
+     * @param port Pointer to the UART port structure.
+     * @param buffer Pointer to the 8-bit buffer where the received data will be stored.
+     * @param size Size of the buffer to be received.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    uart_receive_t receive;
+    int8_t (*uart_receive_t)(struct uart_port* port, uint8_t* buffer, size_t size);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
+     * @param port Pointer to the UART port structure.
      * @param callback The callback function to set. Its prototype must match the uart_rx_callback_t
      * type.
+     * @param callback_context Pointer to user-defined callback_context data (can be NULL).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    uart_set_rx_callback_t set_rx_callback;
+    int8_t (*uart_set_rx_callback_t)(struct uart_port*  port,
+                                     uart_rx_callback_t callback,
+                                     void*              callback_context);
 
     /**
      * @brief Enables or disables the UART receive interrupt.
+     * @param port Pointer to the UART port structure.
      * @param enable Set to true to enable the interrupt, false to disable it.
      */
-    uart_enable_rx_interrupt_t enable_rx_interrupt;
+    void (*uart_enable_rx_interrupt_t)(struct uart_port* port, bool enable);
 
     /**
      * @brief Clears the UART buffers.
+     * @param port Pointer to the UART port structure.
      */
-    uart_clear_buffers_t clear_buffers;
-} uart_ops_t;
+    void (*uart_clear_buffers_t)(struct uart_port* p);
+};
 
 /* ============================================================================================== */
 
-typedef struct
+struct uart_port
 {
-    uart_ops_t* ops;
-    uint32_t    baud_rate;
-    uint8_t*    rx_buffer;
-    size_t      rx_buffer_size;
-    void*       callback_context;
-} uart_port_t;
+    uint32_t baud_rate;
+    uint8_t* rx_buffer;
+    size_t   rx_buffer_size;
+    void*    callback_context;
 
-/* ============================================================================================== */
-
-typedef int8_t (*uart_initialize_t)(uart_port_t* p);
-typedef int8_t (*uart_transmit_t)(uart_port_t* p, const uint8_t* buffer, size_t buffer_size);
-typedef int8_t (*uart_receive_t)(uart_port_t* p, uint8_t* buffer, size_t buffer_size);
-typedef int8_t (*uart_set_rx_callback_t)(uart_port_t*       p,
-                                         uart_rx_callback_t callback,
-                                         void*              callback_context);
-typedef void (*uart_enable_rx_interrupt_t)(uart_port_t* p, bool enable);
-typedef void (*uart_clear_buffers_t)(uart_port_t* p);
+    /**
+     * @brief Pointer to the UART operations structure.
+     */
+    const struct uart_ops* ops;
+};
 
 /* ============================================================================================== */
 
 /*
 Usage:
-
 int main(void)
 {
-    const uart_t uart = {uart1_initialize, uart1_transmit, uart1_receive, uart1_set_rx_callback,
-                         uart1_clear_buffers};
-    uart.initialize();
+    const struct uart_ops my_uart_ops = {
+        .uart_initialize_t = my_uart_initialize,
+        .uart_transmit_t = my_uart_transmit,
+        .uart_receive_t = my_uart_receive,
+        .uart_set_rx_callback_t = my_uart_set_rx_callback,
+        .uart_enable_rx_interrupt_t = my_uart_enable_rx_interrupt,
+        .uart_clear_buffers_t = my_uart_clear_buffers,
+    };
+    struct uart_port my_uart;
+    my_uart.ops = &my_uart_ops;
+    my_uart.baud_rate = 9600;
+    my_uart.rx_buffer = malloc(128);
+    my_uart.rx_buffer_size = 128;
+    my_uart.ops->uart_initialize_t(&my_uart);
+    // Other application code...
     return 0;
 }
 */
