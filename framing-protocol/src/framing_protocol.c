@@ -17,8 +17,6 @@
 
 /* ============================================================================================== */
 
-/* ============================================================================================== */
-
 /* RX state machine implementation */
 
 /* ============================================================================================== */
@@ -224,9 +222,9 @@ static void tmr_timeout_callback(void* context)
 static void uart_rx_byte_callback(const uint8_t* buffer, uint8_t length)
 {
     SET_TIMEOUT_OFF_DRIVER();
-    if (waiting_for_ack)
+    if (self->_waiting_for_ack)
     {
-        if (byte == ACK)
+        if (buffer[0] == ACK)
         {
             /* ACK received, reset retransmission counter */
             reset_frame_transmitter();
@@ -242,13 +240,13 @@ static void uart_rx_byte_callback(const uint8_t* buffer, uint8_t length)
     else
     {
         /* Fill rx_buffer with received byte */
-        rx_buffer[rx_buffer_index] = byte;
-        rx_buffer_index += 1;
-        if (rx_buffer_index >= RX_BUFFER_SIZE_BYTES)
+        self->_rx_buffer[self->_rx_buffer_index] = buffer[0];
+        self->_rx_buffer_index += 1;
+        if (self->_rx_buffer_index == RX_BUFFER_SIZE_BYTES)
         {
             rx_buffer_index = 0;
         }
-        SET_TIMEOUT_ON_DRIVER(RX_TIMEOUT_MS);
+        self->_timer->set_timeout(RX_TIMEOUT_MS);
     }
     return;
 }
@@ -310,10 +308,11 @@ static void framing_protocol_transmit(framing_protocol_t* self)
 
 /* ============================================================================================== */
 
-static void framing_protocol_initialize(framing_protocol_t* self)
+int8_t framing_protocol_initialize(framing_protocol_t* self)
 {
-    self->_uart->set_rx_callback(uart_rx_byte_callback);
+    self->_uart->set_rx_callback(uart_rx_byte_callback, self);
     self->_timer->set_callback(tmr_timeout_callback);
+    return 0;
 }
 
 /* ============================================================================================== */
