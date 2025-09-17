@@ -9,22 +9,11 @@
 
 /* ============================================================================================== */
 
+#include "framing_protocol.h"
+
 /* Protocol macros */
-#define STX_VALID 0x02
-#define ETX_VALID 0x03
-#define ACK       0x06
-#define NACK      0x15
-
-/* ============================================================================================== */
-
-uint16_t calculate_bcc(const uint8_t* buffer, uint8_t length);
-
-/* ============================================================================================== */
-
-uint8_t build_frame(const uint8_t* data,
-                    uint8_t        data_size_bytes,
-                    uint8_t*       out_buffer,
-                    uint8_t        out_buffer_size_bytes);
+#define ACK  0x06
+#define NACK 0x15
 
 /* ============================================================================================== */
 

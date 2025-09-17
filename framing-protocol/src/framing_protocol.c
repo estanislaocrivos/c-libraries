@@ -9,6 +9,11 @@
 
 #include "utilities.h"
 
+#define STX_VALID_DEFAULT 0x02
+#define ETX_VALID_DEFAULT 0x03
+#define ACK_DEFAULT       0x06
+#define NACK_DEFAULT      0x15
+
 /* ============================================================================================== */
 
 /* RX state machine implementation */
@@ -57,7 +62,7 @@ static frame_parser_state_t rx_payload_state_handler(uint8_t const byte, framing
 {
     self->_rx_buffer[self->_rx_buffer_index] = byte;
     self->_rx_buffer_index += 1;
-    if (self->_rx_buffer_index == self->_payload_size + 1)
+    if (self->_rx_buffer_index == self->payload_size + 1)
     {
         /* If payload is full, expect ETX */
         return STATE_PROCESS_ETX;
@@ -131,29 +136,29 @@ static bool is_frame_valid(framing_protocol_t* self)
 
 static void reset_framing_protocol(framing_protocol_t* self)
 {
-    self->_state                  = STATE_PROCESS_STX;
-    self->_rx_buffer_index        = 0;
-    self->_tx_buffer_index        = 0;
-    self->_bcc_buffer_index       = 0;
-    self->_waiting_for_ack        = false;
-    self->_receiving_frame        = false;
-    self->_lost_frames            = 0;
-    self->_retransmission_counter = 0;
+    self->_state                = STATE_PROCESS_STX;
+    self->_rx_buffer_index      = 0;
+    self->_tx_buffer_index      = 0;
+    self->_bcc_buffer_index     = 0;
+    self->_waiting_for_ack      = false;
+    self->_receiving_frame      = false;
+    self->lost_frames_counter   = 0;
+    self->transmissions_counter = 0;
 }
 
 /* ============================================================================================== */
 
 static void handle_frame_transmission(framing_protocol_t* self)
 {
-    self->_retransmission_counter += 1;
-    if (self->_retransmission_counter > self->_max_retransmissions)
+    self->transmissions_counter += 1;
+    if (self->transmissions_counter > self->max_retransmissions)
     {
         reset_framing_protocol(self);
         return;
     }
     self->_waiting_for_ack = true;
     self->_uart->ops->transmit(self->_uart, self->_tx_buffer, self->_tx_buffer_index);
-    self->_timer->ops->set_timeout_ms(self->_timer, self->_tx_timeout_ms);
+    self->_timer->ops->set_timeout_ms(self->_timer, self->tx_timeout_ms);
 }
 
 static void build_frame(framing_protocol_t* self, const uint8_t* payload, size_t size)
@@ -225,7 +230,7 @@ static void uart_rx_byte_callback(const uint8_t* buffer, uint8_t size, void* con
         {
             self->_rx_buffer_index = 0;
         }
-        self->_timer->ops->set_timeout_ms(self->_timer, self->_rx_timeout_ms);
+        self->_timer->ops->set_timeout_ms(self->_timer, self->rx_timeout_ms);
     }
     return;
 }
@@ -239,23 +244,26 @@ static void uart_rx_byte_callback(const uint8_t* buffer, uint8_t size, void* con
 /* This function is expected to be called continuosly to check for new data */
 int8_t framing_protocol_receive_payload(framing_protocol_t* self, uint8_t* payload, uint8_t size)
 {
-    if (is_frame_valid(&self))
+    if (self->_initialized)
     {
-        /* Parse payload to public interface. Re-enable uart for next reception */
-        self->_uart->ops->transmit(self->_uart, ACK, 1);
-        for (uint8_t i = 0; i < self->_payload_size; i++)
+        if (is_frame_valid(&self))
         {
-            payload[i] = self->_rx_buffer[i + 1];
+            /* Parse payload to public interface. Re-enable uart for next reception */
+            self->_uart->ops->transmit(self->_uart, ACK, 1);
+            for (uint8_t i = 0; i < self->payload_size; i++)
+            {
+                payload[i] = self->_rx_buffer[i + 1];
+            }
+            self->_uart->ops->enable_rx_interrupt(self->_uart, true);
+            return 0;
         }
-        self->_uart->ops->enable_rx_interrupt(self->_uart, true);
-        return 0;
-    }
-    else
-    {
-        self->_uart->ops->transmit(self->_uart, NACK, 1);
-        self->_lost_frames += 1;
-        reset_framing_protocol(self);
-        self->_uart->ops->enable_rx_interrupt(self->_uart, true);
+        else
+        {
+            self->_uart->ops->transmit(self->_uart, NACK, 1);
+            self->lost_frames_counter += 1;
+            reset_framing_protocol(self);
+            self->_uart->ops->enable_rx_interrupt(self->_uart, true);
+        }
     }
     return -EBUSY;
 }
@@ -275,11 +283,9 @@ int8_t framing_protocol_transmit_payload(framing_protocol_t* self,
 
 int8_t framing_protocol_initialize(framing_protocol_t* self)
 {
-    self->_uart->rx_buffer      = &(self->_rx_byte);
-    self->_uart->rx_buffer_size = 1;
-    self->_uart->ops->initialize(self->_uart);
     self->_uart->ops->set_rx_callback(self->_uart, uart_rx_byte_callback, self);
     self->_timer->ops->set_timeout_callback(self->_timer, tmr_timeout_callback, self);
+    self->_initialized = true;
     return 0;
 }
 
@@ -287,6 +293,24 @@ int8_t framing_protocol_initialize(framing_protocol_t* self)
 
 int8_t framing_protocol_create(framing_protocol_t* self)
 {
+    self->_initialized = false;
+    if (!self->_stx_byte)
+    {
+        self->_stx_byte = STX_VALID_DEFAULT;
+    }
+    if (!self->_etx_byte)
+    {
+        self->_etx_byte = ETX_VALID_DEFAULT;
+    }
+    if (!self->_ack_byte)
+    {
+        self->_ack_byte = ACK_DEFAULT;
+    }
+    if (!self->_nack_byte)
+    {
+        self->_nack_byte = NACK_DEFAULT;
+    }
+
     return 0;
 }
 

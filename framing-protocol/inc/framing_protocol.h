@@ -10,7 +10,7 @@
 
 #include "errno.h"
 #include "../../uart-interface/inc/uart.h"
-#include "../../mcu-mngr-interface/inc/mcu_manager.h"
+#include "../../mcu-mngr-interface/inc/timer.h"
 
 /* ============================================================================================== */
 
@@ -33,20 +33,22 @@ typedef struct
 {
     /**
      * @brief Pointer to the UART port structure. This structure must be first created and
-     * initialized.
+     * initialized. The UART is expected to be initialized with the following parameters:
+     * - Baud rate: to be defined by the user
+     * - Data bits: 8 bits
+     * - Parity: None
+     * - Stop bits: 1 bit
+     * - Flow control: None
+     * - RX interrupt: enabled
+     * - RX buffer size: 1 byte
      */
     struct uart_port* _uart;
 
     /**
      * @brief Pointer to the Timer structure. This structure must be first created and
-     * initialized.
+     * initialized. The timer is expected to be initialized in timeout mode.
      */
     struct timer* _timer;
-
-    /**
-     * @brief Byte used to store incoming bytes on the UART RX interrupt.
-     */
-    volatile uint8_t _rx_byte;
 
     /**
      * @brief RX buffer and index used for incoming bytes. This buffer is filled internally.
@@ -67,24 +69,52 @@ typedef struct
     uint8_t _bcc_buffer_index;
 
     /**
-     * @brief Keeps track of whether the framing protocol instance has been initialized.
-     */
-    bool _initialized;
-
-    /**
      * @brief Various internal state variables.
      */
+    bool                 _initialized;
     bool                 _waiting_for_ack;
     bool                 _receiving_frame;
     frame_parser_state_t _state;
-    uint8_t              _payload_size;
-    uint8_t              _lost_frames;
-    uint8_t              _stx_byte;
-    uint8_t              _etx_byte;
-    uint8_t              _rx_timeout_ms;
-    uint8_t              _tx_timeout_ms;
-    uint8_t              _max_retransmissions;
-    uint8_t              _retransmission_counter;
+
+    /**
+     * @brief Payload size in bytes. Must be defined by the user and must not exceed
+     * MAX_PAYLOAD_SIZE.
+     */
+    uint8_t payload_size;
+
+    /**
+     * @brief Timeout between bytes during frame reception in milliseconds.
+     */
+    uint8_t rx_timeout_ms;
+
+    /**
+     * @brief Timeout to wait for an ACK after frame transmission in milliseconds.
+     */
+    uint8_t tx_timeout_ms;
+
+    /**
+     * @brief Maximum number of retransmissions before giving up.
+     */
+    uint8_t max_retransmissions;
+
+    /**
+     * @brief Counter for the number of transmissions (including retransmissions) of the current
+     * frame.
+     */
+    uint8_t transmissions_counter;
+
+    /**
+     * @brief Counter for the number of lost frames detected due to errors.
+     */
+    uint8_t lost_frames_counter;
+
+    /**
+     * @brief Special bytes used in the framing protocol. If left null, default values will be used.
+     */
+    uint8_t _stx_byte;
+    uint8_t _etx_byte;
+    uint8_t _ack_byte;
+    uint8_t _nack_byte;
 
     /**
      * @brief Checksum calculator function pointer. This function must be provided by the user and
