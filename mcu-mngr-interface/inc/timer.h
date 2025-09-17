@@ -28,7 +28,24 @@ typedef void (*timer_callback_t)(void* context);
 struct timer_ops
 {
     /**
-     * @brief Sets the timer timeout in milliseconds.
+     * @brief Configures a non-blocking delay in milliseconds.
+     * @param self Pointer to the timer structure.
+     * @param ms Delay in milliseconds.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     */
+    int8_t (*delay_ms)(struct timer* self, uint16_t ms);
+
+    /**
+     * @brief Configures a non-blocking delay in microseconds.
+     * @param self Pointer to the timer structure.
+     * @param us Delay in microseconds.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     */
+    int8_t (*delay_us)(struct timer* self, uint16_t us);
+
+    /**
+     * @brief Configures a timeout for the timer in milliseconds. When the timeout expires, the
+     * callback function set by 'set_callback' will be called.
      * @param self Pointer to the timer structure.
      * @param ms Timeout in milliseconds.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
@@ -39,21 +56,22 @@ struct timer_ops
      * @brief Resets the timer countdown.
      * @param self Pointer to the timer structure.
      */
-    void (*reset)(struct timer* self);
+    void (*reset_timeout)(struct timer* self);
 
     /**
      * @brief Deactivates the timer.
      * @param self Pointer to the timer structure.
      */
-    void (*deactivate)(struct timer* self);
+    void (*deactivate_timeout)(struct timer* self);
 
     /**
      * @brief Sets the callback function to be called when the timer expires.
      * @param self Pointer to the timer structure.
      * @param callback Pointer to the callback function.
+     * @param context Pointer to user-defined context data (can be NULL).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*set_callback)(struct timer* self, timer_callback_t callback);
+    int8_t (*set_timeout_callback)(struct timer* self, timer_callback_t callback, void* context);
 };
 
 /* ============================================================================================== */
