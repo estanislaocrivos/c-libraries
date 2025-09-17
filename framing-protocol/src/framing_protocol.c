@@ -219,7 +219,7 @@ static void tmr_timeout_callback(void* context)
 /* ============================================================================================== */
 
 /* This function is expected to be called inside the serial protocol RX ISR */
-static void uart_rx_byte_callback(const uint8_t* buffer, uint8_t length)
+static void uart_rx_byte_callback(const uint8_t* buffer, uint8_t length, void* context)
 {
     SET_TIMEOUT_OFF_DRIVER();
     if (self->_waiting_for_ack)

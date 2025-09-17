@@ -16,15 +16,18 @@
 
 /* ============================================================================================== */
 
+#include "uart.h"
 #include "errno.h"
 
 /* ============================================================================================== */
 
-typedef void (*usart1_callback_t)(const uint8_t* buffer, size_t length);
+static void* usart1_callback_context;
+
+uart_rx_callback_t usart1_callback_t;
 
 /* ============================================================================================== */
 
-int8_t usart1_initialize(void);
+int8_t usart1_initialize(struct uart_port* usart1_port);
 
 /* ============================================================================================== */
 

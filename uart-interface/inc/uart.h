@@ -19,9 +19,9 @@
  * @param length Length of the received data.
  * @param callback_context Pointer to user-defined callback_context data (can be NULL).
  */
-typedef void (*uart_rx_callback_t)(const uint8_t* buffer,
-                                   size_t         buffer_size,
-                                   void*          callback_context);
+typedef void (*uart_rx_callback_t)(void*          callback_context,
+                                   const uint8_t* buffer,
+                                   size_t         buffer_size);
 
 /* ============================================================================================== */
 
@@ -86,6 +86,7 @@ struct uart_ops
 
 struct uart_port
 {
+    uint8_t  port_id;
     uint32_t baud_rate;
     uint8_t* rx_buffer;
     size_t   rx_buffer_size;
