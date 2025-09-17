@@ -39,53 +39,53 @@ struct uart_ops
 {
     /**
      * @brief Initializes the UART interface.
-     * @param p Pointer to the UART port structure.
+     * @param self Pointer to the UART port structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*initialize)(struct uart_port* port);
+    int8_t (*initialize)(struct uart_port* self);
 
     /**
      * @brief Transmits data through the UART interface.
-     * @param port Pointer to the UART port structure.
+     * @param self Pointer to the UART port structure.
      * @param buffer Pointer to the 8-bit buffer to be transmitted.
      * @param size Size of the buffer to be transmitted.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*transmit)(struct uart_port* port, const uint8_t* buffer, size_t size);
+    int8_t (*transmit)(struct uart_port* self, const uint8_t* buffer, size_t size);
 
     /**
      * @brief Receives data through the UART interface.
-     * @param port Pointer to the UART port structure.
+     * @param self Pointer to the UART port structure.
      * @param buffer Pointer to the 8-bit buffer where the received data will be stored.
      * @param size Size of the buffer to be received.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct uart_port* port, uint8_t* buffer, size_t size);
+    int8_t (*receive)(struct uart_port* self, uint8_t* buffer, size_t size);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
-     * @param port Pointer to the UART port structure.
+     * @param self Pointer to the UART port structure.
      * @param callback The callback function to set. Its prototype must match the uart_rx_callback_t
      * type.
      * @param callback_context Pointer to user-defined callback_context data (can be NULL).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*set_rx_callback)(struct uart_port*  port,
+    int8_t (*set_rx_callback)(struct uart_port*  self,
                               uart_rx_callback_t callback,
                               void*              callback_context);
 
     /**
      * @brief Enables or disables the UART receive interrupt.
-     * @param port Pointer to the UART port structure.
+     * @param self Pointer to the UART port structure.
      * @param enable Set to true to enable the interrupt, false to disable it.
      */
-    void (*enable_rx_interrupt)(struct uart_port* port, bool enable);
+    void (*enable_rx_interrupt)(struct uart_port* self, bool enable);
 
     /**
      * @brief Clears the UART buffers.
-     * @param port Pointer to the UART port structure.
+     * @param self Pointer to the UART port structure.
      */
-    void (*clear_buffers)(struct uart_port* p);
+    void (*clear_buffers)(struct uart_port* self);
 };
 
 /* ============================================================================================== */
