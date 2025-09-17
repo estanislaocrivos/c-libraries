@@ -1,7 +1,7 @@
 #ifndef CHECKSUM_H
 #define CHECKSUM_H
 
-#include "stdint.h"
+#include <stdint.h>
 
 uint16_t basic_checksum(const uint8_t* buffer, uint8_t length);
 

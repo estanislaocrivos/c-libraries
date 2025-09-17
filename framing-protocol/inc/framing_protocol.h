@@ -8,7 +8,7 @@
 
 /* ============================================================================================== */
 
-#include "errno.h"
+#include "../../inc/errno.h"
 #include "../../uart-interface/inc/uart.h"
 #include "../../mcu-mngr-interface/inc/timer.h"
 
@@ -22,7 +22,7 @@
 typedef enum
 {
     STATE_PROCESS_STX,
-    STATE_PROCESS_DATA,
+    STATE_PROCESS_PAYLOAD,
     STATE_PROCESS_ETX,
     STATE_PROCESS_BCC,
     STATE_DISCARD_FRAME,

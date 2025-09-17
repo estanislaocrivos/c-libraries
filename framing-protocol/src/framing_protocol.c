@@ -7,7 +7,9 @@
 
 /* ============================================================================================== */
 
-#include "utilities.h"
+#include "../inc/utilities.h"
+
+/* ============================================================================================== */
 
 #define STX_VALID_DEFAULT 0x02
 #define ETX_VALID_DEFAULT 0x03
@@ -25,7 +27,6 @@ typedef frame_parser_state_t (*frame_parser_state_handler_t)(uint8_t const      
 
 typedef struct
 {
-    frame_parser_state_t         _state;
     frame_parser_state_handler_t state_handler_function;
 } frame_parser_state_table_entry_t;
 
@@ -37,14 +38,10 @@ static frame_parser_state_t rx_discard_frame_state_handler(uint8_t const       b
                                                            framing_protocol_t* self);
 static frame_parser_state_t rx_frame_ok_state_handler(uint8_t const byte, framing_protocol_t* self);
 
-/* State table. May be modified to change dynamics */
+/* State table. State handlers are in order according to the frame_parser_state_t enum */
 static const frame_parser_state_table_entry_t state_table[] = {
-    {STATE_PROCESS_STX, rx_stx_state_handler},
-    {STATE_PROCESS_DATA, rx_payload_state_handler},
-    {STATE_PROCESS_ETX, rx_etx_state_handler},
-    {STATE_PROCESS_BCC, rx_bcc_state_handler},
-    {STATE_DISCARD_FRAME, rx_discard_frame_state_handler},
-    {STATE_FRAME_OK, rx_frame_ok_state_handler},
+    {rx_stx_state_handler}, {rx_payload_state_handler},       {rx_etx_state_handler},
+    {rx_bcc_state_handler}, {rx_discard_frame_state_handler}, {rx_frame_ok_state_handler},
 };
 
 static frame_parser_state_t rx_stx_state_handler(uint8_t const byte, framing_protocol_t* self)
@@ -55,7 +52,7 @@ static frame_parser_state_t rx_stx_state_handler(uint8_t const byte, framing_pro
     }
     self->_rx_buffer[0]    = byte;
     self->_rx_buffer_index = 1;
-    return STATE_PROCESS_DATA;
+    return STATE_PROCESS_PAYLOAD;
 }
 
 static frame_parser_state_t rx_payload_state_handler(uint8_t const byte, framing_protocol_t* self)
@@ -67,7 +64,7 @@ static frame_parser_state_t rx_payload_state_handler(uint8_t const byte, framing
         /* If payload is full, expect ETX */
         return STATE_PROCESS_ETX;
     }
-    return STATE_PROCESS_DATA;
+    return STATE_PROCESS_PAYLOAD;
 }
 
 static frame_parser_state_t rx_etx_state_handler(uint8_t const byte, framing_protocol_t* self)
@@ -119,7 +116,7 @@ static frame_parser_state_t rx_frame_ok_state_handler(uint8_t const byte, framin
 
 /* ============================================================================================== */
 
-static bool is_frame_valid(framing_protocol_t* self)
+static bool is_frame_valid(const framing_protocol_t* self)
 {
     if (self->_state == STATE_FRAME_OK)
     {
