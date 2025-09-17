@@ -14,9 +14,10 @@
 
 /* ============================================================================================== */
 
-#define MAX_PAYLOAD_SIZE  16
-#define MAX_OVERHEAD_SIZE 4 /* STX, ETX, 2x BCC */
-#define MAX_FRAME_SIZE    (MAX_PAYLOAD_SIZE + MAX_OVERHEAD_SIZE)
+#define MAX_PAYLOAD_SIZE    16
+#define FRAME_OVERHEAD_SIZE 2 /* STX + ETX */
+#define BCC_SIZE_BYTES      2
+#define MAX_FRAME_SIZE      (MAX_PAYLOAD_SIZE + FRAME_OVERHEAD_SIZE + BCC_SIZE_BYTES)
 
 typedef enum
 {
@@ -30,9 +31,11 @@ typedef enum
 
 typedef struct
 {
-    struct uart_port*    _uart;
-    struct timer*        _timer;
+    struct uart_port* _uart;
+    struct timer*     _timer;
+
     frame_parser_state_t _state;
+    uint8_t              _payload_size;
 
     volatile uint8_t _rx_byte;
 
@@ -42,17 +45,20 @@ typedef struct
     uint8_t _tx_buffer[MAX_FRAME_SIZE];
     uint8_t _tx_buffer_index;
 
-    uint8_t _retransmission_counter;
-    uint8_t _frame_bcc_buffer[2];
-    uint8_t _frame_bcc_index;
-    bool    _waiting_for_ack;
+    uint8_t _bcc_buffer[BCC_SIZE_BYTES];
+    uint8_t _bcc_buffer_index;
 
+    bool    _waiting_for_ack;
     bool    _receiving_frame;
     uint8_t _lost_frames;
     uint8_t _stx_byte;
     uint8_t _etx_byte;
+    uint8_t _rx_timeout_ms;
+    uint8_t _tx_timeout_ms;
+    uint8_t _max_retransmissions;
+    uint8_t _retransmission_counter;
 
-    uint16_t (*checksum_calculator)(const uint8_t*, uint8_t);
+    uint16_t (*checksum_calculator)(const uint8_t* buffer, uint8_t size);
 
 } framing_protocol_t;
 
@@ -72,7 +78,7 @@ int8_t framing_protocol_transmit_payload(framing_protocol_t* self,
 
 /* ============================================================================================== */
 
-bool framing_protocol_receive_payload(framing_protocol_t* self, uint8_t* payload, uint8_t size);
+int8_t framing_protocol_receive_payload(framing_protocol_t* self, uint8_t* payload, uint8_t size);
 
 /* ============================================================================================== */
 
