@@ -25,10 +25,16 @@ typedef void (*uart_rx_callback_t)(void*          callback_context,
 
 /* ============================================================================================== */
 
-struct uart_port;  // Forward declaration. Declared later.
+/**
+ * @brief UART port structure. This structure holds the configuration and state of a UART port.
+ */
+struct uart_port;
 
 /* ============================================================================================== */
 
+/**
+ * @brief UART operations structure. This structure holds function pointers for UART operations.
+ */
 struct uart_ops
 {
     /**
@@ -86,14 +92,38 @@ struct uart_ops
 
 struct uart_port
 {
-    uint8_t  port_id;
-    uint32_t baud_rate;
-    uint8_t* rx_buffer;
-    size_t   rx_buffer_size;
-    void*    callback_context;
+    /**
+     * @brief UART port identifier. Serves to identify different UART peripherals within the same
+     * driver.
+     */
+    uint8_t port_id;
 
     /**
-     * @brief Pointer to the UART operations structure.
+     * @brief Baud rate for UART communication.
+     */
+    uint32_t baud_rate;
+
+    /**
+     * @brief Pointer to the receive buffer. This buffer must be created by the user, assigned, and
+     * kept alive throughout the lifetime of the UART port.
+     */
+    uint8_t* rx_buffer;
+
+    /**
+     * @brief Size of the receive buffer in bytes. This size must match the actual size of the
+     * buffer created by the user.
+     */
+    size_t rx_buffer_size;
+
+    /**
+     * @brief Pointer to the user-defined callback_context data (can be NULL).
+     */
+    void* callback_context;
+
+    /**
+     * @brief Pointer to the UART operations structure. This structure must be first created and
+     * initialized by the user. This structure must be of type 'const struct uart_ops', which
+     * ensures that the function pointers cannot be modified after initialization.
      */
     const struct uart_ops* ops;
 };

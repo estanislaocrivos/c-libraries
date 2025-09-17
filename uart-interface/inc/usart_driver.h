@@ -31,19 +31,25 @@ int8_t usart1_initialize(struct uart_port* usart1_port);
 
 /* ============================================================================================== */
 
-int8_t usart1_transmit(const uint8_t* tx_buffer, size_t length);
+int8_t usart1_transmit(struct uart_port* port, const uint8_t* buffer, size_t size);
 
 /* ============================================================================================== */
 
-int8_t usart1_receive(uint8_t* rx_buffer, size_t length);
+int8_t usart1_receive(struct uart_port* port, uint8_t* buffer, size_t size);
 
 /* ============================================================================================== */
 
-int8_t usart1_set_rx_callback(usart1_callback_t callback);
+int8_t usart1_set_rx_callback(struct uart_port*  port,
+                              uart_rx_callback_t callback,
+                              void*              callback_context);
 
 /* ============================================================================================== */
 
-void usart1_clear_buffers(void);
+void usart1_enable_rx_interrupt(struct uart_port* port, bool enable);
+
+/* ============================================================================================== */
+
+void usart1_clear_buffers(struct uart_port* port);
 
 /* ============================================================================================== */
 
