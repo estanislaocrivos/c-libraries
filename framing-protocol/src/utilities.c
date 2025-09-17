@@ -2,16 +2,16 @@
 
 /* ============================================================================================== */
 
-bool is_stx_valid(
+bool is_stx_valid(framing_protocol_t* self, uint8_t byte)
 {
-    return (byte == STX_VALID);
+    return (byte == self->_stx_byte);
 }
 
 /* ============================================================================================== */
 
-bool is_etx_valid(uint8_t byte)
+bool is_etx_valid(framing_protocol_t* self, uint8_t byte)
 {
-    return (byte == ETX_VALID);
+    return (byte == self->_etx_byte);
 }
 
 /* ============================================================================================== */
