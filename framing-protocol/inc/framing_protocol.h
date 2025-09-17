@@ -31,7 +31,7 @@ typedef enum
 typedef struct
 {
     struct uart_port*    _uart;
-    timer_interface_t*   _timer;
+    struct timer*        _timer;
     frame_parser_state_t _state;
 
     volatile uint8_t _rx_byte;
