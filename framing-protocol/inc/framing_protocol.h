@@ -42,13 +42,13 @@ typedef struct
      * - RX interrupt: enabled
      * - RX buffer size: 1 byte
      */
-    struct uart_port* _uart;
+    const struct uart_port* _uart;
 
     /**
      * @brief Pointer to the Timer structure. This structure must be first created and
      * initialized. The timer is expected to be initialized in timeout mode.
      */
-    struct timer* _timer;
+    const struct timer* _timer;
 
     /**
      * @brief RX buffer and index used for incoming bytes. This buffer is filled internally.
@@ -73,8 +73,12 @@ typedef struct
      */
     bool                 _initialized;
     bool                 _waiting_for_ack;
-    bool                 _receiving_frame;
     frame_parser_state_t _state;
+
+    /**
+     * @brief Flag indicating if a frame is being received.
+     */
+    bool receiving_frame;
 
     /**
      * @brief Payload size in bytes. Must be defined by the user and must not exceed
@@ -131,10 +135,6 @@ typedef struct
 /* ============================================================================================== */
 
 int8_t framing_protocol_create(framing_protocol_t* self);
-
-/* ============================================================================================== */
-
-int8_t framing_protocol_initialize(framing_protocol_t* self);
 
 /* ============================================================================================== */
 

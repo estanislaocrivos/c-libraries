@@ -8,13 +8,17 @@
 /* ============================================================================================== */
 
 #include "../inc/utilities.h"
+#include "../inc/checksum.h"
 
 /* ============================================================================================== */
 
-#define STX_VALID_DEFAULT 0x02
-#define ETX_VALID_DEFAULT 0x03
-#define ACK_DEFAULT       0x06
-#define NACK_DEFAULT      0x15
+#define STX_VALID_DEFAULT           0x02
+#define ETX_VALID_DEFAULT           0x03
+#define ACK_DEFAULT                 0x06
+#define NACK_DEFAULT                0x15
+#define RX_TIMEOUT_DEFAULT_MS       10
+#define TX_TIMEOUT_DEFAULT_MS       100
+#define MAX_RETRANSMISSIONS_DEFAULT 3
 
 /* ============================================================================================== */
 
@@ -138,7 +142,7 @@ static void reset_framing_protocol(framing_protocol_t* self)
     self->_tx_buffer_index      = 0;
     self->_bcc_buffer_index     = 0;
     self->_waiting_for_ack      = false;
-    self->_receiving_frame      = false;
+    self->receiving_frame       = false;
     self->lost_frames_counter   = 0;
     self->transmissions_counter = 0;
 }
@@ -293,16 +297,6 @@ int8_t framing_protocol_transmit_payload(framing_protocol_t* self,
 
 /* ============================================================================================== */
 
-int8_t framing_protocol_initialize(framing_protocol_t* self)
-{
-    self->_uart->ops->set_rx_callback(self->_uart, uart_rx_byte_callback, self);
-    self->_timer->ops->set_timeout_callback(self->_timer, tmr_timeout_callback, self);
-    self->_initialized = true;
-    return 0;
-}
-
-/* ============================================================================================== */
-
 int8_t framing_protocol_create(framing_protocol_t* self)
 {
     self->_initialized = false;
@@ -322,7 +316,30 @@ int8_t framing_protocol_create(framing_protocol_t* self)
     {
         self->_nack_byte = NACK_DEFAULT;
     }
-
+    if (!self->checksum_calculator)
+    {
+        self->checksum_calculator = basic_checksum;
+    }
+    if (!self->payload_size || self->payload_size > MAX_PAYLOAD_SIZE)
+    {
+        self->payload_size = MAX_PAYLOAD_SIZE;
+    }
+    if (!self->rx_timeout_ms)
+    {
+        self->rx_timeout_ms = RX_TIMEOUT_DEFAULT_MS;
+    }
+    if (!self->tx_timeout_ms)
+    {
+        self->tx_timeout_ms = TX_TIMEOUT_DEFAULT_MS;
+    }
+    if (!self->max_retransmissions)
+    {
+        self->max_retransmissions = MAX_RETRANSMISSIONS_DEFAULT;
+    }
+    reset_framing_protocol(self);
+    self->_uart->ops->set_rx_callback(self->_uart, uart_rx_byte_callback, self);
+    self->_timer->ops->set_timeout_callback(self->_timer, tmr_timeout_callback, self);
+    self->_initialized = true;
     return 0;
 }
 
