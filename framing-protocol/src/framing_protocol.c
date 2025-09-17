@@ -11,7 +11,7 @@
 
 /* ============================================================================================== */
 
-/* RX _state machine implementation */
+/* RX state machine implementation */
 
 /* ============================================================================================== */
 
@@ -42,12 +42,6 @@ static const frame_parser_state_table_entry_t state_table[] = {
     {STATE_FRAME_OK, rx_frame_ok_state_handler},
 };
 
-/* ============================================================================================== */
-
-/* Frame parser fsm states implementation */
-
-/* ============================================================================================== */
-
 static frame_parser_state_t rx_stx_state_handler(uint8_t const byte, framing_protocol_t* self)
 {
     if (!is_stx_valid(byte))
@@ -73,7 +67,6 @@ static frame_parser_state_t rx_payload_state_handler(uint8_t const byte, framing
 
 static frame_parser_state_t rx_etx_state_handler(uint8_t const byte, framing_protocol_t* self)
 {
-    ASSERT(self != NULL);
     if (!is_etx_valid(byte))
     {
         return STATE_DISCARD_FRAME;
@@ -107,13 +100,11 @@ static frame_parser_state_t rx_bcc_state_handler(uint8_t const byte, framing_pro
 static frame_parser_state_t rx_discard_frame_state_handler(uint8_t const       byte,
                                                            framing_protocol_t* self)
 {
-    ASSERT(self != NULL);
     return STATE_DISCARD_FRAME;
 }
 
 static frame_parser_state_t rx_frame_ok_state_handler(uint8_t const byte, framing_protocol_t* self)
 {
-    ASSERT(self != NULL);
     return STATE_FRAME_OK;
 }
 
@@ -125,20 +116,11 @@ static frame_parser_state_t rx_frame_ok_state_handler(uint8_t const byte, framin
 
 static bool is_frame_valid(framing_protocol_t* self)
 {
-    /* Check last _state */
     if (self->_state == STATE_FRAME_OK)
     {
         return true;
     }
     return false;
-}
-
-static void recover_payload_from_rx_buffer(framing_protocol_t* self, uint8_t* payload)
-{
-    for (uint8_t i = 0; i < self->_payload_size; i++)
-    {
-        payload[i] = self->_rx_buffer[i + 1];
-    }
 }
 
 /* ============================================================================================== */
@@ -174,7 +156,7 @@ static void handle_frame_transmission(framing_protocol_t* self)
     self->_timer->ops->set_timeout_ms(self->_timer, self->_tx_timeout_ms);
 }
 
-static void build_frame(framing_protocol_t* self, const uint8_t* payload, uint8_t size)
+static void build_frame(framing_protocol_t* self, const uint8_t* payload, size_t size)
 {
     if (size > MAX_PAYLOAD_SIZE)
     {
@@ -260,7 +242,6 @@ int8_t framing_protocol_receive_payload(framing_protocol_t* self, uint8_t* paylo
     if (is_frame_valid(&self))
     {
         /* Parse payload to public interface. Re-enable uart for next reception */
-        UART_TRANSMIT_BYTE_DRIVER(ACK);
         self->_uart->ops->transmit(self->_uart, ACK, 1);
         for (uint8_t i = 0; i < self->_payload_size; i++)
         {
