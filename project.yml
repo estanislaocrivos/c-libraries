@@ -99,23 +99,23 @@
   :test:
     - +:test/**
     - -:test/support
-    - +:spi-interface/test/**
+    - +:spi/test/**
     - +:hamming-codec/test/**
-    - +:mcu-mngr-interface/test/**
-    - +:lcd-16x2-driver/test/**
-    - +:uart-interface/test/**
+    - +:mcu-manager/test/**
+    - +:lcd-16-by-2/test/**
+    - +:uart/test/**
   :source:
-    - spi-interface/src/**
+    - spi/src/**
     - hamming-codec/src/**
-    - mcu-mngr-interface/src/**
-    - lcd-16x2-driver/src/**
-    - uart-interface/src/**
+    - mcu-manager/src/**
+    - lcd-16-by-2/src/**
+    - uart/src/**
   :include:
-    - spi-interface/inc/**
+    - spi/inc/**
     - hamming-codec/inc/**
-    - mcu-mngr-interface/inc/**
-    - lcd-16x2-driver/inc/**
-    - uart-interface/inc/**
+    - mcu-manager/inc/**
+    - lcd-16-by-2/inc/**
+    - uart/inc/**
   :support:
     - test/support
 
