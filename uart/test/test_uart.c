@@ -29,12 +29,6 @@ void helper_uart_create(struct uart_ops* ops, struct uart_port* uart)
 void mock_uart_callback(void* context, const uint8_t* buffer, size_t size)
 {
     // Mock implementation of the UART callback function
-    if (context)
-    {
-        // Do something with the context if needed
-    }
-    (void)buffer;  // Suppress unused variable warning
-    (void)size;    // Suppress unused variable warning
 }
 
 /* ============================================================================================== */
