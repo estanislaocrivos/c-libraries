@@ -23,7 +23,7 @@
 
 static void* usart1_callback_context;
 
-uart_rx_callback_t usart1_callback_t;
+uart_rx_callback_t usart1_callback;
 
 /* ============================================================================================== */
 
