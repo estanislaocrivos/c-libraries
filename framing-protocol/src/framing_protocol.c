@@ -116,7 +116,7 @@ static frame_parser_state_t rx_frame_ok_state_handler(uint8_t const byte, framin
 
 /* ============================================================================================== */
 
-/* Rx utilities */
+/* Utilities */
 
 /* ============================================================================================== */
 
@@ -128,10 +128,6 @@ static bool is_frame_valid(const framing_protocol_t* self)
     }
     return false;
 }
-
-/* ============================================================================================== */
-
-/* Tx utilities */
 
 /* ============================================================================================== */
 
@@ -154,7 +150,7 @@ static void handle_frame_transmission(framing_protocol_t* self)
     if (self->_initialized)
     {
         self->transmissions_counter += 1;
-        if (self->transmissions_counter > self->max_retransmissions)
+        if (self->transmissions_counter > self->max_retransmissions + 1)
         {
             reset_framing_protocol(self);
             return;
@@ -165,13 +161,19 @@ static void handle_frame_transmission(framing_protocol_t* self)
     }
 }
 
-static void build_frame(framing_protocol_t* self, const uint8_t* payload, size_t size)
+/* ============================================================================================== */
+
+static int8_t build_frame(framing_protocol_t* self, const uint8_t* payload, size_t size)
 {
+    if (self == NULL || payload == NULL)
+    {
+        return -EFAULT;
+    }
     if (self->_initialized)
     {
         if (size > MAX_PAYLOAD_SIZE)
         {
-            return;
+            return -EINVAL;
         }
         uint8_t index             = 0;
         self->_tx_buffer[index++] = self->_stx_byte;
@@ -184,7 +186,9 @@ static void build_frame(framing_protocol_t* self, const uint8_t* payload, size_t
         self->_tx_buffer[index++] = (bcc >> 8) & 0xFF;
         self->_tx_buffer[index++] = bcc & 0xFF;
         self->_tx_buffer_index    = index;
+        return 0;
     }
+    return -ENOENT;
 }
 
 /* ============================================================================================== */
@@ -316,7 +320,7 @@ int8_t framing_protocol_create(framing_protocol_t* self)
     {
         self->_nack_byte = NACK_DEFAULT;
     }
-    if (!self->checksum_calculator)
+    if (self->checksum_calculator == NULL)
     {
         self->checksum_calculator = basic_checksum;
     }

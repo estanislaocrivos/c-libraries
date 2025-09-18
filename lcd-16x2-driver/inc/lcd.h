@@ -8,36 +8,31 @@
 
 /* ============================================================================================== */
 
-typedef struct
+struct lcd_bus_interface
 {
-    gpio_interface_t rs;
-    gpio_interface_t en;
-    gpio_interface_t d0;
-    gpio_interface_t d1;
-    gpio_interface_t d2;
-    gpio_interface_t d3;
-    gpio_interface_t d4;
-    gpio_interface_t d5;
-    gpio_interface_t d6;
-    gpio_interface_t d7;
-} lcd_bus_interface_t;
+    struct gpio rs;
+    struct gpio en;
+    struct gpio d0;
+    struct gpio d1;
+    struct gpio d2;
+    struct gpio d3;
+    struct gpio d4;
+    struct gpio d5;
+    struct gpio d6;
+    struct gpio d7;
+};
 
 typedef struct
 {
-    lcd_bus_interface_t* bus;
-    delay_interface_t*   delay;
-} lcd_interface_t;
-
-typedef struct
-{
-    bool             initialized;
-    bool             eight_bit_mode;
-    lcd_interface_t* iface;
+    bool                      eight_bit_mode;
+    bool                      _initialized;
+    struct lcd_bus_interface* _bus;
+    struct timer*             _delay;
 } lcd_t;
 
 /* ============================================================================================== */
 
-int8_t lcd_create(lcd_t* self, lcd_interface_t* iface, bool eight_bit_mode);
+int8_t lcd_create(lcd_t* self);
 
 /* ============================================================================================== */
 

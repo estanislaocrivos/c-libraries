@@ -9,30 +9,30 @@
 
 static void _lcd_command_assert_seq(const lcd_t* self)
 {
-    self->iface->bus->rs.set_state(false);
-    self->iface->bus->en.set_state(true);
-    self->iface->delay->set_ms(10);
-    self->iface->bus->en.set_state(false);
+    self->_bus->rs.ops->set_state(&self->_bus->rs, false);
+    self->_bus->en.ops->set_state(&self->_bus->en, true);
+    self->_delay->ops->delay_ms(self->_delay, 10);
+    self->_bus->en.ops->set_state(&self->_bus->en, false);
 }
 
 /* ============================================================================================== */
 
 static void _lcd_data_assert_seq(const lcd_t* self)
 {
-    self->iface->bus->rs.set_state(true);
-    self->iface->bus->en.set_state(true);
-    self->iface->delay->set_ms(10);
-    self->iface->bus->en.set_state(false);
+    self->_bus->rs.ops->set_state(&self->_bus->rs, true);
+    self->_bus->en.ops->set_state(&self->_bus->en, true);
+    self->_delay->ops->delay_ms(self->_delay, 10);
+    self->_bus->en.ops->set_state(&self->_bus->en, false);
 }
 
 /* ============================================================================================== */
 
 static void _lcd_send_nibble(const lcd_t* self, uint8_t nibble)
 {
-    self->iface->bus->d4.set_state((nibble >> 0) & 0x01);
-    self->iface->bus->d5.set_state((nibble >> 1) & 0x01);
-    self->iface->bus->d6.set_state((nibble >> 2) & 0x01);
-    self->iface->bus->d7.set_state((nibble >> 3) & 0x01);
+    self->_bus->d4.ops->set_state(&self->_bus->d4, (nibble >> 0) & 0x01);
+    self->_bus->d5.ops->set_state(&self->_bus->d5, (nibble >> 1) & 0x01);
+    self->_bus->d6.ops->set_state(&self->_bus->d6, (nibble >> 2) & 0x01);
+    self->_bus->d7.ops->set_state(&self->_bus->d7, (nibble >> 3) & 0x01);
 }
 
 /* ============================================================================================== */
@@ -57,15 +57,13 @@ static void _lcd_send_char(const lcd_t* self, char character)
 
 /* ============================================================================================== */
 
-int8_t lcd_create(lcd_t* self, lcd_interface_t* iface, bool eight_bit_mode)
+int8_t lcd_create(lcd_t* self)
 {
-    if (self == NULL || iface == NULL)
+    if (self == NULL || self->_bus == NULL || self->_delay == NULL)
     {
         return -EFAULT;
     }
-    self->iface          = iface;
-    self->initialized    = false;
-    self->eight_bit_mode = eight_bit_mode;
+    self->_initialized = true;
     return 0;
 }
 
@@ -73,41 +71,41 @@ int8_t lcd_create(lcd_t* self, lcd_interface_t* iface, bool eight_bit_mode)
 
 int8_t lcd_initialize(lcd_t* self)
 {
-    if (self == NULL || self->iface == NULL)
+    if (self == NULL || self == NULL)
     {
         return -EFAULT;
     }
-    self->initialized = true;
-    self->iface->bus->rs.set_state(false);
-    self->iface->bus->en.set_state(false);
+    self->_initialized = true;
+    self->_bus->rs.ops->set_state(&self->_bus->rs, false);
+    self->_bus->en.ops->set_state(&self->_bus->en, false);
 
     /* Init. routine. First send only nibbles (4-bit mode not active yet) */
     _lcd_send_nibble(self, 0x03);
     _lcd_command_assert_seq(self);
-    self->iface->delay->set_ms(5);
+    self->_delay->ops->delay_ms(self->_delay, 5);
     _lcd_send_nibble(self, 0x03);
     _lcd_command_assert_seq(self);
-    self->iface->delay->set_us(150);
+    self->_delay->ops->delay_us(self->_delay, 150);
     _lcd_send_nibble(self, 0x03);
     _lcd_command_assert_seq(self);
-    self->iface->delay->set_us(150);
+    self->_delay->ops->delay_us(self->_delay, 150);
     _lcd_send_nibble(self, 0x02);
     _lcd_command_assert_seq(self);
-    self->iface->delay->set_us(150);
+    self->_delay->ops->delay_us(self->_delay, 150);
 
     /* Now send 8-bit commands */
     _lcd_send_command(self, 0x28); /* Function set */
-    self->iface->delay->set_ms(2);
+    self->_delay->ops->delay_ms(self->_delay, 2);
     _lcd_send_command(self, 0x08); /* Display off */
-    self->iface->delay->set_ms(2);
+    self->_delay->ops->delay_ms(self->_delay, 2);
     _lcd_send_command(self, 0x01); /* Clear display */
-    self->iface->delay->set_ms(2);
+    self->_delay->ops->delay_ms(self->_delay, 2);
     _lcd_send_command(self, 0x06); /* Entry mode */
-    self->iface->delay->set_ms(2);
+    self->_delay->ops->delay_ms(self->_delay, 2);
     _lcd_send_command(self, 0x0C); /* Display on */
-    self->iface->delay->set_ms(2);
+    self->_delay->ops->delay_ms(self->_delay, 2);
     _lcd_send_command(self, 0x01); /* Clear display */
-    self->iface->delay->set_ms(2);
+    self->_delay->ops->delay_ms(self->_delay, 2);
     return 0;
 }
 
@@ -115,7 +113,7 @@ int8_t lcd_initialize(lcd_t* self)
 
 int8_t lcd_go_to_index(const lcd_t* self, uint8_t x, uint8_t y)
 {
-    if (self == NULL || self->iface == NULL)
+    if (self == NULL || self == NULL)
     {
         return -EFAULT;
     }
@@ -123,7 +121,7 @@ int8_t lcd_go_to_index(const lcd_t* self, uint8_t x, uint8_t y)
     {
         return -EINVAL;
     }
-    if (!self->initialized)
+    if (!self->_initialized)
     {
         return -ENOENT;
     }
@@ -136,11 +134,11 @@ int8_t lcd_go_to_index(const lcd_t* self, uint8_t x, uint8_t y)
 
 int8_t lcd_clear_display(const lcd_t* self)
 {
-    if (self == NULL || self->iface == NULL)
+    if (self == NULL || self == NULL)
     {
         return -EFAULT;
     }
-    if (!self->initialized)
+    if (!self->_initialized)
     {
         return -ENOENT;
     }
@@ -152,11 +150,11 @@ int8_t lcd_clear_display(const lcd_t* self)
 
 int8_t lcd_print_string(const lcd_t* self, char* string)
 {
-    if (self == NULL || self->iface == NULL || string == NULL)
+    if (self == NULL || self == NULL || string == NULL)
     {
         return -EFAULT;
     }
-    if (!self->initialized)
+    if (!self->_initialized)
     {
         return -ENOENT;
     }
@@ -170,7 +168,7 @@ int8_t lcd_print_string(const lcd_t* self, char* string)
         }
         else if (char_index == 32)
         {
-            self->iface->delay->set_ms(500);
+            self->_delay->ops->delay_ms(self->_delay, 500);
             lcd_clear_display(self);
             lcd_go_to_index(self, 0, 0);
             char_index = 0;
