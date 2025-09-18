@@ -12,8 +12,8 @@
 
 /* ============================================================================================== */
 
-void helper_lcd_init(struct gpio_ops*          gpio_ops,
-                     struct timer_ops*         timer_ops,
+void helper_lcd_init(const struct gpio_ops*    gpio_ops,
+                     const struct timer_ops*   timer_ops,
                      struct lcd*               lcd,
                      struct lcd_bus_interface* lcd_bus,
                      struct timer*             lcd_delay)
@@ -84,10 +84,10 @@ void test_lcd_command_assert_seq(void)
 
     lcd_create(&lcd);
 
-    gpio_set_state_Expect(&lcd_bus.rs, false);
-    gpio_set_state_Expect(&lcd_bus.en, true);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->rs, false, 0);
+    gpio_set_state_ExpectAndReturn(&lcd_bus.en, true, 0);
     tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
-    gpio_set_state_Expect(&lcd_bus.en, false);
+    gpio_set_state_ExpectAndReturn(&lcd_bus.en, false, 0);
     _lcd_command_assert_seq(&lcd);
 }
 
@@ -110,10 +110,10 @@ void test_lcd_data_assert_seq(void)
 
     lcd_create(&lcd);
 
-    gpio_set_state_Expect(&lcd_bus.rs, true);
-    gpio_set_state_Expect(&lcd_bus.en, true);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->rs, true, 0);
+    gpio_set_state_ExpectAndReturn(&lcd_bus.en, true, 0);
     tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
-    gpio_set_state_Expect(&lcd_bus.en, false);
+    gpio_set_state_ExpectAndReturn(&lcd_bus.en, false, 0);
     _lcd_data_assert_seq(&lcd);
 }
 
@@ -136,10 +136,10 @@ void test_lcd_send_nibble(void)
 
     lcd_create(&lcd);
 
-    gpio_set_state_Expect(&lcd_bus.d4, 1);
-    gpio_set_state_Expect(&lcd_bus.d5, 0);
-    gpio_set_state_Expect(&lcd_bus.d6, 1);
-    gpio_set_state_Expect(&lcd_bus.d7, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d4, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d5, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d6, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d7, 0, 0);
     _lcd_send_nibble(&lcd, 0x05);
 }
 
@@ -162,23 +162,23 @@ void test_lcd_send_command(void)
 
     lcd_create(&lcd);
 
-    gpio_set_state_Expect(&lcd_bus.d4, 1);
-    gpio_set_state_Expect(&lcd_bus.d5, 0);
-    gpio_set_state_Expect(&lcd_bus.d6, 1);
-    gpio_set_state_Expect(&lcd_bus.d7, 0);
-    gpio_set_state_Expect(&lcd_bus.rs, false);
-    gpio_set_state_Expect(&lcd_bus.en, true);
-    tmr_delay_ms_ExpectAndReturn(&lcd._delay, 10, 0);
-    gpio_set_state_Expect(&lcd_bus.en, false);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d4, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d5, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d6, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d7, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->rs, false, 0);
+    gpio_set_state_ExpectAndReturn(&lcd_bus.en, true, 0);
+    tmr_delay_ms_ExpectAndReturn(lcd._delay, 10, 0);
+    gpio_set_state_ExpectAndReturn(&lcd_bus.en, false, 0);
 
-    gpio_set_state_Expect(&lcd_bus.d4, 1);
-    gpio_set_state_Expect(&lcd_bus.d5, 1);
-    gpio_set_state_Expect(&lcd_bus.d6, 1);
-    gpio_set_state_Expect(&lcd_bus.d7, 1);
-    gpio_set_state_Expect(&lcd_bus.rs, false);
-    gpio_set_state_Expect(&lcd_bus.en, true);
-    tmr_delay_ms_ExpectAndReturn(&lcd._delay, 10, 0);
-    gpio_set_state_Expect(&lcd_bus.en, false);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d4, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d5, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d6, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d7, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->rs, false, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->en, true, 0);
+    tmr_delay_ms_ExpectAndReturn(lcd._delay, 10, 0);
+    gpio_set_state_ExpectAndReturn(&lcd_bus.en, false, 0);
 
     _lcd_send_command(&lcd, 0x5F);
 }
@@ -200,23 +200,23 @@ void test_lcd_send_char(void)
     struct lcd               lcd;
     helper_lcd_init(&gpio_ops, &timer_ops, &lcd, &lcd_bus, &lcd_delay);
 
-    gpio2_set_state_Expect(0);
-    gpio3_set_state_Expect(0);
-    gpio4_set_state_Expect(1);
-    gpio5_set_state_Expect(0);
-    gpio0_set_state_Expect(true);
-    gpio1_set_state_Expect(true);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d4, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d5, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d6, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d7, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->rs, true, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->en, true, 0);
     tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
-    gpio1_set_state_Expect(false);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->en, false, 0);
 
-    gpio2_set_state_Expect(1);
-    gpio3_set_state_Expect(0);
-    gpio4_set_state_Expect(0);
-    gpio5_set_state_Expect(0);
-    gpio0_set_state_Expect(true);
-    gpio1_set_state_Expect(true);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d4, 1, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d5, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d6, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->d7, 0, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->rs, true, 0);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->en, true, 0);
     tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
-    gpio1_set_state_Expect(false);
+    gpio_set_state_ExpectAndReturn(&lcd._bus->en, false, 0);
 
     _lcd_send_char(&lcd, 'A');
 }
