@@ -102,19 +102,19 @@
     - +:spi/test/**
     - +:hamming-codec/test/**
     - +:mcu-manager/test/**
-    - +:lcd-16x2-driver/test/**
+    - +:lcd-16-by-2/test/**
     - +:uart/test/**
   :source:
     - spi/src/**
     - hamming-codec/src/**
     - mcu-manager/src/**
-    - lcd-16x2-driver/src/**
+    - lcd-16-by-2/src/**
     - uart/src/**
   :include:
     - spi/inc/**
     - hamming-codec/inc/**
     - mcu-manager/inc/**
-    - lcd-16x2-driver/inc/**
+    - lcd-16-by-2/inc/**
     - uart/inc/**
   :support:
     - test/support

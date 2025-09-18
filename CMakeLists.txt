@@ -8,5 +8,5 @@ project(common-c-libs
 add_subdirectory(hamming-codec)
 add_subdirectory(spi)
 add_subdirectory(mcu-manager)
-add_subdirectory(lcd-16x2-driver)
+add_subdirectory(lcd-16-by-2)
 add_subdirectory(uart)
