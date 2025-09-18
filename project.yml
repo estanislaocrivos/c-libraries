@@ -99,19 +99,19 @@
   :test:
     - +:test/**
     - -:test/support
-    - +:spi-interface/test/**
+    - +:spi/test/**
     - +:hamming-codec/test/**
     - +:mcu-mngr-interface/test/**
     - +:lcd-16x2-driver/test/**
     - +:uart-interface/test/**
   :source:
-    - spi-interface/src/**
+    - spi/src/**
     - hamming-codec/src/**
     - mcu-mngr-interface/src/**
     - lcd-16x2-driver/src/**
     - uart-interface/src/**
   :include:
-    - spi-interface/inc/**
+    - spi/inc/**
     - hamming-codec/inc/**
     - mcu-mngr-interface/inc/**
     - lcd-16x2-driver/inc/**

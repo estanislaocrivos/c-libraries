@@ -8,7 +8,7 @@
 #include "../hamming-codec/inc/hamming_codec.h"
 #include "../lcd-16x2-driver/inc/lcd.h"
 #include "../mcu-mngr-interface/inc/mcu_manager.h"
-#include "../spi-interface/inc/spi.h"
+#include "../spi/inc/spi.h"
 #include "../uart-interface/inc/uart.h"
 
 /* ============================================================================================== */
