@@ -71,7 +71,7 @@ int8_t lcd_create(struct lcd* self)
 
 int8_t lcd_initialize(struct lcd* self)
 {
-    if (self == NULL || self == NULL)
+    if (self == NULL)
     {
         return -EFAULT;
     }
@@ -113,7 +113,7 @@ int8_t lcd_initialize(struct lcd* self)
 
 int8_t lcd_go_to_index(const struct lcd* self, uint8_t x, uint8_t y)
 {
-    if (self == NULL || self == NULL)
+    if (self == NULL)
     {
         return -EFAULT;
     }
@@ -134,7 +134,7 @@ int8_t lcd_go_to_index(const struct lcd* self, uint8_t x, uint8_t y)
 
 int8_t lcd_clear_display(const struct lcd* self)
 {
-    if (self == NULL || self == NULL)
+    if (self == NULL)
     {
         return -EFAULT;
     }
@@ -150,7 +150,7 @@ int8_t lcd_clear_display(const struct lcd* self)
 
 int8_t lcd_print_string(const struct lcd* self, char* string)
 {
-    if (self == NULL || self == NULL || string == NULL)
+    if (self == NULL || string == NULL)
     {
         return -EFAULT;
     }
