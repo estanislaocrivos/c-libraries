@@ -12,93 +12,82 @@
 
 /* ============================================================================================== */
 
-void helper_lcd_init(lcd_bus_interface_t* lcd_bus,
-                     delay_interface_t*   lcd_delay,
-                     lcd_interface_t*     lcd_iface)
+void helper_lcd_init(struct gpio_ops*          gpio_ops,
+                     struct timer_ops*         timer_ops,
+                     struct lcd*               lcd,
+                     struct lcd_bus_interface* lcd_bus,
+                     struct timer*             lcd_delay)
 {
-    memset(lcd_bus, 0, sizeof(lcd_bus_interface_t));
-    memset(lcd_delay, 0, sizeof(delay_interface_t));
-    memset(lcd_iface, 0, sizeof(lcd_interface_t));
-    lcd_bus->rs.set_state = gpio0_set_state;
-    lcd_bus->rs.get_state = gpio0_get_state;
-    lcd_bus->en.set_state = gpio1_set_state;
-    lcd_bus->en.get_state = gpio1_get_state;
-    lcd_bus->d0.set_state = gpio6_set_state;
-    lcd_bus->d0.get_state = gpio6_get_state;
-    lcd_bus->d1.set_state = gpio7_set_state;
-    lcd_bus->d1.get_state = gpio7_get_state;
-    lcd_bus->d2.set_state = gpio8_set_state;
-    lcd_bus->d2.get_state = gpio8_get_state;
-    lcd_bus->d3.set_state = gpio9_set_state;
-    lcd_bus->d3.get_state = gpio9_get_state;
-    lcd_bus->d4.set_state = gpio2_set_state;
-    lcd_bus->d4.get_state = gpio2_get_state;
-    lcd_bus->d5.set_state = gpio3_set_state;
-    lcd_bus->d5.get_state = gpio3_get_state;
-    lcd_bus->d6.set_state = gpio4_set_state;
-    lcd_bus->d6.get_state = gpio4_get_state;
-    lcd_bus->d7.set_state = gpio5_set_state;
-    lcd_bus->d7.get_state = gpio5_get_state;
-    lcd_delay->set_ms     = delay_ms;
-    lcd_delay->set_us     = delay_us;
-
-    lcd_iface->bus   = lcd_bus;
-    lcd_iface->delay = lcd_delay;
+    lcd_bus->rs.ops = gpio_ops;
+    lcd_bus->en.ops = gpio_ops;
+    lcd_bus->d0.ops = gpio_ops;
+    lcd_bus->d1.ops = gpio_ops;
+    lcd_bus->d2.ops = gpio_ops;
+    lcd_bus->d3.ops = gpio_ops;
+    lcd_bus->d4.ops = gpio_ops;
+    lcd_bus->d5.ops = gpio_ops;
+    lcd_bus->d6.ops = gpio_ops;
+    lcd_bus->d7.ops = gpio_ops;
+    lcd_delay->ops  = timer_ops;
+    lcd->_bus       = lcd_bus;
+    lcd->_delay     = lcd_delay;
 }
 
 /* ============================================================================================== */
 
 void test_lcd_creation(void)
 {
-    lcd_bus_interface_t lcd_bus;
-    delay_interface_t   lcd_delay;
-    lcd_interface_t     lcd_iface;
-    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
+    const struct gpio_ops gpio_ops
+        = {.get_state = gpio_get_state, .set_state = gpio_set_state, .toggle = gpio_toggle};
+    const struct timer_ops   timer_ops = {.deactivate_timeout   = tmr_deactivate_timeout,
+                                          .delay_ms             = tmr_delay_ms,
+                                          .delay_us             = tmr_delay_us,
+                                          .reset_timeout        = tmr_reset_timeout,
+                                          .set_timeout_callback = tmr_set_timeout_callback,
+                                          .set_timeout_ms       = tmr_set_timeout_ms};
+    struct lcd_bus_interface lcd_bus;
+    struct timer             lcd_delay;
+    struct lcd               lcd;
+    helper_lcd_init(&gpio_ops, &timer_ops, &lcd, &lcd_bus, &lcd_delay);
 
-    lcd_t lcd;
-    lcd_create(&lcd, &lcd_iface, false);
+    lcd_create(&lcd);
 
-    TEST_ASSERT_EQUAL_PTR(gpio0_set_state, lcd.iface->bus->rs.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio1_set_state, lcd.iface->bus->en.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio2_set_state, lcd.iface->bus->d4.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio3_set_state, lcd.iface->bus->d5.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio4_set_state, lcd.iface->bus->d6.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio5_set_state, lcd.iface->bus->d7.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio6_set_state, lcd.iface->bus->d0.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio7_set_state, lcd.iface->bus->d1.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio8_set_state, lcd.iface->bus->d2.set_state);
-    TEST_ASSERT_EQUAL_PTR(gpio9_set_state, lcd.iface->bus->d3.set_state);
-
-    TEST_ASSERT_EQUAL_PTR(gpio0_get_state, lcd.iface->bus->rs.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio1_get_state, lcd.iface->bus->en.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio2_get_state, lcd.iface->bus->d4.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio3_get_state, lcd.iface->bus->d5.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio4_get_state, lcd.iface->bus->d6.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio5_get_state, lcd.iface->bus->d7.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio6_get_state, lcd.iface->bus->d0.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio7_get_state, lcd.iface->bus->d1.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio8_get_state, lcd.iface->bus->d2.get_state);
-    TEST_ASSERT_EQUAL_PTR(gpio9_get_state, lcd.iface->bus->d3.get_state);
-    TEST_ASSERT_EQUAL_PTR(delay_ms, lcd.iface->delay->set_ms);
-    TEST_ASSERT_EQUAL_PTR(delay_us, lcd.iface->delay->set_us);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->rs.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->en.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d4.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d5.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d6.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d7.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d0.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d1.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d2.ops);
+    TEST_ASSERT_EQUAL_PTR(&gpio_ops, lcd._bus->d3.ops);
+    TEST_ASSERT_EQUAL_PTR(&timer_ops, lcd._delay->ops);
 }
 
 /* ============================================================================================== */
 
 void test_lcd_command_assert_seq(void)
 {
-    lcd_bus_interface_t lcd_bus;
-    delay_interface_t   lcd_delay;
-    lcd_interface_t     lcd_iface;
-    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
+    const struct gpio_ops gpio_ops
+        = {.get_state = gpio_get_state, .set_state = gpio_set_state, .toggle = gpio_toggle};
+    const struct timer_ops   timer_ops = {.deactivate_timeout   = tmr_deactivate_timeout,
+                                          .delay_ms             = tmr_delay_ms,
+                                          .delay_us             = tmr_delay_us,
+                                          .reset_timeout        = tmr_reset_timeout,
+                                          .set_timeout_callback = tmr_set_timeout_callback,
+                                          .set_timeout_ms       = tmr_set_timeout_ms};
+    struct lcd_bus_interface lcd_bus;
+    struct timer             lcd_delay;
+    struct lcd               lcd;
+    helper_lcd_init(&gpio_ops, &timer_ops, &lcd, &lcd_bus, &lcd_delay);
 
-    lcd_t lcd;
-    lcd_create(&lcd, &lcd_iface, false);
+    lcd_create(&lcd);
 
-    gpio0_set_state_Expect(false);
-    gpio1_set_state_Expect(true);
-    delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_state_Expect(false);
+    gpio_set_state_Expect(&lcd_bus.rs, false);
+    gpio_set_state_Expect(&lcd_bus.en, true);
+    tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
+    gpio_set_state_Expect(&lcd_bus.en, false);
     _lcd_command_assert_seq(&lcd);
 }
 
@@ -106,18 +95,25 @@ void test_lcd_command_assert_seq(void)
 
 void test_lcd_data_assert_seq(void)
 {
-    lcd_bus_interface_t lcd_bus;
-    delay_interface_t   lcd_delay;
-    lcd_interface_t     lcd_iface;
-    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
+    const struct gpio_ops gpio_ops
+        = {.get_state = gpio_get_state, .set_state = gpio_set_state, .toggle = gpio_toggle};
+    const struct timer_ops   timer_ops = {.deactivate_timeout   = tmr_deactivate_timeout,
+                                          .delay_ms             = tmr_delay_ms,
+                                          .delay_us             = tmr_delay_us,
+                                          .reset_timeout        = tmr_reset_timeout,
+                                          .set_timeout_callback = tmr_set_timeout_callback,
+                                          .set_timeout_ms       = tmr_set_timeout_ms};
+    struct lcd_bus_interface lcd_bus;
+    struct timer             lcd_delay;
+    struct lcd               lcd;
+    helper_lcd_init(&gpio_ops, &timer_ops, &lcd, &lcd_bus, &lcd_delay);
 
-    lcd_t lcd;
-    lcd_create(&lcd, &lcd_iface, false);
+    lcd_create(&lcd);
 
-    gpio0_set_state_Expect(true);
-    gpio1_set_state_Expect(true);
-    delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_state_Expect(false);
+    gpio_set_state_Expect(&lcd_bus.rs, true);
+    gpio_set_state_Expect(&lcd_bus.en, true);
+    tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
+    gpio_set_state_Expect(&lcd_bus.en, false);
     _lcd_data_assert_seq(&lcd);
 }
 
@@ -125,18 +121,25 @@ void test_lcd_data_assert_seq(void)
 
 void test_lcd_send_nibble(void)
 {
-    lcd_bus_interface_t lcd_bus;
-    delay_interface_t   lcd_delay;
-    lcd_interface_t     lcd_iface;
-    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
+    const struct gpio_ops gpio_ops
+        = {.get_state = gpio_get_state, .set_state = gpio_set_state, .toggle = gpio_toggle};
+    const struct timer_ops   timer_ops = {.deactivate_timeout   = tmr_deactivate_timeout,
+                                          .delay_ms             = tmr_delay_ms,
+                                          .delay_us             = tmr_delay_us,
+                                          .reset_timeout        = tmr_reset_timeout,
+                                          .set_timeout_callback = tmr_set_timeout_callback,
+                                          .set_timeout_ms       = tmr_set_timeout_ms};
+    struct lcd_bus_interface lcd_bus;
+    struct timer             lcd_delay;
+    struct lcd               lcd;
+    helper_lcd_init(&gpio_ops, &timer_ops, &lcd, &lcd_bus, &lcd_delay);
 
-    lcd_t lcd;
-    lcd_create(&lcd, &lcd_iface, false);
+    lcd_create(&lcd);
 
-    gpio2_set_state_Expect(1);
-    gpio3_set_state_Expect(0);
-    gpio4_set_state_Expect(1);
-    gpio5_set_state_Expect(0);
+    gpio_set_state_Expect(&lcd_bus.d4, 1);
+    gpio_set_state_Expect(&lcd_bus.d5, 0);
+    gpio_set_state_Expect(&lcd_bus.d6, 1);
+    gpio_set_state_Expect(&lcd_bus.d7, 0);
     _lcd_send_nibble(&lcd, 0x05);
 }
 
@@ -144,31 +147,38 @@ void test_lcd_send_nibble(void)
 
 void test_lcd_send_command(void)
 {
-    lcd_bus_interface_t lcd_bus;
-    delay_interface_t   lcd_delay;
-    lcd_interface_t     lcd_iface;
-    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
+    const struct gpio_ops gpio_ops
+        = {.get_state = gpio_get_state, .set_state = gpio_set_state, .toggle = gpio_toggle};
+    const struct timer_ops   timer_ops = {.deactivate_timeout   = tmr_deactivate_timeout,
+                                          .delay_ms             = tmr_delay_ms,
+                                          .delay_us             = tmr_delay_us,
+                                          .reset_timeout        = tmr_reset_timeout,
+                                          .set_timeout_callback = tmr_set_timeout_callback,
+                                          .set_timeout_ms       = tmr_set_timeout_ms};
+    struct lcd_bus_interface lcd_bus;
+    struct timer             lcd_delay;
+    struct lcd               lcd;
+    helper_lcd_init(&gpio_ops, &timer_ops, &lcd, &lcd_bus, &lcd_delay);
 
-    lcd_t lcd;
-    lcd_create(&lcd, &lcd_iface, false);
+    lcd_create(&lcd);
 
-    gpio2_set_state_Expect(1);
-    gpio3_set_state_Expect(0);
-    gpio4_set_state_Expect(1);
-    gpio5_set_state_Expect(0);
-    gpio0_set_state_Expect(false);
-    gpio1_set_state_Expect(true);
-    delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_state_Expect(false);
+    gpio_set_state_Expect(&lcd_bus.d4, 1);
+    gpio_set_state_Expect(&lcd_bus.d5, 0);
+    gpio_set_state_Expect(&lcd_bus.d6, 1);
+    gpio_set_state_Expect(&lcd_bus.d7, 0);
+    gpio_set_state_Expect(&lcd_bus.rs, false);
+    gpio_set_state_Expect(&lcd_bus.en, true);
+    tmr_delay_ms_ExpectAndReturn(&lcd._delay, 10, 0);
+    gpio_set_state_Expect(&lcd_bus.en, false);
 
-    gpio2_set_state_Expect(1);
-    gpio3_set_state_Expect(1);
-    gpio4_set_state_Expect(1);
-    gpio5_set_state_Expect(1);
-    gpio0_set_state_Expect(false);
-    gpio1_set_state_Expect(true);
-    delay_ms_ExpectAndReturn(10, 0);
-    gpio1_set_state_Expect(false);
+    gpio_set_state_Expect(&lcd_bus.d4, 1);
+    gpio_set_state_Expect(&lcd_bus.d5, 1);
+    gpio_set_state_Expect(&lcd_bus.d6, 1);
+    gpio_set_state_Expect(&lcd_bus.d7, 1);
+    gpio_set_state_Expect(&lcd_bus.rs, false);
+    gpio_set_state_Expect(&lcd_bus.en, true);
+    tmr_delay_ms_ExpectAndReturn(&lcd._delay, 10, 0);
+    gpio_set_state_Expect(&lcd_bus.en, false);
 
     _lcd_send_command(&lcd, 0x5F);
 }
@@ -177,13 +187,18 @@ void test_lcd_send_command(void)
 
 void test_lcd_send_char(void)
 {
-    lcd_bus_interface_t lcd_bus;
-    delay_interface_t   lcd_delay;
-    lcd_interface_t     lcd_iface;
-    helper_lcd_init(&lcd_bus, &lcd_delay, &lcd_iface);
-
-    lcd_t lcd;
-    lcd_create(&lcd, &lcd_iface, false);
+    const struct gpio_ops gpio_ops
+        = {.get_state = gpio_get_state, .set_state = gpio_set_state, .toggle = gpio_toggle};
+    const struct timer_ops   timer_ops = {.deactivate_timeout   = tmr_deactivate_timeout,
+                                          .delay_ms             = tmr_delay_ms,
+                                          .delay_us             = tmr_delay_us,
+                                          .reset_timeout        = tmr_reset_timeout,
+                                          .set_timeout_callback = tmr_set_timeout_callback,
+                                          .set_timeout_ms       = tmr_set_timeout_ms};
+    struct lcd_bus_interface lcd_bus;
+    struct timer             lcd_delay;
+    struct lcd               lcd;
+    helper_lcd_init(&gpio_ops, &timer_ops, &lcd, &lcd_bus, &lcd_delay);
 
     gpio2_set_state_Expect(0);
     gpio3_set_state_Expect(0);
@@ -191,7 +206,7 @@ void test_lcd_send_char(void)
     gpio5_set_state_Expect(0);
     gpio0_set_state_Expect(true);
     gpio1_set_state_Expect(true);
-    delay_ms_ExpectAndReturn(10, 0);
+    tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
     gpio1_set_state_Expect(false);
 
     gpio2_set_state_Expect(1);
@@ -200,7 +215,7 @@ void test_lcd_send_char(void)
     gpio5_set_state_Expect(0);
     gpio0_set_state_Expect(true);
     gpio1_set_state_Expect(true);
-    delay_ms_ExpectAndReturn(10, 0);
+    tmr_delay_ms_ExpectAndReturn(&lcd_delay, 10, 0);
     gpio1_set_state_Expect(false);
 
     _lcd_send_char(&lcd, 'A');
