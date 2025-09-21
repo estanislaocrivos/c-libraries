@@ -2,7 +2,7 @@
 
 /* ============================================================================================== */
 
-#include "../inc/uart.h"
+#include "../inc/serial.h"
 
 /* Mocked interfaces */
 #include "mock_usart_driver.h"

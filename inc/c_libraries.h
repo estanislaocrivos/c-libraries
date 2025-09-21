@@ -7,7 +7,7 @@
 #include "../lcd-16-by-2/inc/lcd.h"
 #include "../embedded-hal/inc/mcu_manager.h"
 #include "../spi/inc/spi.h"
-#include "../uart/inc/uart.h"
+#include "../uart/inc/serial.h"
 
 /* ============================================================================================== */
 
