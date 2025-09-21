@@ -99,23 +99,17 @@
   :test:
     - +:test/**
     - -:test/support
-    - +:spi/test/**
     - +:hamming-codec/test/**
-    - +:mcu-manager/test/**
+    - +:embedded-hal/test/**
     - +:lcd-16-by-2/test/**
-    - +:uart/test/**
   :source:
-    - spi/src/**
     - hamming-codec/src/**
-    - mcu-manager/src/**
+    - embedded-hal/src/**
     - lcd-16-by-2/src/**
-    - uart/src/**
   :include:
-    - spi/inc/**
     - hamming-codec/inc/**
-    - mcu-manager/inc/**
+    - embedded-hal/inc/**
     - lcd-16-by-2/inc/**
-    - uart/inc/**
   :support:
     - test/support
 

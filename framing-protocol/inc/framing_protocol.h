@@ -10,7 +10,7 @@
 
 #include "../../inc/errno.h"
 #include "../../uart/inc/uart.h"
-#include "../../mcu-manager/inc/timer.h"
+#include "../../embedded-hal/inc/timer.h"
 
 /* ============================================================================================== */
 

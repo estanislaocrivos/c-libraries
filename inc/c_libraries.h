@@ -5,7 +5,7 @@
 
 #include "errno.h"
 #include "../lcd-16-by-2/inc/lcd.h"
-#include "../mcu-manager/inc/mcu_manager.h"
+#include "../embedded-hal/inc/mcu_manager.h"
 #include "../spi/inc/spi.h"
 #include "../uart/inc/uart.h"
 
