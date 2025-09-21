@@ -1,3 +1,3 @@
-# UART Interface 📨
+# Serial HAL Interface 📨
 
-A simple C abstraction interface to communicate with UART devices.
+A simple hardware abstraction layer interface to communicate with UART devices.

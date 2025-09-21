@@ -1,3 +1,3 @@
-# SPI Interface 📨
+# SPI HAL Interface 📨
 
-A simple C abstraction interface to communicate with SPI devices.
+A simple hardware abstraction layer interface to communicate with SPI devices.
