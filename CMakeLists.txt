@@ -6,7 +6,5 @@ project(common-c-libs
 )
 
 add_subdirectory(hamming-codec)
-add_subdirectory(spi)
 add_subdirectory(embedded-hal)
 add_subdirectory(lcd-16-by-2)
-add_subdirectory(uart)

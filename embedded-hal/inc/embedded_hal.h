@@ -1,12 +1,14 @@
-#ifndef C_LIBRARIES_H
-#define C_LIBRARIES_H
+#ifndef EMBEDDED_HAL_H
+#define EMBEDDED_HAL_H
 
 /* ============================================================================================== */
 
-#include "errno.h"
-#include "../lcd-16-by-2/inc/lcd.h"
-#include "../embedded-hal/inc/embedded_hal.h"
+#include "gpio.h"
+#include "timer.h"
+#include "serial.h"
+#include "interrupt.h"
+#include "spi.h"
 
 /* ============================================================================================== */
 
-#endif  // C_LIBRARIES_H
+#endif  // EMBEDDED_HAL_H
