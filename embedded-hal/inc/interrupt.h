@@ -1,23 +1,30 @@
-#ifndef UTILITIES_H
-#define UTILITIES_H
+#ifndef INTERRUPT_H
+#define INTERRUPT_H
 
 /* ============================================================================================== */
 
-#include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
+#include <stdbool.h>
 
 /* ============================================================================================== */
 
-#include "framing_protocol.h"
+/**
+ * @brief Interrupt operations structure.
+ */
+struct interrupt_ops
+{
+    /**
+     * @brief Enables global interrupts.
+     */
+    void (*enable_global)(bool);
+};
 
 /* ============================================================================================== */
 
-bool is_stx_valid(const framing_protocol_t* self, uint8_t byte);
-
-/* ============================================================================================== */
-
-bool is_etx_valid(const framing_protocol_t* self, uint8_t byte);
+struct interrupt
+{
+    const struct interrupt_ops* ops;
+};
 
 /* ============================================================================================== */
 
