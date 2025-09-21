@@ -3,7 +3,6 @@
 /* ============================================================================================== */
 
 #include "../inc/spi.h"
-#include "../src/spi.c"
 
 /* Mocked interfaces */
 #include "mock_spi_driver.h"

@@ -3,7 +3,6 @@
 /* ============================================================================================== */
 
 #include "../inc/uart.h"
-#include "../src/uart.c"
 
 /* Mocked interfaces */
 #include "mock_usart_driver.h"
