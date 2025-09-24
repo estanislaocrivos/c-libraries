@@ -9,81 +9,83 @@
 
 /* ============================================================================================== */
 
-void helper_spi_create(spi_t* spi)
+void helper_spi_create(struct spi_ops* ops, struct spi_port* spi)
 {
-    spi->initialize      = spi1_initialize;
-    spi->transfer        = spi1_transfer;
-    spi->set_rx_callback = spi1_set_rx_callback;
-    spi->clear_buffers   = spi1_clear_buffers;
+    ops->initialize          = spi1_initialize;
+    ops->transmit            = spi1_transmit;
+    ops->receive             = spi1_receive;
+    ops->enable_rx_interrupt = spi1_enable_rx_interrupt;
+    ops->set_rx_callback     = spi1_set_rx_callback;
+    ops->clear_buffers       = spi1_clear_buffers;
+    spi->ops                 = ops;
+    spi->port_id             = 0;
+    spi->frequency           = 115200;
+    spi->rx_buffer           = NULL;
+    spi->rx_buffer_size      = 0;
+    spi->callback_context    = NULL;
 }
 
-void mock_spi_callback(const uint8_t* buffer, size_t length)
+void mock_spi_callback(void* context, const uint8_t* buffer, size_t size)
 {
-    // Mock implementation of the SPI callback function
+    // Mock implementation of the spi callback function
 }
 
 /* ============================================================================================== */
 
 void test_spi_creation(void)
 {
-    spi_t spi;
-    helper_spi_create(&spi);
+    struct spi_port spi = {0};
+    struct spi_ops  ops = {0};
+    helper_spi_create(&ops, &spi);
 
-    TEST_ASSERT_NOT_NULL(spi.initialize);
-    TEST_ASSERT_NOT_NULL(spi.transfer);
-    TEST_ASSERT_NOT_NULL(spi.set_rx_callback);
-    TEST_ASSERT_NOT_NULL(spi.clear_buffers);
-    TEST_ASSERT_EQUAL_PTR(spi.initialize, spi1_initialize);
-    TEST_ASSERT_EQUAL_PTR(spi.transfer, spi1_transfer);
-    TEST_ASSERT_EQUAL_PTR(spi.set_rx_callback, spi1_set_rx_callback);
-    TEST_ASSERT_EQUAL_PTR(spi.clear_buffers, spi1_clear_buffers);
+    TEST_ASSERT_NOT_NULL(spi.ops->initialize);
+    TEST_ASSERT_NOT_NULL(spi.ops->transmit);
+    TEST_ASSERT_NOT_NULL(spi.ops->receive);
+    TEST_ASSERT_NOT_NULL(spi.ops->set_rx_callback);
+    TEST_ASSERT_NOT_NULL(spi.ops->clear_buffers);
+    TEST_ASSERT_EQUAL_PTR(spi.ops->initialize, spi1_initialize);
+    TEST_ASSERT_EQUAL_PTR(spi.ops->transmit, spi1_transmit);
+    TEST_ASSERT_EQUAL_PTR(spi.ops->receive, spi1_receive);
+    TEST_ASSERT_EQUAL_PTR(spi.ops->set_rx_callback, spi1_set_rx_callback);
+    TEST_ASSERT_EQUAL_PTR(spi.ops->clear_buffers, spi1_clear_buffers);
 }
 
 /* ============================================================================================== */
 
 void test_spi_callback(void)
 {
-    spi_t spi;
-    helper_spi_create(&spi);
+    struct spi_port spi = {0};
+    struct spi_ops  ops = {0};
+    helper_spi_create(&ops, &spi);
 
-    spi1_set_rx_callback_ExpectAndReturn(mock_spi_callback, 0);
-    TEST_ASSERT_EQUAL(0, spi.set_rx_callback(mock_spi_callback));
+    spi1_set_rx_callback_ExpectAndReturn(&spi, mock_spi_callback, NULL, 0);
+    TEST_ASSERT_EQUAL(0, spi.ops->set_rx_callback(&spi, mock_spi_callback, NULL));
 }
 
 /* ============================================================================================== */
 
 void test_spi_methods(void)
 {
-    spi_t spi;
-    helper_spi_create(&spi);
+    struct spi_port spi = {0};
+    struct spi_ops  ops = {0};
+    helper_spi_create(&ops, &spi);
 
-    spi1_initialize_ExpectAndReturn(0);
-    TEST_ASSERT_EQUAL(0, spi.initialize());
-
-    uint8_t tx_buffer[2] = {0x12, 0x34};
-    uint8_t rx_buffer[2] = {0};
-    spi1_transfer_ExpectAndReturn(tx_buffer, rx_buffer, 2, 0);
-    TEST_ASSERT_EQUAL(0, spi.transfer(tx_buffer, rx_buffer, 2));
-
-    spi1_set_rx_callback_ExpectAndReturn(mock_spi_callback, 0);
-    TEST_ASSERT_EQUAL(0, spi.set_rx_callback(mock_spi_callback));
-
-    spi1_clear_buffers_Expect();
-    spi.clear_buffers();
-}
-
-/* ============================================================================================== */
-
-void test_spi_transfer(void)
-{
-    spi_t spi;
-    helper_spi_create(&spi);
+    spi1_initialize_ExpectAndReturn(&spi, 0);
+    TEST_ASSERT_EQUAL(0, spi.ops->initialize(&spi));
 
     uint8_t tx_buffer[2] = {0x12, 0x34};
-    uint8_t rx_buffer[2] = {0};
+    spi1_transmit_ExpectAndReturn(&spi, tx_buffer, 2, 0);
+    TEST_ASSERT_EQUAL(0, spi.ops->transmit(&spi, tx_buffer, 2));
 
-    spi1_transfer_ExpectAndReturn(tx_buffer, rx_buffer, 2, 0);
-    TEST_ASSERT_EQUAL(0, spi.transfer(tx_buffer, rx_buffer, 2));
+    uint8_t rx_buffer[2] = {0};
+    spi1_receive_ExpectAndReturn(&spi, rx_buffer, 2, 0);
+    TEST_ASSERT_EQUAL(0, spi.ops->receive(&spi, rx_buffer, 2));
+
+    spi1_set_rx_callback_ExpectAndReturn(&spi, mock_spi_callback, NULL, 0);
+    TEST_ASSERT_EQUAL(0, spi.ops->set_rx_callback(&spi, mock_spi_callback, NULL));
+
+    spi1_clear_buffers_Expect(&spi);
+    spi.ops->clear_buffers(&spi);
 }
 
 /* ============================================================================================== */
