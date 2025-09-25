@@ -2,7 +2,7 @@
 
 /* ============================================================================================== */
 
-static void _send_command(struct esp8266ex* self, const char* command)
+static void _esp8266ex_send_command(struct esp8266ex* self, const char* command)
 {
     // Function to send AT command to ESP8266EX via UART
     // Implementation depends on the uart_port structure and its methods
@@ -14,7 +14,7 @@ int8_t esp8266ex_initialize(struct esp8266ex* self)
 {
     if (self == NULL)
     {
-        return -EINVAL;
+        return -EFAULT;
     }
 
     // Initialization code here
@@ -27,7 +27,7 @@ int8_t esp8266ex_connect(struct esp8266ex* self, const char* ssid, const char* p
 {
     if (self == NULL || ssid == NULL || password == NULL)
     {
-        return -EINVAL;
+        return -EFAULT;
     }
 
     // Connection code here
@@ -41,7 +41,7 @@ int8_t esp8266ex_disconnect(struct esp8266ex* self)
 {
     if (self == NULL)
     {
-        return -EINVAL;
+        return -EFAULT;
     }
 
     // Disconnection code here
@@ -55,7 +55,7 @@ int8_t esp8266ex_send_data(struct esp8266ex* self, const uint8_t* data, size_t l
 {
     if (self == NULL || data == NULL || length == 0)
     {
-        return -EINVAL;
+        return -EFAULT;
     }
 
     // Data sending code here
