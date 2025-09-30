@@ -11,5 +11,6 @@
 #define EINVAL    6 /* Invalid argument */
 #define EFAULT    7 /* Invalid pointer */
 #define ETIMEDOUT 8 /* Operation timed out */
+#define ENOTCONN  9 /* The device is not connected */
 
 #endif /* ERRNO_H */

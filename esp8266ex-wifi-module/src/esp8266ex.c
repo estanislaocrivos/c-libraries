@@ -1,4 +1,7 @@
 #include "../inc/esp8266ex.h"
+
+/* ============================================================================================== */
+
 #include <string.h>
 #include <stdio.h>
 
@@ -27,16 +30,6 @@ int8_t esp8266ex_initialize(struct esp8266ex* self)
         return -EFAULT;
     }
 
-    // Initialize UART first
-    int8_t result = self->uart->ops->initialize(self->uart);
-    if (result != 0)
-    {
-        return result;
-    }
-
-    // Clear buffers
-    self->uart->ops->clear_buffers(self->uart);
-
     // Test ESP8266EX communication with AT command
     _esp8266ex_send_command(self, "AT");
 
@@ -52,7 +45,6 @@ int8_t esp8266ex_initialize(struct esp8266ex* self)
     memset(self->ipv4_address, 0, sizeof(self->ipv4_address));
     self->is_initialized = true;
     self->is_connected   = false;
-
     return 0;
 }
 
@@ -66,7 +58,7 @@ int8_t esp8266ex_connect(struct esp8266ex* self, const char* ssid, const char* p
 
     if (!self->is_initialized)
     {
-        return -ENOTCONN;
+        return -ENOENT;
     }
 
     // Store SSID and password
@@ -102,7 +94,7 @@ int8_t esp8266ex_disconnect(struct esp8266ex* self)
 
     if (!self->is_initialized)
     {
-        return -ENOTCONN;
+        return -ENOENT;
     }
 
     // Disconnect from WiFi
@@ -128,7 +120,7 @@ int8_t esp8266ex_send_data(struct esp8266ex* self, const uint8_t* data, size_t l
 
     if (!self->is_connected)
     {
-        return -ENOTCONN;
+        return -ENOENT;
     }
 
     // Prepare data length command

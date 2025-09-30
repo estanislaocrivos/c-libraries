@@ -20,7 +20,7 @@ struct esp8266ex
     struct uart_port* uart;
     char              ssid[32];
     char              password[64];
-    char              ipv4_address[16];  // e.g., "192.168.1.1"
+    char              ipv4_address[16];
     bool              is_initialized;
     bool              is_connected;
 };
