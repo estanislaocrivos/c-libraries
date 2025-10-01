@@ -1,5 +1,5 @@
-#ifndef UART_H
-#define UART_H
+#ifndef serial_H
+#define serial_H
 
 /* ============================================================================================== */
 
@@ -14,98 +14,98 @@
 /* ============================================================================================== */
 
 /**
- * @brief Prototype for the UART receive callback function.
+ * @brief Prototype for the serial receive callback function.
  * @param buffer Pointer to the received data buffer.
  * @param length Length of the received data.
  * @param callback_context Pointer to user-defined callback_context data (can be NULL).
  */
-typedef void (*uart_rx_callback_t)(void*          callback_context,
-                                   const uint8_t* buffer,
-                                   size_t         buffer_size);
+typedef void (*serial_rx_callback_t)(void*          callback_context,
+                                     const uint8_t* buffer,
+                                     size_t         buffer_size);
 
 /* ============================================================================================== */
 
 /**
- * @brief UART port structure. This structure holds the configuration and state of a UART port.
+ * @brief serial port structure. This structure holds the configuration and state of a serial port.
  */
-struct uart_port;
+struct serial_port;
 
 /* ============================================================================================== */
 
 /**
- * @brief UART operations structure. This structure holds function pointers for UART operations.
+ * @brief serial operations structure. This structure holds function pointers for serial operations.
  */
-struct uart_ops
+struct serial_ops
 {
     /**
-     * @brief Initializes the UART interface.
-     * @param self Pointer to the UART port structure.
+     * @brief Initializes the serial interface.
+     * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*initialize)(struct uart_port* self);
+    int8_t (*initialize)(struct serial_port* self);
 
     /**
-     * @brief Transmits data through the UART interface.
-     * @param self Pointer to the UART port structure.
+     * @brief Transmits data through the serial interface.
+     * @param self Pointer to the serial port structure.
      * @param buffer Pointer to the 8-bit buffer to be transmitted.
      * @param size Size of the buffer to be transmitted.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*transmit)(struct uart_port* self, const uint8_t* buffer, size_t size);
+    int8_t (*transmit)(struct serial_port* self, const uint8_t* buffer, size_t size);
 
     /**
-     * @brief Receives data through the UART interface.
-     * @param self Pointer to the UART port structure.
+     * @brief Receives data through the serial interface.
+     * @param self Pointer to the serial port structure.
      * @param buffer Pointer to the 8-bit buffer where the received data will be stored.
      * @param size Size of the buffer to be received.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct uart_port* self, uint8_t* buffer, size_t size);
+    int8_t (*receive)(struct serial_port* self, uint8_t* buffer, size_t size);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
-     * @param self Pointer to the UART port structure.
-     * @param callback The callback function to set. Its prototype must match the uart_rx_callback_t
-     * type.
+     * @param self Pointer to the serial port structure.
+     * @param callback The callback function to set. Its prototype must match the
+     * serial_rx_callback_t type.
      * @param callback_context Pointer to user-defined callback_context data (can be NULL).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*set_rx_callback)(struct uart_port*  self,
-                              uart_rx_callback_t callback,
-                              void*              callback_context);
+    int8_t (*set_rx_callback)(struct serial_port*  self,
+                              serial_rx_callback_t callback,
+                              void*                callback_context);
 
     /**
-     * @brief Enables or disables the UART receive interrupt.
-     * @param self Pointer to the UART port structure.
+     * @brief Enables or disables the serial receive interrupt.
+     * @param self Pointer to the serial port structure.
      * @param enable Set to true to enable the interrupt, false to disable it.
      */
-    void (*enable_rx_interrupt)(struct uart_port* self, bool enable);
+    void (*enable_rx_interrupt)(struct serial_port* self, bool enable);
 
     /**
-     * @brief Clears the UART buffers.
-     * @param self Pointer to the UART port structure.
+     * @brief Clears the serial buffers.
+     * @param self Pointer to the serial port structure.
      */
-    void (*clear_buffers)(struct uart_port* self);
+    void (*clear_buffers)(struct serial_port* self);
 };
 
 /* ============================================================================================== */
 
-struct uart_port
+struct serial_port
 {
     /**
-     * @brief UART port identifier. Serves to identify different UART peripherals within the same
-     * driver.
+     * @brief serial port identifier. Serves to identify different serial peripherals within the
+     * same driver.
      */
     uint8_t port_id;
 
     /**
-     * @brief Baud rate for UART communication.
+     * @brief Baud rate for serial communication.
      */
     uint32_t baud_rate;
 
     /**
      * @brief Pointer to the receive buffer. This buffer must be created by the user, assigned, and
-     * kept alive throughout the lifetime of the UART port.
+     * kept alive throughout the lifetime of the serial port.
      */
     uint8_t* rx_buffer;
 
@@ -121,11 +121,11 @@ struct uart_port
     void* callback_context;
 
     /**
-     * @brief Pointer to the UART operations structure. This structure must be first created and
-     * initialized by the user. This structure must be of type 'const struct uart_ops', which
+     * @brief Pointer to the serial operations structure. This structure must be first created and
+     * initialized by the user. This structure must be of type 'const struct serial_ops', which
      * ensures that the function pointers cannot be modified after initialization.
      */
-    const struct uart_ops* ops;
+    const struct serial_ops* ops;
 };
 
 /* ============================================================================================== */
@@ -134,20 +134,20 @@ struct uart_port
 Usage:
 int main(void)
 {
-    const struct uart_ops my_uart_ops = {
-        .uart_initialize_t = my_uart_initialize,
-        .uart_transmit_t = my_uart_transmit,
-        .uart_receive_t = my_uart_receive,
-        .uart_set_rx_callback_t = my_uart_set_rx_callback,
-        .uart_enable_rx_interrupt_t = my_uart_enable_rx_interrupt,
-        .uart_clear_buffers_t = my_uart_clear_buffers,
+    const struct serial_ops my_serial_ops = {
+        .initialize = my_serial_initialize,
+        .transmit = my_serial_transmit,
+        .receive = my_serial_receive,
+        .set_rx_callback = my_serial_set_rx_callback,
+        .enable_rx_interrupt = my_serial_enable_rx_interrupt,
+        .clear_buffers = my_serial_clear_buffers,
     };
-    struct uart_port my_uart;
-    my_uart.ops = &my_uart_ops;
-    my_uart.baud_rate = 9600;
-    my_uart.rx_buffer = malloc(128);
-    my_uart.rx_buffer_size = 128;
-    my_uart.ops->uart_initialize_t(&my_uart);
+    struct serial_port my_serial;
+    my_serial.ops = &my_serial_ops;
+    my_serial.baud_rate = 9600;
+    my_serial.rx_buffer = malloc(128);
+    my_serial.rx_buffer_size = 128;
+    my_serial.ops->initialize(&my_serial);
     // Other application code...
     return 0;
 }
@@ -155,4 +155,4 @@ int main(void)
 
 /* ============================================================================================== */
 
-#endif  // UART_H
+#endif  // serial_H
