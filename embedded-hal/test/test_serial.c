@@ -9,7 +9,7 @@
 
 /* ============================================================================================== */
 
-void helper_uart_create(struct uart_ops* ops, struct uart_port* uart)
+void helper_uart_create(struct serial_ops* ops, struct serial_port* uart)
 {
     ops->initialize          = usart1_initialize;
     ops->transmit            = usart1_transmit;
@@ -34,8 +34,8 @@ void mock_uart_callback(void* context, const uint8_t* buffer, size_t size)
 
 void test_uart_creation(void)
 {
-    struct uart_port uart = {0};
-    struct uart_ops  ops  = {0};
+    struct serial_port uart = {0};
+    struct serial_ops  ops  = {0};
     helper_uart_create(&ops, &uart);
 
     TEST_ASSERT_NOT_NULL(uart.ops->initialize);
@@ -54,8 +54,8 @@ void test_uart_creation(void)
 
 void test_uart_callback(void)
 {
-    struct uart_port uart = {0};
-    struct uart_ops  ops  = {0};
+    struct serial_port uart = {0};
+    struct serial_ops  ops  = {0};
     helper_uart_create(&ops, &uart);
 
     usart1_set_rx_callback_ExpectAndReturn(&uart, mock_uart_callback, NULL, 0);
@@ -66,8 +66,8 @@ void test_uart_callback(void)
 
 void test_uart_methods(void)
 {
-    struct uart_port uart = {0};
-    struct uart_ops  ops  = {0};
+    struct serial_port uart = {0};
+    struct serial_ops  ops  = {0};
     helper_uart_create(&ops, &uart);
 
     usart1_initialize_ExpectAndReturn(&uart, 0);
