@@ -183,8 +183,47 @@ int8_t usart_set_rx_callback(struct serial_port*  port,
 
 /* ============================================================================================== */
 
-void usart0_clear_buffers(void)
+void usart_enable_rx_interrupt(struct serial_port* self, bool enable)
 {
+    if (self == NULL)
+    {
+        return;
+    }
+    switch (self->port_id)
+    {
+        case 0:
+            if (enable)
+            {
+                UCSR0B |= (1 << RXCIE0);
+            }
+            else
+            {
+                UCSR0B &= ~(1 << RXCIE0);
+            }
+            break;
+
+        case 1:
+            if (enable)
+            {
+                UCSR1B |= (1 << RXCIE1);
+            }
+            else
+            {
+                UCSR1B &= ~(1 << RXCIE1);
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
+/* ============================================================================================== */
+
+void usart_clear_buffers(struct serial_port* self)
+{
+    (void)self;
+    // No buffers to clear in this implementation
 }
 
 /* ============================================================================================== */
