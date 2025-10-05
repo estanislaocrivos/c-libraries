@@ -2,9 +2,10 @@
 
 /* ============================================================================================== */
 
-static void* usart0_callback_context;
-
+static void*                usart0_callback_context;
+static void*                usart1_callback_context;
 static serial_rx_callback_t usart0_callback;
+static serial_rx_callback_t usart1_callback;
 
 /* ============================================================================================== */
 
@@ -56,6 +57,8 @@ int8_t usart_initialize(struct serial_port* port)
     return 0;
 }
 
+/* ============================================================================================== */
+
 static inline void _usart0_transmit_byte(const uint8_t* byte)
 {
     while (!(UCSR0A & (1 << UDRE0)))
@@ -64,18 +67,51 @@ static inline void _usart0_transmit_byte(const uint8_t* byte)
     UDR0 = *byte;
 }
 
+static inline void _usart1_transmit_byte(const uint8_t* byte)
+{
+    while (!(UCSR1A & (1 << UDRE1)))
+    {
+    }
+    UDR1 = *byte;
+}
+
 int8_t usart_transmit(struct serial_port* port, const uint8_t* buffer, size_t size)
 {
-    if (buffer == NULL || size == 0)
+    if (port == NULL || buffer == NULL)
+    {
+        return -EFAULT;
+    }
+    if (size == 0)
     {
         return -EINVAL;
     }
-    for (size_t i = 0; i < size; i++)
+    switch (port->port_id)
     {
-        _usart0_transmit_byte(buffer + i);
+        case 0:
+
+            for (size_t i = 0; i < size; i++)
+            {
+                _usart0_transmit_byte(buffer + i);
+            }
+            break;
+
+        case 1:
+
+            for (size_t i = 0; i < size; i++)
+            {
+                _usart1_transmit_byte(buffer + i);
+            }
+            break;
+
+        default:
+
+            break;
     }
+
     return 0;
 }
+
+/* ============================================================================================== */
 
 static inline uint8_t _usart0_receive_byte(void)
 {
@@ -87,28 +123,65 @@ static inline uint8_t _usart0_receive_byte(void)
 
 int8_t usart_receive(struct serial_port* port, uint8_t* buffer, size_t size)
 {
-    if (buffer == NULL || size == 0)
+    if (port == NULL || buffer == NULL)
+    {
+        return -EFAULT;
+    }
+    if (size == 0)
     {
         return -EINVAL;
     }
-    for (size_t i = 0; i < size; i++)
+    switch (port->port_id)
     {
-        buffer[i] = _usart0_receive_byte();
+        case 0:
+            for (size_t i = 0; i < size; i++)
+            {
+                buffer[i] = _usart0_receive_byte();
+            }
+            break;
+
+        case 1:
+            for (size_t i = 0; i < size; i++)
+            {
+                buffer[i] = _usart1_receive_byte();
+            }
+            break;
+
+        default:
+            break;
     }
     return 0;
 }
+
+/* ============================================================================================== */
 
 int8_t usart_set_rx_callback(struct serial_port*  port,
                              serial_rx_callback_t callback,
                              void*                callback_context)
 {
-    if (port->port_id == 0)
+    if (port == NULL || callback == NULL || callback_context == NULL)
     {
-        usart0_callback         = callback;
-        usart0_callback_context = callback_context;
+        return -EFAULT;
+    }
+    switch (port->port_id)
+    {
+        case 0:
+            usart0_callback         = callback;
+            usart0_callback_context = callback_context;
+            break;
+
+        case 1:
+            usart1_callback         = callback;
+            usart1_callback_context = callback_context;
+            break;
+
+        default:
+            break;
     }
     return 0;
 }
+
+/* ============================================================================================== */
 
 void usart0_clear_buffers(void)
 {
@@ -116,58 +189,22 @@ void usart0_clear_buffers(void)
 
 /* ============================================================================================== */
 
-static usart_rx_callback_t usart1_rx_callback = NULL;
-
-static inline void _usart1_transmit_byte(const uint8_t* byte)
+ISR(USART0_RX_vect)
 {
-    while (!(UCSR1A & (1 << UDRE1)))
+    uint8_t data = UDR0;
+    if (usart0_callback)
     {
+        usart0_callback(usart0_callback_context, &data, 1);
     }
-    UDR1 = *byte;
 }
 
-int8_t usart1_transmit(const uint8_t* buffer, size_t length)
+ISR(USART1_RX_vect)
 {
-    if (buffer == NULL || length == 0)
+    uint8_t data = UDR1;
+    if (usart1_callback)
     {
-        return -EINVAL;
+        usart1_callback(usart1_callback_context, &data, 1);
     }
-    for (size_t i = 0; i < length; i++)
-    {
-        _usart1_transmit_byte(buffer + i);
-    }
-    return 0;
-}
-
-static inline uint8_t _usart1_receive_byte(void)
-{
-    while (!(UCSR1A & (1 << RXC1)))
-    {
-    }
-    return UDR1;
-}
-
-int8_t usart1_receive(uint8_t* buffer, size_t length)
-{
-    if (buffer == NULL || length == 0)
-    {
-        return -EINVAL;
-    }
-    for (size_t i = 0; i < length; i++)
-    {
-        buffer[i] = _usart1_receive_byte();
-    }
-    return 0;
-}
-
-int8_t usart1_set_rx_callback(usart_rx_callback_t callback)
-{
-    usart1_rx_callback = callback;
-    return 0;
-}
-
-void usart1_clear_buffers(void)
-{
 }
 
 /* ============================================================================================== */
