@@ -100,19 +100,10 @@
     - +:test/**
     - -:test/support
     - +:libraries/**
-    # - +:libraries/hamming-codec/test/**
-    # - +:libraries/embedded-hal/test/**
-    # - +:libraries/lcd-16-by-2/test/**
   :source:
     - +:libraries/**
-    # - libraries/hamming-codec/src/**
-    # - libraries/embedded-hal/src/**
-    # - libraries/lcd-16-by-2/src/**
   :include:
     - +:libraries/**
-    # - libraries/hamming-codec/inc/**
-    # - libraries/embedded-hal/inc/**
-    # - libraries/lcd-16-by-2/inc/**
   :support:
     - test/support
 
