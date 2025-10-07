@@ -19,6 +19,8 @@
                 "build/",
                 "-i",
                 "docs/",
+                "-i",
+                "drivers/",
                 "--checkers-report=checkers.txt",
             ],
             "group": {

@@ -99,17 +99,11 @@
   :test:
     - +:test/**
     - -:test/support
-    - +:hamming-codec/test/**
-    - +:embedded-hal/test/**
-    - +:lcd-16-by-2/test/**
+    - +:libraries/**
   :source:
-    - hamming-codec/src/**
-    - embedded-hal/src/**
-    - lcd-16-by-2/src/**
+    - +:libraries/**
   :include:
-    - hamming-codec/inc/**
-    - embedded-hal/inc/**
-    - lcd-16-by-2/inc/**
+    - +:libraries/**
   :support:
     - test/support
 

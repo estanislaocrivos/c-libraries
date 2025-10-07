@@ -5,7 +5,7 @@
 
 #include "../../embedded-hal/inc/gpio.h"
 #include "../../embedded-hal/inc/timer.h"
-#include "../../inc/errno.h"
+#include "../../../inc/errno.h"
 
 /* ============================================================================================== */
 
