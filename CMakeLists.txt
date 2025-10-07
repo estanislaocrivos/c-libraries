@@ -5,6 +5,4 @@ project(common-c-libs
     DESCRIPTION "Common portable C libraries module"
 )
 
-add_subdirectory(hamming-codec)
-add_subdirectory(embedded-hal)
-add_subdirectory(lcd-16-by-2)
+add_subdirectory(libraries)

@@ -4,9 +4,9 @@
 /* ============================================================================================== */
 
 #include "errno.h"
-#include "../lcd-16-by-2/inc/lcd.h"
-#include "../embedded-hal/inc/embedded_hal.h"
-#include "../esp8266ex-wifi-module/inc/esp8266ex.h"
+#include "../libraries/lcd-16-by-2/inc/lcd.h"
+#include "../libraries/embedded-hal/inc/embedded_hal.h"
+#include "../libraries/esp8266ex-wifi-module/inc/esp8266ex.h"
 
 /* ============================================================================================== */
 
