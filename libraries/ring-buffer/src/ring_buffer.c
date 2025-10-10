@@ -25,6 +25,10 @@ int8_t initialize(struct ring_buffer* rb, uint8_t* buffer, size_t size, bool ove
 
 size_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
 {
+    if (self == NULL || data == NULL || len == 0)
+    {
+        return 0;
+    }
     size_t count = 0;
     while (count < len)
     {
@@ -48,6 +52,10 @@ size_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
 
 size_t pop(struct ring_buffer* self, uint8_t* dest, size_t len)
 {
+    if (self == NULL || dest == NULL || len == 0)
+    {
+        return 0;
+    }
     size_t count = 0;
     while (count < len && self->_tail != self->_head)
     {
@@ -77,8 +85,13 @@ bool is_full(const struct ring_buffer* self)
 size_t available(const struct ring_buffer* self)
 {
     if (self->_head >= self->_tail)
+    {
         return self->_head - self->_tail;
-    return self->size - (self->_tail - self->_head);
+    }
+    else
+    {
+        return self->size - (self->_tail - self->_head);
+    }
 }
 
 /* ============================================================================================== */

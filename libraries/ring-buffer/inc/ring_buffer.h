@@ -16,13 +16,13 @@
 struct ring_buffer
 {
     // Private
-    volatile size_t _head;
-    volatile size_t _tail;
+    volatile size_t _head; /**< Head index */
+    volatile size_t _tail; /**< Tail index */
 
     // Public
-    uint8_t* buffer;
-    size_t   size;
-    bool     overwrite;
+    uint8_t* buffer;    /**< Pointer to the buffer array */
+    size_t   size;      /**< Size of the buffer array */
+    bool     overwrite; /**< Overwrite old data when full if true */
 };
 
 /* ============================================================================================== */
