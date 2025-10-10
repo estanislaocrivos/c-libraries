@@ -90,7 +90,7 @@ void test_available(void)
     struct ring_buffer rb;
     TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
 
-    uint8_t data[] = {1, 2, 3, 4, 5};
+    uint8_t data[] = {1, 2, 3, 4, 5, 6};
     TEST_ASSERT_EQUAL(sizeof(data), push(&rb, data, sizeof(data)));
     TEST_ASSERT_EQUAL(BUFFER_SIZE - sizeof(data), available(&rb));
 }

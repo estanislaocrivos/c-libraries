@@ -84,14 +84,16 @@ bool is_full(const struct ring_buffer* self)
 
 size_t available(const struct ring_buffer* self)
 {
+    size_t used;
     if (self->_head >= self->_tail)
     {
-        return self->_head - self->_tail;
+        used = self->_head - self->_tail;
     }
     else
     {
-        return self->size - (self->_tail - self->_head);
+        used = self->size - (self->_tail - self->_head);
     }
+    return self->size - used;
 }
 
 /* ============================================================================================== */
