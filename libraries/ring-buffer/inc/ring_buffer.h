@@ -31,23 +31,23 @@ int8_t initialize(struct ring_buffer* rb, uint8_t* buffer, size_t size, bool ove
 
 /* ============================================================================================== */
 
-size_t push(struct ring_buffer* self, const uint8_t* data, size_t len);
+int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len);
 
 /* ============================================================================================== */
 
-size_t pop(struct ring_buffer* self, uint8_t* dest, size_t len);
+int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len);
 
 /* ============================================================================================== */
 
-bool is_empty(const struct ring_buffer* self);
+int8_t is_empty(const struct ring_buffer* self, bool* empty);
 
 /* ============================================================================================== */
 
-bool is_full(const struct ring_buffer* self);
+int8_t is_full(const struct ring_buffer* self, bool* full);
 
 /* ============================================================================================== */
 
-size_t available(const struct ring_buffer* self);
+int8_t available(const struct ring_buffer* self, size_t* available);
 
 /* ============================================================================================== */
 
