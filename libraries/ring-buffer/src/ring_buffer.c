@@ -4,7 +4,11 @@
 
 #include <string.h>
 
-#define OPTIMIZE_OPERATIONS 1
+/* ============================================================================================== */
+
+#define OPTIMIZE_OPERATIONS \
+    1  // If true, uses if statements instead of modulo operations (avoids division, faster on
+       // smaller MCUs)
 
 /* ============================================================================================== */
 
@@ -85,8 +89,12 @@ int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len)
         return -EFAULT;
     }
     size_t count = 0;
-    while (count < len && self->_tail != self->_head)
+    while (count < len)
     {
+        if (self->_tail == self->_head)
+        {
+            return -ENODATA;
+        }
         dest[count] = self->config->buffer[self->_tail];
 #if OPTIMIZE_OPERATIONS
         self->_tail += 1;
