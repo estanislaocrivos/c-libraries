@@ -52,7 +52,7 @@ int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
         size_t next;
 #if AVOID_MOD_OPERATION
         next = self->_head + 1;
-        if (next == self->_config->size)
+        if (next >= self->_config->size)
         {
             next = 0;
         }
@@ -69,7 +69,7 @@ int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
             {
 #if AVOID_MOD_OPERATION
                 self->_tail += 1;
-                if (self->_tail == self->_config->size)
+                if (self->_tail >= self->_config->size)
                 {
                     self->_tail = 0;
                 }
@@ -107,7 +107,7 @@ int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len)
         dest[count] = self->_config->buffer[self->_tail];
 #if AVOID_MOD_OPERATION
         self->_tail += 1;
-        if (self->_tail == self->_config->size)
+        if (self->_tail >= self->_config->size)
         {
             self->_tail = 0;
         }
@@ -147,7 +147,16 @@ int8_t is_full(const struct ring_buffer* self, bool* full)
     {
         return -EPERM;
     }
+#if AVOID_MOD_OPERATION
+    size_t next_head = self->_head + 1;
+    if (next_head >= self->_config->size)
+    {
+        next_head = 0;
+    }
+    *full = (next_head == self->_tail);
+#else
     *full = ((self->_head + 1) % self->_config->size) == self->_tail;
+#endif
     return 0;
 }
 

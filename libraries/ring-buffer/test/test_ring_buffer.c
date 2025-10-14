@@ -27,7 +27,7 @@ void test_initialize(void)
 
 /* ============================================================================================== */
 
-void test_use_no_initialized(void)
+void test_use_not_initialized(void)
 {
     uint8_t                   buffer[RING_BUFFER_SIZE];
     struct ring_buffer        rb     = {0};
@@ -120,7 +120,7 @@ void test_is_full(void)
     struct ring_buffer_config config = {
         .buffer    = buffer,
         .size      = RING_BUFFER_SIZE,
-        .overwrite = true,
+        .overwrite = false,
     };
     TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
