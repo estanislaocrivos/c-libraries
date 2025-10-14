@@ -27,6 +27,32 @@ void test_initialize(void)
 
 /* ============================================================================================== */
 
+void test_use_no_initialized(void)
+{
+    uint8_t                   buffer[RING_BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(-EPERM, push(&rb, test_data_buffer, sizeof(test_data_buffer)));
+
+    uint8_t pop_buffer[TEST_DATA_BUFFER_SIZE] = {0};
+    TEST_ASSERT_EQUAL(-EPERM, pop(&rb, pop_buffer, sizeof(pop_buffer)));
+
+    bool empty = false;
+    TEST_ASSERT_EQUAL(-EPERM, is_empty(&rb, &empty));
+
+    bool full = false;
+    TEST_ASSERT_EQUAL(-EPERM, is_full(&rb, &full));
+
+    size_t available_space = 0;
+    TEST_ASSERT_EQUAL(-EPERM, available(&rb, &available_space));
+}
+
+/* ============================================================================================== */
+
 void test_push_data(void)
 {
     uint8_t                   buffer[RING_BUFFER_SIZE];
