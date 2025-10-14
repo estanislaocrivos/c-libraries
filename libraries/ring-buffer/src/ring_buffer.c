@@ -6,7 +6,7 @@
 
 /* ============================================================================================== */
 
-#define OPTIMIZE_OPERATIONS \
+#define AVOID_MOD_OPERATION \
     1  // If true, uses if statements instead of modulo operations (avoids division, faster on
        // smaller MCUs)
 
@@ -45,7 +45,7 @@ int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
     while (count < len)
     {
         size_t next;
-#if OPTIMIZE_OPERATIONS
+#if AVOID_MOD_OPERATION
         next = self->_head + 1;
         if (next == self->config->size)
         {
@@ -62,7 +62,7 @@ int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
             }
             else
             {
-#if OPTIMIZE_OPERATIONS
+#if AVOID_MOD_OPERATION
                 self->_tail += 1;
                 if (self->_tail == self->config->size)
                 {
@@ -96,7 +96,7 @@ int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len)
             return -ENODATA;
         }
         dest[count] = self->config->buffer[self->_tail];
-#if OPTIMIZE_OPERATIONS
+#if AVOID_MOD_OPERATION
         self->_tail += 1;
         if (self->_tail == self->config->size)
         {
