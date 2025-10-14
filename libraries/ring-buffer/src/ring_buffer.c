@@ -4,20 +4,24 @@
 
 #include <string.h>
 
+#define OPTIMIZE_OPERATIONS false
+
 /* ============================================================================================== */
 
-int8_t initialize(struct ring_buffer* rb, uint8_t* buffer, size_t size, bool overwrite)
+int8_t initialize(struct ring_buffer* rb, struct ring_buffer_config* config)
 {
-    if (size == 0 || buffer == NULL)
+    if (rb == NULL || config == NULL || config->buffer == NULL)
     {
         return -EFAULT;
     }
-    rb->buffer    = buffer;
-    rb->size      = size;
-    rb->_head     = 0;
-    rb->_tail     = 0;
-    rb->overwrite = overwrite;
-    memset(rb->buffer, 0, size);
+    if (config->size == 0)
+    {
+        return -EINVAL;
+    }
+    rb->_head  = 0;
+    rb->_tail  = 0;
+    rb->config = config;
+    memset(rb->config->buffer, 0, config->size);
     return 0;
 }
 
@@ -36,23 +40,35 @@ int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
     size_t count = 0;
     while (count < len)
     {
-        size_t next = (self->_head + 1) % self->size;  // The same as doing if (next == size)
-                                                       // {next = 0;} (avoids buffer overflow)
+        size_t next;
+#if OPTIMIZE_OPERATIONS
+        if (next == self->config->size)
+        {
+            next = 0;
+        }
+#else
+        next = (self->_head + 1) % self->config->size;
+#endif
         if (next == self->_tail)
         {
-            if (!self->overwrite)
+            if (!self->config->overwrite)
             {
                 return -ENOSPC;
             }
             else
             {
-                self->_tail
-                    = (self->_tail + 1) % self->size;  // The same asi doing if (tail == size) {tail
-                                                       // = 0;} (avoids buffer overflow)
+#if OPTIMIZE_OPERATIONS
+                if (self->_tail == self->config->size)
+                {
+                    self->_tail = 0;
+                }
+#else
+                self->_tail = (self->_tail + 1) % self->config->size;
+#endif
             }
         }
-        self->buffer[self->_head] = data[count];
-        self->_head               = next;
+        self->config->buffer[self->_head] = data[count];
+        self->_head                       = next;
         count += 1;
     }
     return 0;
@@ -69,8 +85,15 @@ int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len)
     size_t count = 0;
     while (count < len && self->_tail != self->_head)
     {
-        dest[count] = self->buffer[self->_tail];
-        self->_tail = (self->_tail + 1) % self->size;
+        dest[count] = self->config->buffer[self->_tail];
+#if OPTIMIZE_OPERATIONS
+        if (self->_tail == self->config->size)
+        {
+            self->_tail = 0;
+        }
+#else
+        self->_tail = (self->_tail + 1) % self->config->size;
+#endif
         count += 1;
     }
     return 0;
@@ -96,7 +119,7 @@ int8_t is_full(const struct ring_buffer* self, bool* full)
     {
         return -EFAULT;
     }
-    *full = ((self->_head + 1) % self->size) == self->_tail;
+    *full = ((self->_head + 1) % self->config->size) == self->_tail;
     return 0;
 }
 
@@ -115,9 +138,9 @@ int8_t available(const struct ring_buffer* self, size_t* available)
     }
     else
     {
-        used = self->size - (self->_tail - self->_head);
+        used = self->config->size - (self->_tail - self->_head);
     }
-    *available = self->size - used;
+    *available = self->config->size - used;
     return 0;
 }
 

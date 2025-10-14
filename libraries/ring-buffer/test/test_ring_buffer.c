@@ -14,18 +14,28 @@ static const uint8_t test_data_buffer[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
 void test_initialize(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 }
 
 /* ============================================================================================== */
 
 void test_push_data(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     TEST_ASSERT_EQUAL(0, push(&rb, test_data_buffer, sizeof(test_data_buffer)));
 }
@@ -34,9 +44,14 @@ void test_push_data(void)
 
 void test_pop_data(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     TEST_ASSERT_EQUAL(0, push(&rb, test_data_buffer, sizeof(test_data_buffer)));
 
@@ -50,9 +65,14 @@ void test_pop_data(void)
 
 void test_is_empty(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     bool empty = false;
     is_empty(&rb, &empty);
@@ -68,9 +88,14 @@ void test_is_empty(void)
 
 void test_is_full(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, false));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     bool full = false;
     is_full(&rb, &full);
@@ -87,9 +112,14 @@ void test_is_full(void)
 
 void test_overwrite_data(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     static const uint8_t buffer_to_full_occupancy[BUFFER_SIZE - 1] = {1};
     TEST_ASSERT_EQUAL(0, push(&rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
@@ -106,9 +136,14 @@ void test_overwrite_data(void)
 
 void test_not_overwrite_data(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, false));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     static const uint8_t buffer_to_full_occupancy[BUFFER_SIZE - 1] = {1};
     TEST_ASSERT_EQUAL(0, push(&rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
@@ -120,9 +155,14 @@ void test_not_overwrite_data(void)
 
 void test_available(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     static const uint8_t test_data[] = {1, 2, 3, 4, 5, 6};
     TEST_ASSERT_EQUAL(0, push(&rb, test_data, sizeof(test_data)));
@@ -136,9 +176,14 @@ void test_available(void)
 
 void test_pop_partial(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     static const uint8_t test_data[] = {1, 2, 3, 4, 5};
     TEST_ASSERT_EQUAL(0, push(&rb, test_data, sizeof(test_data)));
@@ -152,9 +197,14 @@ void test_pop_partial(void)
 
 void test_push_pop_alternated(void)
 {
-    uint8_t            buffer[BUFFER_SIZE];
-    struct ring_buffer rb;
-    TEST_ASSERT_EQUAL(0, initialize(&rb, buffer, BUFFER_SIZE, true));
+    uint8_t                   buffer[BUFFER_SIZE];
+    struct ring_buffer        rb     = {0};
+    struct ring_buffer_config config = {
+        .buffer    = buffer,
+        .size      = BUFFER_SIZE,
+        .overwrite = true,
+    };
+    TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
     static const uint8_t data1[] = {10, 20, 30, 40, 50};
     TEST_ASSERT_EQUAL(0, push(&rb, data1, 5));

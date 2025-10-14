@@ -13,6 +13,14 @@
 
 /* ============================================================================================== */
 
+struct ring_buffer_config
+{
+    // Public
+    uint8_t* buffer;    /**< Pointer to the buffer array */
+    size_t   size;      /**< Size of the buffer array */
+    bool     overwrite; /**< Overwrite old data when full if true */
+};
+
 struct ring_buffer
 {
     // Private
@@ -20,14 +28,12 @@ struct ring_buffer
     volatile size_t _tail; /**< Tail index */
 
     // Public
-    uint8_t* buffer;    /**< Pointer to the buffer array */
-    size_t   size;      /**< Size of the buffer array */
-    bool     overwrite; /**< Overwrite old data when full if true */
+    struct ring_buffer_config* config; /**< Configuration struct */
 };
 
 /* ============================================================================================== */
 
-int8_t initialize(struct ring_buffer* rb, uint8_t* buffer, size_t size, bool overwrite);
+int8_t initialize(struct ring_buffer* rb, struct ring_buffer_config* config);
 
 /* ============================================================================================== */
 
