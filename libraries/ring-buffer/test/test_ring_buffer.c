@@ -141,7 +141,7 @@ void test_not_overwrite_data(void)
     struct ring_buffer_config config = {
         .buffer    = buffer,
         .size      = BUFFER_SIZE,
-        .overwrite = true,
+        .overwrite = false,
     };
     TEST_ASSERT_EQUAL(0, initialize(&rb, &config));
 
