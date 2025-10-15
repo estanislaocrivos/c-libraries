@@ -17,7 +17,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y cppcheck
 
       - name: Run cppcheck
-        run: cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem . -i test/ -i build/ -i docs/ -i drivers/
+        run: cppcheck --enable=all --inconclusive --suppress=missingIncludeSystem . -i test/ -i build/ -i docs/
 
   build:
     name: Build with GCC (CMake)
