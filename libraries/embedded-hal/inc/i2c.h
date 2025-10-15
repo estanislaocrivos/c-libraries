@@ -15,9 +15,8 @@
 
 /**
  * @brief Prototype for the I2C receive callback function.
- * @param buffer Pointer to the received data buffer.
- * @param length Length of the received data.
  * @param callback_context Pointer to user-defined callback_context data (can be NULL).
+ * @param byte The received byte.
  */
 typedef void (*i2c_rx_callback_t)(void* callback_context, uint8_t byte);
 
@@ -113,8 +112,8 @@ struct i2c_port
      */
     uint16_t own_address;
 
-    bool  _was_initialized;   // Internal flag to prevent reinitialization
-    void* _callback_context;  // Internal pointer to store the callback_context
+    bool  _was_initialized;   // Internal flag to prevent reinitialization or misuse.
+    void* _callback_context;  // Pointer to user-defined callback_context data (can be NULL).
 
     /**
      * @brief Pointer to the I2C operations structure. This structure must be first created and

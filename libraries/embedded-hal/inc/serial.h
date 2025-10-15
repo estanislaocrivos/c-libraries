@@ -1,5 +1,5 @@
-#ifndef serial_H
-#define serial_H
+#ifndef SERIAL_H
+#define SERIAL_H
 
 /* ============================================================================================== */
 
@@ -15,13 +15,10 @@
 
 /**
  * @brief Prototype for the serial receive callback function.
- * @param buffer Pointer to the received data buffer.
- * @param length Length of the received data.
  * @param callback_context Pointer to user-defined callback_context data (can be NULL).
+ * @param byte The received byte.
  */
-typedef void (*serial_rx_callback_t)(void*          callback_context,
-                                     const uint8_t* buffer,
-                                     size_t         buffer_size);
+typedef void (*serial_rx_callback_t)(void* callback_context, uint8_t byte);
 
 /* ============================================================================================== */
 
@@ -82,10 +79,18 @@ struct serial_ops
     void (*enable_rx_interrupt)(struct serial_port* self, bool enable);
 
     /**
-     * @brief Clears the serial buffers.
+     * @brief Flushes the transmit buffer.
      * @param self Pointer to the serial port structure.
+     * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    void (*clear_buffers)(struct serial_port* self);
+    int8_t (*flush_tx)(struct serial_port* self);
+
+    /**
+     * @brief Flushes the receive buffer.
+     * @param self Pointer to the serial port structure.
+     * @return int8_t Returns 0 on success or -ERR on failure.
+     */
+    int8_t (*flush_rx)(struct serial_port* self);
 };
 
 /* ============================================================================================== */
@@ -104,21 +109,22 @@ struct serial_port
     uint32_t baud_rate;
 
     /**
-     * @brief Pointer to the receive buffer. This buffer must be created by the user, assigned, and
-     * kept alive throughout the lifetime of the serial port.
+     * @brief Number of data bits (5, 6, 7, 8, or 9).
      */
-    uint8_t* rx_buffer;
+    uint8_t data_bits;
 
     /**
-     * @brief Size of the receive buffer in bytes. This size must match the actual size of the
-     * buffer created by the user.
+     * @brief Parity configuration: 'N' (None), 'E' (Even), 'O' (Odd), 'M' (Mark), 'S' (Space).
      */
-    size_t rx_buffer_size;
+    char parity;
 
     /**
-     * @brief Pointer to the user-defined callback_context data (can be NULL).
+     * @brief Number of stop bits: 1 or 2 (some support 0.5 or 1.5).
      */
-    void* callback_context;
+    uint8_t stop_bits;
+
+    bool  _was_initialized;   // Internal flag to prevent reinitialization or misuse.
+    void* _callback_context;  // Pointer to user-defined callback_context data (can be NULL).
 
     /**
      * @brief Pointer to the serial operations structure. This structure must be first created and
@@ -130,29 +136,4 @@ struct serial_port
 
 /* ============================================================================================== */
 
-/*
-Usage:
-int main(void)
-{
-    const struct serial_ops my_serial_ops = {
-        .initialize = my_serial_initialize,
-        .transmit = my_serial_transmit,
-        .receive = my_serial_receive,
-        .set_rx_callback = my_serial_set_rx_callback,
-        .enable_rx_interrupt = my_serial_enable_rx_interrupt,
-        .clear_buffers = my_serial_clear_buffers,
-    };
-    struct serial_port my_serial;
-    my_serial.ops = &my_serial_ops;
-    my_serial.baud_rate = 9600;
-    my_serial.rx_buffer = malloc(128);
-    my_serial.rx_buffer_size = 128;
-    my_serial.ops->initialize(&my_serial);
-    // Other application code...
-    return 0;
-}
-*/
-
-/* ============================================================================================== */
-
-#endif  // serial_H
+#endif  // SERIAL_H
