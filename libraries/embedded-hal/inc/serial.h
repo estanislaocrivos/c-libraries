@@ -74,8 +74,9 @@ struct serial_ops
      * @brief Enables or disables the serial receive interrupt.
      * @param self Pointer to the serial port structure.
      * @param enable Set to true to enable the interrupt, false to disable it.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    void (*enable_rx_interrupt)(struct serial_port* self, bool enable);
+    int8_t (*enable_rx_interrupt)(struct serial_port* self, bool enable);
 
     /**
      * @brief Flushes the transmit buffer.

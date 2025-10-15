@@ -73,8 +73,9 @@ struct spi_ops
      * @brief Controls the Chip Select (CS) line manually.
      * @param self Pointer to the SPI port structure.
      * @param active true to activate CS, false to deactivate.
+     * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    void (*set_cs)(struct spi_port* self, bool active);
+    int8_t (*set_cs)(struct spi_port* self, bool active);
 
     /**
      * @brief Changes SPI frequency dynamically (useful for multi-device communication).
@@ -100,28 +101,23 @@ struct spi_ops
      * @brief Enables or disables the SPI receive interrupt.
      * @param self Pointer to the SPI port structure.
      * @param enable Set to true to enable the interrupt, false to disable it.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    void (*enable_rx_interrupt)(struct spi_port* self, bool enable);
-
-    /**
-     * @brief Clears the SPI buffers.
-     * @param self Pointer to the SPI port structure.
-     */
-    void (*clear_buffers)(struct spi_port* self);
+    int8_t (*enable_rx_interrupt)(struct spi_port* self, bool enable);
 
     /**
      * @brief Flushes the transmit buffer.
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_tx)(struct serial_port* self);
+    int8_t (*flush_tx)(struct spi_port* self);
 
     /**
      * @brief Flushes the receive buffer.
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_rx)(struct serial_port* self);
+    int8_t (*flush_rx)(struct spi_port* self);
 };
 
 /* ============================================================================================== */
