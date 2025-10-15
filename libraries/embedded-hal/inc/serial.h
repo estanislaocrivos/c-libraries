@@ -53,11 +53,10 @@ struct serial_ops
     /**
      * @brief Receives data through the serial interface.
      * @param self Pointer to the serial port structure.
-     * @param buffer Pointer to the 8-bit buffer where the received data will be stored.
-     * @param size Size of the buffer to be received.
+     * @param data Pointer to the data byte where the received data will be stored.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct serial_port* self, uint8_t* buffer, size_t size);
+    int8_t (*receive)(struct serial_port* self, uint8_t* data);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.

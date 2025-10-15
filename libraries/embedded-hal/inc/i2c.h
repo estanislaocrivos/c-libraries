@@ -52,8 +52,7 @@ struct i2c_ops
      * @brief Receives data through the I2C interface.
      * @param self Pointer to the I2C port structure.
      * @param buffer Pointer to the byte where the received data will be stored.
-     * @return int8_t Returns 0 on success or -ERR on failure or -EAGAIN if no data is available
-     * (see errno.h).
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
     int8_t (*receive)(struct i2c_port* self, uint8_t* byte);
 
