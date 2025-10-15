@@ -9,7 +9,7 @@ static serial_rx_callback_t usart1_callback;
 
 /* ============================================================================================== */
 
-static inline void usart0_initialize(struct serial_port* port)
+static inline void usart0_initialize(const struct serial_port* port)
 {
     uint16_t ubrr = (F_CPU / (16UL * port->baud_rate)) - 1;
     if (ubrr > 4095)
@@ -22,7 +22,7 @@ static inline void usart0_initialize(struct serial_port* port)
     UCSR0C = (1 << USBS0) | (3 << UCSZ00);
 }
 
-static inline void usart1_initialize(struct serial_port* port)
+static inline void usart1_initialize(const struct serial_port* port)
 {
     uint16_t ubrr = (F_CPU / (16UL * port->baud_rate)) - 1;
     if (ubrr > 4095)
@@ -35,7 +35,7 @@ static inline void usart1_initialize(struct serial_port* port)
     UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 }
 
-int8_t usart_initialize(struct serial_port* port)
+int8_t usart_initialize(const struct serial_port* port)
 {
     if (port == NULL || port->baud_rate == 0)
     {
@@ -75,7 +75,7 @@ static inline void _usart1_transmit_byte(const uint8_t* byte)
     UDR1 = *byte;
 }
 
-int8_t usart_transmit(struct serial_port* port, const uint8_t* buffer, size_t size)
+int8_t usart_transmit(const struct serial_port* port, const uint8_t* buffer, size_t size)
 {
     if (port == NULL || buffer == NULL)
     {
@@ -121,7 +121,7 @@ static inline uint8_t _usart0_receive_byte(void)
     return UDR0;
 }
 
-int8_t usart_receive(struct serial_port* port, uint8_t* buffer, size_t size)
+int8_t usart_receive(const struct serial_port* port, uint8_t* buffer, size_t size)
 {
     if (port == NULL || buffer == NULL)
     {
@@ -155,9 +155,9 @@ int8_t usart_receive(struct serial_port* port, uint8_t* buffer, size_t size)
 
 /* ============================================================================================== */
 
-int8_t usart_set_rx_callback(struct serial_port*  port,
-                             serial_rx_callback_t callback,
-                             void*                callback_context)
+int8_t usart_set_rx_callback(const struct serial_port* port,
+                             serial_rx_callback_t      callback,
+                             void*                     callback_context)
 {
     if (port == NULL || callback == NULL || callback_context == NULL)
     {
@@ -183,13 +183,13 @@ int8_t usart_set_rx_callback(struct serial_port*  port,
 
 /* ============================================================================================== */
 
-void usart_enable_rx_interrupt(struct serial_port* self, bool enable)
+void usart_enable_rx_interrupt(const struct serial_port* port, bool enable)
 {
-    if (self == NULL)
+    if (port == NULL)
     {
         return;
     }
-    switch (self->port_id)
+    switch (port->port_id)
     {
         case 0:
             if (enable)
@@ -220,9 +220,9 @@ void usart_enable_rx_interrupt(struct serial_port* self, bool enable)
 
 /* ============================================================================================== */
 
-void usart_clear_buffers(struct serial_port* self)
+void usart_clear_buffers(const struct serial_port* port)
 {
-    (void)self;
+    (void)port;
     // No buffers to clear in this implementation
 }
 
@@ -233,7 +233,7 @@ ISR(USART0_RX_vect)
     uint8_t data = UDR0;
     if (usart0_callback)
     {
-        usart0_callback(usart0_callback_context, &data, 1);
+        usart0_callback(usart0_callback_context, &data);
     }
 }
 
@@ -242,7 +242,7 @@ ISR(USART1_RX_vect)
     uint8_t data = UDR1;
     if (usart1_callback)
     {
-        usart1_callback(usart1_callback_context, &data, 1);
+        usart1_callback(usart1_callback_context, &data);
     }
 }
 
