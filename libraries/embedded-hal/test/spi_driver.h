@@ -35,7 +35,7 @@ int8_t spi1_transmit(struct spi_port* port, const uint8_t* buffer, size_t size);
 
 /* ============================================================================================== */
 
-int8_t spi1_receive(struct spi_port* port, uint8_t* buffer, size_t size);
+int8_t spi1_receive(struct spi_port* port, uint8_t* buffer);
 
 /* ============================================================================================== */
 
@@ -45,11 +45,15 @@ int8_t spi1_set_rx_callback(struct spi_port*  port,
 
 /* ============================================================================================== */
 
-void spi1_enable_rx_interrupt(struct spi_port* port, bool enable);
+int8_t spi1_enable_rx_interrupt(struct spi_port* port, bool enable);
 
 /* ============================================================================================== */
 
-void spi1_clear_buffers(struct spi_port* port);
+int8_t spi1_flush_tx(struct spi_port* port);
+
+/* ============================================================================================== */
+
+int8_t spi1_flush_rx(struct spi_port* port);
 
 /* ============================================================================================== */
 

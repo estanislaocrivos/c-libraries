@@ -8,6 +8,8 @@
 #include "serial.h"
 #include "interrupt.h"
 #include "spi.h"
+#include "i2c.h"
+#include "adc.h"
 
 /* ============================================================================================== */
 

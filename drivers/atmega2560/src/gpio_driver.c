@@ -2,7 +2,7 @@
 
 /* ============================================================================================== */
 
-int8_t gpio_set_state(struct gpio* self, bool state)
+int8_t gpio_set_state(const struct gpio* self, bool state)
 {
     if (self == NULL)
     {
@@ -84,14 +84,15 @@ int8_t gpio_set_state(struct gpio* self, bool state)
 
 /* ============================================================================================== */
 
-int8_t gpio_get_state(struct gpio* self, bool* state)
+int8_t gpio_get_state(const struct gpio* self, bool* state)
 {
+    *state = false;
     return 0;
 }
 
 /* ============================================================================================== */
 
-int8_t gpio_toggle(struct gpio* self)
+int8_t gpio_toggle(const struct gpio* self)
 {
     return 0;
 }

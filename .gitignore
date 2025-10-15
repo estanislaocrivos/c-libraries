@@ -4,3 +4,5 @@ docs/
 deploy.sh
 checkers.txt
 build.sh
+generate_docs.sh
+run_workflow.sh

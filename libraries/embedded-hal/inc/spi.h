@@ -15,13 +15,10 @@
 
 /**
  * @brief Prototype for the SPI receive callback function.
- * @param buffer Pointer to the received data buffer.
- * @param length Length of the received data.
  * @param callback_context Pointer to user-defined callback_context data (can be NULL).
+ * @param byte The received byte.
  */
-typedef void (*spi_rx_callback_t)(void*          callback_context,
-                                  const uint8_t* buffer,
-                                  size_t         buffer_size);
+typedef void (*spi_rx_callback_t)(void* callback_context, uint8_t byte);
 
 /* ============================================================================================== */
 
@@ -54,11 +51,39 @@ struct spi_ops
     /**
      * @brief Receives data through the SPI interface.
      * @param self Pointer to the SPI port structure.
-     * @param buffer Pointer to the 8-bit buffer where the received data will be stored.
-     * @param size Size of the buffer to be received.
+     * @param data Pointer to the data byte where the received data will be stored.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct spi_port* self, uint8_t* buffer, size_t size);
+    int8_t (*receive)(struct spi_port* self, uint8_t* data);
+
+    /**
+     * @brief Performs a full-duplex transfer (simultaneous transmit and receive).
+     * @param self Pointer to the SPI port structure.
+     * @param tx_buffer Pointer to transmit buffer.
+     * @param rx_buffer Pointer to receive buffer.
+     * @param size Number of bytes to transfer.
+     * @return int8_t Returns 0 on success or -ERR on failure.
+     */
+    int8_t (*transfer)(struct spi_port* self,
+                       const uint8_t*   tx_buffer,
+                       uint8_t*         rx_buffer,
+                       size_t           size);
+
+    /**
+     * @brief Controls the Chip Select (CS) line manually.
+     * @param self Pointer to the SPI port structure.
+     * @param active true to activate CS, false to deactivate.
+     * @return int8_t Returns 0 on success or -ERR on failure.
+     */
+    int8_t (*set_cs)(struct spi_port* self, bool active);
+
+    /**
+     * @brief Changes SPI frequency dynamically (useful for multi-device communication).
+     * @param self Pointer to the SPI port structure.
+     * @param frequency New frequency in Hz.
+     * @return int8_t Returns 0 on success or -ERR on failure.
+     */
+    int8_t (*set_frequency)(struct spi_port* self, uint32_t frequency);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
@@ -76,14 +101,23 @@ struct spi_ops
      * @brief Enables or disables the SPI receive interrupt.
      * @param self Pointer to the SPI port structure.
      * @param enable Set to true to enable the interrupt, false to disable it.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    void (*enable_rx_interrupt)(struct spi_port* self, bool enable);
+    int8_t (*enable_rx_interrupt)(struct spi_port* self, bool enable);
 
     /**
-     * @brief Clears the SPI buffers.
-     * @param self Pointer to the SPI port structure.
+     * @brief Flushes the transmit buffer.
+     * @param self Pointer to the serial port structure.
+     * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    void (*clear_buffers)(struct spi_port* self);
+    int8_t (*flush_tx)(struct spi_port* self);
+
+    /**
+     * @brief Flushes the receive buffer.
+     * @param self Pointer to the serial port structure.
+     * @return int8_t Returns 0 on success or -ERR on failure.
+     */
+    int8_t (*flush_rx)(struct spi_port* self);
 };
 
 /* ============================================================================================== */
@@ -96,7 +130,11 @@ struct spi_port
     uint8_t port_id;
 
     /**
-     * @brief SPI mode (0-3).
+     * @brief SPI mode (0-3): CPOL and CPHA configuration.
+     * Mode 0: CPOL=0, CPHA=0
+     * Mode 1: CPOL=0, CPHA=1
+     * Mode 2: CPOL=1, CPHA=0
+     * Mode 3: CPOL=1, CPHA=1
      */
     uint8_t mode;
 
@@ -111,21 +149,22 @@ struct spi_port
     uint32_t frequency;
 
     /**
-     * @brief Pointer to the receive buffer. This buffer must be created by the user, assigned, and
-     * kept alive throughout the lifetime of the SPI port.
+     * @brief Bit order: true for MSB first, false for LSB first.
      */
-    uint8_t* rx_buffer;
+    bool msb_first;
 
     /**
-     * @brief Size of the receive buffer in bytes. This size must match the actual size of the
-     * buffer created by the user.
+     * @brief Chip Select (CS) polarity: true for active high, false for active low.
      */
-    size_t rx_buffer_size;
+    bool cs_active_high;
 
     /**
-     * @brief Pointer to the user-defined callback_context data (can be NULL).
+     * @brief Enable/disable hardware CS control. If false, user must control CS manually.
      */
-    void* callback_context;
+    bool hardware_cs;
+
+    bool  _was_initialized;   // Internal flag to prevent reinitialization or misuse.
+    void* _callback_context;  // Pointer to user-defined callback_context data (can be NULL).
 
     /**
      * @brief Pointer to the SPI operations structure. This structure must be first created and
