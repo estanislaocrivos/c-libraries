@@ -73,13 +73,13 @@ struct i2c_ops
      * @param self Pointer to the I2C port structure.
      * @param enable Set to true to enable the interrupt, false to disable it.
      */
-    void (*enable_rx_interrupt)(struct i2c_port* self, bool enable);
+    int8_t (*enable_rx_interrupt)(struct i2c_port* self, bool enable);
 
     /**
      * @brief Clears the I2C buffers.
      * @param self Pointer to the I2C port structure.
      */
-    void (*clear_buffers)(struct i2c_port* self);
+    int8_t (*clear_buffers)(struct i2c_port* self);
 };
 
 /* ============================================================================================== */
