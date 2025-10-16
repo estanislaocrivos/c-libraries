@@ -28,6 +28,15 @@ typedef void (*i2c_rx_callback_t)(void* callback_context, uint8_t byte);
 struct i2c_port;
 
 /**
+ * @brief I2C addressing modes.
+ */
+enum i2c_address_mode
+{
+    I2C_ADDR_7BIT  = 0,
+    I2C_ADDR_10BIT = 1,
+};
+
+/**
  * @brief I2C operations structure. This structure holds function pointers for I2C operations.
  */
 struct i2c_ops
@@ -49,12 +58,29 @@ struct i2c_ops
     int8_t (*transmit)(struct i2c_port* self, const uint8_t* buffer, size_t size);
 
     /**
+     * @brief Transmits data through the I2C interface.
+     * @param self Pointer to the I2C port structure.
+     * @param byte Byte to be transmitted.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     */
+    int8_t (*transmit_byte)(struct i2c_port* self, uint8_t byte);
+
+    /**
      * @brief Receives data through the I2C interface.
      * @param self Pointer to the I2C port structure.
      * @param buffer Pointer to the byte where the received data will be stored.
+     * @param size Size of the buffer to be received.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct i2c_port* self, uint8_t* byte);
+    int8_t (*receive)(struct i2c_port* self, uint8_t* buffer, size_t size);
+
+    /**
+     * @brief Receives data through the I2C interface.
+     * @param self Pointer to the I2C port structure.
+     * @param byte Pointer to the byte where the received data will be stored.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     */
+    int8_t (*receive_byte)(struct i2c_port* self, uint8_t* byte);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
@@ -79,7 +105,7 @@ struct i2c_ops
      * @brief Clears the I2C buffers.
      * @param self Pointer to the I2C port structure.
      */
-    int8_t (*clear_buffers)(struct i2c_port* self);
+    int8_t (*flush_buffer)(struct i2c_port* self);
 };
 
 /* ============================================================================================== */
@@ -100,6 +126,11 @@ struct i2c_port
      * @brief Clock frequency in Hertz.
      */
     uint32_t frequency;
+
+    /**
+     * @brief Addressing mode (7-bit or 10-bit).
+     */
+    enum i2c_address_mode address_mode;
 
     /**
      * @brief I2C slave address (7-bit or 10-bit). Only used in master mode.
