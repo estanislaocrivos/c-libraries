@@ -55,15 +55,32 @@ struct i2c_ops
      * @param size Size of the buffer to be transmitted.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*transmit)(struct i2c_port* self, const uint8_t byte);
+    int8_t (*transmit)(struct i2c_port* self, const uint8_t* buffer, size_t size);
+
+    /**
+     * @brief Transmits data through the I2C interface.
+     * @param self Pointer to the I2C port structure.
+     * @param byte Byte to be transmitted.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     */
+    int8_t (*transmit_byte)(struct i2c_port* self, uint8_t byte);
 
     /**
      * @brief Receives data through the I2C interface.
      * @param self Pointer to the I2C port structure.
      * @param buffer Pointer to the byte where the received data will be stored.
+     * @param size Size of the buffer to be received.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct i2c_port* self, uint8_t* byte);
+    int8_t (*receive)(struct i2c_port* self, uint8_t* buffer, size_t size);
+
+    /**
+     * @brief Receives data through the I2C interface.
+     * @param self Pointer to the I2C port structure.
+     * @param byte Pointer to the byte where the received data will be stored.
+     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     */
+    int8_t (*receive_byte)(struct i2c_port* self, uint8_t* byte);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
