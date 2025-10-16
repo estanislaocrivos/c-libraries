@@ -37,6 +37,42 @@ enum i2c_address_mode
 };
 
 /**
+ * @brief I2C transfer structure. This structure holds the details of an I2C transfer.
+ */
+struct i2c_transfer
+{
+    /**
+     * @brief Pointer to the register address to read from or write to.
+     */
+    const uint8_t* reg_address;
+
+    /**
+     * @brief Size of the register address in bytes (1 or 2).
+     */
+    size_t reg_address_size;
+
+    /**
+     * @brief Pointer to the data to be written.
+     */
+    const uint8_t* tx_payload;
+
+    /**
+     * @brief Size of the data to be written in bytes.
+     */
+    size_t tx_payload_size;
+
+    /**
+     * @brief Pointer to the buffer where the received data will be stored.
+     */
+    uint8_t* rx_payload;
+
+    /**
+     * @brief Size of the buffer to be received in bytes.
+     */
+    size_t rx_payload_size;
+};
+
+/**
  * @brief I2C operations structure. This structure holds function pointers for I2C operations.
  */
 struct i2c_ops
@@ -51,36 +87,25 @@ struct i2c_ops
     /**
      * @brief Transmits data through the I2C interface.
      * @param self Pointer to the I2C port structure.
-     * @param buffer Pointer to the 8-bit buffer to be transmitted.
-     * @param size Size of the buffer to be transmitted.
+     * @param transfer Pointer to the i2c_transfer structure containing transfer details. Must
+     * contain reg_address, reg_address_size, tx_payload, tx_payload_size.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     * @note In master mode, this function performs a write to the reg. address pointer register
+     * followed by a write operation, all in the same transaction without a stop condition in
+     * between.
      */
-    int8_t (*transmit)(struct i2c_port* self, const uint8_t* buffer, size_t size);
-
-    /**
-     * @brief Transmits data through the I2C interface.
-     * @param self Pointer to the I2C port structure.
-     * @param byte Byte to be transmitted.
-     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
-     */
-    int8_t (*transmit_byte)(struct i2c_port* self, uint8_t byte);
+    int8_t (*write)(struct i2c_port* self, const struct i2c_transfer* transfer);
 
     /**
      * @brief Receives data through the I2C interface.
      * @param self Pointer to the I2C port structure.
-     * @param buffer Pointer to the byte where the received data will be stored.
-     * @param size Size of the buffer to be received.
+     * @param transfer Pointer to the i2c_transfer structure containing transfer details. Must
+     * contain reg_address, reg_address_size, rx_payload, rx_payload_size.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
+     * @note In master mode, this function performs a write to the reg. address pointer register
+     * followed by a read operation with a repeated start condition.
      */
-    int8_t (*receive)(struct i2c_port* self, uint8_t* buffer, size_t size);
-
-    /**
-     * @brief Receives data through the I2C interface.
-     * @param self Pointer to the I2C port structure.
-     * @param byte Pointer to the byte where the received data will be stored.
-     * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
-     */
-    int8_t (*receive_byte)(struct i2c_port* self, uint8_t* byte);
+    int8_t (*read)(struct i2c_port* self, struct i2c_transfer* transfer);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
