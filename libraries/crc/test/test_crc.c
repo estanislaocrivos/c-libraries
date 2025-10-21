@@ -13,11 +13,11 @@ TEST_SOURCE_FILE("../src/crc.c")
 
 void test_crc8_autosar(void)
 {
-    struct crc crc8 = {.crc8_final_xor_value = 0xFF,
-                       .crc8_initial_value   = 0xFF,
-                       .crc8_polynomial      = 0x2F,
-                       .reflect_input        = false,
-                       .reflect_output       = false};
+    const struct crc crc8 = {.crc8_final_xor_value = 0xFF,
+                             .crc8_initial_value   = 0xFF,
+                             .crc8_polynomial      = 0x2F,
+                             .reflect_input        = false,
+                             .reflect_output       = false};
 
     const uint8_t data_1[] = {0xC2};
     uint8_t       result   = 0;
@@ -42,11 +42,11 @@ void test_crc8_autosar(void)
 
 void test_crc8_bluetooth(void)
 {
-    struct crc crc8 = {.crc8_final_xor_value = 0x00,
-                       .crc8_initial_value   = 0x00,
-                       .crc8_polynomial      = 0xA7,
-                       .reflect_input        = true,
-                       .reflect_output       = true};
+    const struct crc crc8 = {.crc8_final_xor_value = 0x00,
+                             .crc8_initial_value   = 0x00,
+                             .crc8_polynomial      = 0xA7,
+                             .reflect_input        = true,
+                             .reflect_output       = true};
 
     const uint8_t data_1[] = {0xC2};
     uint8_t       result   = 0;
@@ -71,11 +71,11 @@ void test_crc8_bluetooth(void)
 
 void test_crc8_cdma2000(void)
 {
-    struct crc crc8 = {.crc8_final_xor_value = 0x00,
-                       .crc8_initial_value   = 0xFF,
-                       .crc8_polynomial      = 0x9B,
-                       .reflect_input        = false,
-                       .reflect_output       = false};
+    const struct crc crc8 = {.crc8_final_xor_value = 0x00,
+                             .crc8_initial_value   = 0xFF,
+                             .crc8_polynomial      = 0x9B,
+                             .reflect_input        = false,
+                             .reflect_output       = false};
 
     const uint8_t data_1[] = {0xC2};
     uint8_t       result   = 0;
@@ -100,11 +100,11 @@ void test_crc8_cdma2000(void)
 
 void test_crc8_darc(void)
 {
-    struct crc crc8 = {.crc8_final_xor_value = 0x00,
-                       .crc8_initial_value   = 0x00,
-                       .crc8_polynomial      = 0x39,
-                       .reflect_input        = true,
-                       .reflect_output       = true};
+    const struct crc crc8 = {.crc8_final_xor_value = 0x00,
+                             .crc8_initial_value   = 0x00,
+                             .crc8_polynomial      = 0x39,
+                             .reflect_input        = true,
+                             .reflect_output       = true};
 
     const uint8_t data_1[] = {0xC2};
     uint8_t       result   = 0;
@@ -123,6 +123,35 @@ void test_crc8_darc(void)
     status                 = crc8_calculate(&crc8, data_3, sizeof(data_3), &result);
     TEST_ASSERT_EQUAL_INT8(0, status);
     TEST_ASSERT_EQUAL_UINT8(0x4E, result);
+}
+
+/* ============================================================================================== */
+
+void test_crc8_lte(void)
+{
+    const struct crc crc8 = {.crc8_final_xor_value = 0x00,
+                             .crc8_initial_value   = 0x00,
+                             .crc8_polynomial      = 0x9B,
+                             .reflect_input        = false,
+                             .reflect_output       = false};
+
+    const uint8_t data_1[] = {0xC2};
+    uint8_t       result   = 0;
+    int8_t        status   = crc8_calculate(&crc8, data_1, sizeof(data_1), &result);
+    TEST_ASSERT_EQUAL_INT8(0, status);
+    TEST_ASSERT_EQUAL_UINT8(0x6E, result);
+
+    const uint8_t data_2[] = {0xAA, 0xBB, 0xCC};
+    result                 = 0;
+    status                 = crc8_calculate(&crc8, data_2, sizeof(data_2), &result);
+    TEST_ASSERT_EQUAL_INT8(0, status);
+    TEST_ASSERT_EQUAL_UINT8(0xAC, result);
+
+    const uint8_t data_3[] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF};
+    result                 = 0;
+    status                 = crc8_calculate(&crc8, data_3, sizeof(data_3), &result);
+    TEST_ASSERT_EQUAL_INT8(0, status);
+    TEST_ASSERT_EQUAL_UINT8(0x24, result);
 }
 
 /* ============================================================================================== */
