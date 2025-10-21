@@ -7,10 +7,10 @@
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64",
             "includePath": [
-                "${workspaceFolder}/**",
-                "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include",
-                "/Applications/microchip/xc8/v3.00/pic/include/c99/",
-                "/Applications/microchip/xc8/v3.00/pic/include/proc/"
+                "${workspaceFolder}/**"
+                // "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include",
+                // "/Applications/microchip/xc8/v3.00/pic/include/c99/",
+                // "/Applications/microchip/xc8/v3.00/pic/include/proc/"
             ],
             "defines": [
                 "DEV",
