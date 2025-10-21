@@ -8,3 +8,4 @@ project(common-c-libs
 add_subdirectory(libraries/hamming-codec)
 add_subdirectory(libraries/embedded-hal)
 add_subdirectory(libraries/lcd-16-by-2)
+add_subdirectory(libraries/crc)
