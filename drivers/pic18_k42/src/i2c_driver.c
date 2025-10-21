@@ -119,7 +119,7 @@ static inline int8_t _i2c1_write(struct i2c_port* self,
     {
         return -EIO;
     }
-    for (size_t i = 0; i < tx_payload_size - 1; i++)
+    for (size_t i = 0; i < tx_payload_size; i++)
     {
         if (_i2c1_write_tx_buffer(tx_payload[i]))
         {
@@ -168,7 +168,7 @@ static inline int8_t _i2c1_read(struct i2c_port* self,
     {
         return -EIO;
     }
-    for (size_t i = 0; i < rx_payload_size - 1; i++)
+    for (size_t i = 0; i < rx_payload_size; i++)
     {
         _i2c1_wait_rx_buffer_full(&rx_payload[i]);
         if (_i2c1_check_ack())
