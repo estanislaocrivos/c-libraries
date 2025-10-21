@@ -45,7 +45,7 @@ int8_t crc8_calculate(const struct crc* crc, const uint8_t* data, size_t length,
     }
     if (crc->reflect_output)
     {
-        crc_value = (uint8_t)((crc_value * 0x0202020202ULL & 0x010884422010ULL) % 1023);
+        crc_value = _reverse_bits(crc_value);
     }
     crc_value ^= crc->crc8_final_xor_value;
     *result = crc_value;
