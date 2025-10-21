@@ -8,7 +8,15 @@
             "intelliSenseMode": "clang-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include"
+                "/opt/homebrew/Cellar/avr-gcc@9/9.4.0_1/avr/include",
+                "/Applications/microchip/xc8/v3.00/pic/include/c99/",
+                "/Applications/microchip/xc8/v3.00/pic/include/proc/"
+            ],
+            "defines": [
+                "DEV",
+                "__XC8",
+                "__PICC18__",
+                "_18F57K42"
             ]
         }
     ],
