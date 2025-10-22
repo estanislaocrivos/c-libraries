@@ -2,18 +2,20 @@
 
 /* ============================================================================================== */
 
-/* RX state machine implementation */
+static int8_t _fill_internal_buffer(struct framing* self, uint8_t byte)
+{
+    if (self->_buffer_index < self->buffer_size)
+    {
+        self->buffer[self->_buffer_index] = byte;
+        self->_buffer_index += 1;
+        return 0;
+    }
+    return -EMSGSIZE;
+}
 
 /* ============================================================================================== */
 
-static void _fill_internal_buffer(struct framing* self, uint8_t byte)
-{
-    if (self->_buffer_index < self->_buffer_size)
-    {
-        self->_buffer[self->_buffer_index] = byte;
-        self->_buffer_index += 1;
-    }
-}
+/* RX state machine implementation */
 
 typedef enum framing_state (*framing_state_handler_t)(struct framing* self, uint8_t byte);
 
@@ -77,7 +79,7 @@ static enum framing_state stop_state_handler(struct framing* self, uint8_t byte)
 static enum framing_state crc_state_handler(struct framing* self, uint8_t byte)
 {
     uint8_t calculated_crc;
-    crc8_calculate(self->crc_calculator, self->_buffer, self->_buffer_index, &calculated_crc);
+    crc8_calculate(self->crc8_calculator, self->buffer, self->_buffer_index, &calculated_crc);
     if (byte == calculated_crc)
     {
         return FRAMING_COMPLETE_STATE;
@@ -103,10 +105,12 @@ static void _reset_framing(struct framing* self)
     self->_current_state = FRAMING_START_STATE;
 }
 
+/* ============================================================================================== */
+
 int8_t framing_init(struct framing* self)
 {
-    if (self == NULL || self->rx_raw_buffer == NULL || self->rx_payload_buffer == NULL
-        || self->tx_frame_buffer == NULL || self->crc_calculator == NULL)
+    if (self == NULL || self->rx_raw_buffer == NULL || self->tx_frame_buffer == NULL
+        || self->buffer == NULL || self->crc8_calculator == NULL)
     {
         return -EFAULT;
     }
@@ -115,7 +119,9 @@ int8_t framing_init(struct framing* self)
     return 0;
 }
 
-int8_t retrieve_payload(struct framing* self, uint8_t* payload, size_t* payload_size)
+/* ============================================================================================== */
+
+int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload_size)
 {
     if (self == NULL || payload == NULL || payload_size == NULL)
     {
@@ -136,7 +142,7 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, size_t* payload_
         *payload_size = self->_payload_size;
         for (size_t i = 0; i < self->_payload_size; i++)
         {
-            payload[i] = self->_buffer[i + 2];  // Offset by 2 to skip start delimiter and length
+            payload[i] = self->buffer[i + 2];  // Offset by 2 to skip start delimiter and length
         }
         _reset_framing(self);
         return 0;
@@ -147,6 +153,52 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, size_t* payload_
         return -EIO;
     }
     return -EAGAIN;
+}
+
+/* ============================================================================================== */
+
+int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload_size)
+{
+    if (self == NULL || payload == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->_was_initialized)
+    {
+        return -EPERM;
+    }
+    if (payload_size + 4 > self->buffer_size)  // 4 bytes for delimiters and length
+    {
+        return -EMSGSIZE;
+    }
+    size_t index = 0;
+    if (_fill_internal_buffer(self, self->start_delimiter)
+        || _fill_internal_buffer(self, payload_size))
+    {
+        return -EMSGSIZE;
+    }
+    for (size_t i = 0; i < payload_size; i++)
+    {
+        if (_fill_internal_buffer(self, payload[i]))
+        {
+            return -EMSGSIZE;
+        }
+    }
+    if (_fill_internal_buffer(self, self->stop_delimiter))
+    {
+        return -EMSGSIZE;
+    }
+    uint8_t crc;
+    crc8_calculate(self->crc8_calculator, self->buffer, index, &crc);
+    if (_fill_internal_buffer(self, crc))
+    {
+        return -EMSGSIZE;
+    }
+    if (push(self->tx_frame_buffer, self->buffer, index))
+    {
+        return -EIO;
+    }
+    return 0;
 }
 
 /* ============================================================================================== */
