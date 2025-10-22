@@ -173,7 +173,7 @@ int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload
     {
         return -EMSGSIZE;
     }
-    size_t index = 0;
+    self->_buffer_index = 0;
     if (_fill_internal_buffer(self, self->start_delimiter)
         || _fill_internal_buffer(self, payload_size))
     {
@@ -191,12 +191,12 @@ int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload
         return -EMSGSIZE;
     }
     uint8_t crc;
-    crc8_calculate(self->crc8_calculator, self->internal_buffer, index, &crc);
+    crc8_calculate(self->crc8_calculator, self->internal_buffer, self->_buffer_index, &crc);
     if (_fill_internal_buffer(self, crc))
     {
         return -EMSGSIZE;
     }
-    if (push(self->tx_frame_buffer, self->internal_buffer, index))
+    if (push(self->tx_frame_buffer, self->internal_buffer, self->_buffer_index))
     {
         return -EIO;
     }

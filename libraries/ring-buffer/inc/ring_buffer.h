@@ -45,7 +45,7 @@ struct ring_buffer
  * the ring buffer's lifetime.
  * @return 0 on success, -ERRNO on failure.
  */
-int8_t initialize(struct ring_buffer* rb);
+int8_t ring_buffer_init(struct ring_buffer* rb);
 
 /* ============================================================================================== */
 

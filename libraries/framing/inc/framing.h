@@ -37,13 +37,13 @@ struct framing
 
     /**
      * @brief Pointer to the RX raw data ring buffer. Each byte received through the communication
-     * interface should be pushed into this buffer.
+     * interface should be pushed into this buffer. Must have capacity for at least one full frame.
      */
     struct ring_buffer* rx_raw_buffer;
 
     /**
      * @brief Pointer to the TX frame ring buffer. Built frames will be pushed into this buffer
-     * for transmission.
+     * for transmission. Must have capacity for at least one full frame.
      */
     struct ring_buffer* tx_frame_buffer;
 
@@ -69,11 +69,10 @@ struct framing
     uint8_t stop_delimiter;
 
     // Private
-    uint8_t                 _payload_size;   // Stores the payload length byte retrieved from frame
-    size_t                  _buffer_index;   // Current index in the internal buffer
-    enum framing_state      _current_state;  // Current state of the framing state machine
-    framing_state_handler_t _state_handler;  // Current state handler function pointer
-    bool _was_initialized;  // Flag to indicate if the framing instance was initialized
+    uint8_t            _payload_size;   // Stores the payload length byte retrieved from frame
+    size_t             _buffer_index;   // Current index in the internal buffer
+    enum framing_state _current_state;  // Current state of the framing state machine
+    bool _was_initialized;              // Flag to indicate if the framing instance was initialized
 };
 
 /* ============================================================================================== */
