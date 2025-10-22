@@ -2,8 +2,9 @@
 
 /* ============================================================================================== */
 
-#include "../inc/crc.h"
+#include <stdio.h>
 
+#include "../inc/crc.h"
 TEST_SOURCE_FILE("../src/crc.c")
 
 // Used https://crccalc.com/?crc=123456789&method=&datatype=ascii&outtype=hex to generate expected
@@ -152,6 +153,23 @@ void test_crc8_lte(void)
     status                 = crc8_calculate(&crc8, data_3, sizeof(data_3), &result);
     TEST_ASSERT_EQUAL_INT8(0, status);
     TEST_ASSERT_EQUAL_UINT8(0x24, result);
+}
+
+/* ============================================================================================== */
+
+void test_crc8_propietary(void)
+{
+    const struct crc crc8 = {.crc8_final_xor_value = 0x00,
+                             .crc8_initial_value   = 0x00,
+                             .crc8_polynomial      = 0x97,
+                             .reflect_input        = false,
+                             .reflect_output       = false};
+
+    const uint8_t data_1[] = {0xAA, 0x04, 0x01, 0x02, 0x03, 0x04, 0x55};
+    uint8_t       result   = 0;
+    int8_t        status   = crc8_calculate(&crc8, data_1, sizeof(data_1), &result);
+    TEST_ASSERT_EQUAL_INT8(0, status);
+    printf("CRC8 Propietary Test Result: 0x%02X\n", result);
 }
 
 /* ============================================================================================== */
