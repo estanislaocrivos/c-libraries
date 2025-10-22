@@ -13,21 +13,27 @@
 
 /* ============================================================================================== */
 
-struct ring_buffer_config
-{
-    // Public
-    uint8_t* buffer;    /**< Pointer to the buffer array */
-    size_t   size;      /**< Size of the buffer array */
-    bool     overwrite; /**< Overwrite old data when full if true */
-};
-
 struct ring_buffer
 {
+    /**
+     * @brief Pointer to an already allocated buffer of size `size`.
+     */
+    uint8_t* buffer;
+
+    /**
+     * @brief Size of the buffer array. Must match the allocated buffer size.
+     */
+    size_t size;
+
+    /**
+     * @brief If true, new data will overwrite old data when the buffer is full.
+     */
+    bool overwrite;
+
     // Private
-    volatile size_t _head;              /**< Head index */
-    volatile size_t _tail;              /**< Tail index */
-    bool            _was_initialized;   /**< Flag to indicate if the ring buffer was initialized */
-    struct ring_buffer_config* _config; /**< Configuration struct */
+    volatile size_t _head;             // Head index
+    volatile size_t _tail;             // Tail index
+    bool            _was_initialized;  // Flag to indicate if the ring buffer was initialized
 };
 
 /* ============================================================================================== */
@@ -39,7 +45,7 @@ struct ring_buffer
  * the ring buffer's lifetime.
  * @return 0 on success, -ERRNO on failure.
  */
-int8_t initialize(struct ring_buffer* rb, struct ring_buffer_config* config);
+int8_t initialize(struct ring_buffer* rb);
 
 /* ============================================================================================== */
 

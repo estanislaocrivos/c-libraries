@@ -4,9 +4,9 @@
 
 static int8_t _fill_internal_buffer(struct framing* self, uint8_t byte)
 {
-    if (self->_buffer_index < self->buffer_size)
+    if (self->_buffer_index < self->internal_buffer_size)
     {
-        self->buffer[self->_buffer_index] = byte;
+        self->internal_buffer[self->_buffer_index] = byte;
         self->_buffer_index += 1;
         return 0;
     }
@@ -79,7 +79,8 @@ static enum framing_state stop_state_handler(struct framing* self, uint8_t byte)
 static enum framing_state crc_state_handler(struct framing* self, uint8_t byte)
 {
     uint8_t calculated_crc;
-    crc8_calculate(self->crc8_calculator, self->buffer, self->_buffer_index, &calculated_crc);
+    crc8_calculate(self->crc8_calculator, self->internal_buffer, self->_buffer_index,
+                   &calculated_crc);
     if (byte == calculated_crc)
     {
         return FRAMING_COMPLETE_STATE;
@@ -110,7 +111,7 @@ static void _reset_framing(struct framing* self)
 int8_t framing_init(struct framing* self)
 {
     if (self == NULL || self->rx_raw_buffer == NULL || self->tx_frame_buffer == NULL
-        || self->buffer == NULL || self->crc8_calculator == NULL)
+        || self->internal_buffer == NULL || self->crc8_calculator == NULL)
     {
         return -EFAULT;
     }
@@ -142,7 +143,8 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
         *payload_size = self->_payload_size;
         for (size_t i = 0; i < self->_payload_size; i++)
         {
-            payload[i] = self->buffer[i + 2];  // Offset by 2 to skip start delimiter and length
+            payload[i]
+                = self->internal_buffer[i + 2];  // Offset by 2 to skip start delimiter and length
         }
         _reset_framing(self);
         return 0;
@@ -167,7 +169,7 @@ int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload
     {
         return -EPERM;
     }
-    if (payload_size + 4 > self->buffer_size)  // 4 bytes for delimiters and length
+    if (payload_size + 4 > self->internal_buffer_size)  // 4 bytes for delimiters and length
     {
         return -EMSGSIZE;
     }
@@ -189,12 +191,12 @@ int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload
         return -EMSGSIZE;
     }
     uint8_t crc;
-    crc8_calculate(self->crc8_calculator, self->buffer, index, &crc);
+    crc8_calculate(self->crc8_calculator, self->internal_buffer, index, &crc);
     if (_fill_internal_buffer(self, crc))
     {
         return -EMSGSIZE;
     }
-    if (push(self->tx_frame_buffer, self->buffer, index))
+    if (push(self->tx_frame_buffer, self->internal_buffer, index))
     {
         return -EIO;
     }

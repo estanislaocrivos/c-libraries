@@ -51,12 +51,12 @@ struct framing
      * @brief Internal buffer to build frames and parse incoming data. The size must match the
      * maximum expected frame size.
      */
-    uint8_t* buffer;
+    uint8_t* internal_buffer;
 
     /**
      * @brief Size of the internal buffer. Must match the buffer size allocated for `buffer`.
      */
-    size_t buffer_size;
+    size_t internal_buffer_size;
 
     /**
      * @brief Start delimiter byte value.

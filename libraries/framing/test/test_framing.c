@@ -2,15 +2,21 @@
 
 /* ============================================================================================== */
 
-#include "../inc/library.h"
-
-TEST_SOURCE_FILE("../src/library.c")
+#include "../inc/framing.h"
+TEST_SOURCE_FILE("../src/framing.c")
 
 /* ============================================================================================== */
 
 void test_example(void)
 {
-    TEST_ASSERT_TRUE(1);
+    struct ring_buffer rx_buffer =
+    {
+        .
+    } struct ring_buffer tx_buffer;
+    struct framing       framing_instance =
+    {
+        .
+    }
 }
 
 /* ============================================================================================== */

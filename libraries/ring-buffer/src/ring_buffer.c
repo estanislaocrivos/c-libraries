@@ -12,20 +12,18 @@
 
 /* ============================================================================================== */
 
-int8_t initialize(struct ring_buffer* rb, struct ring_buffer_config* config)
+int8_t initialize(struct ring_buffer* rb)
 {
-    if (rb == NULL || config == NULL || config->buffer == NULL)
+    if (rb == NULL || rb->buffer == NULL)
     {
         return -EFAULT;
     }
-    if (config->size == 0)
+    if (rb->size == 0)
     {
         return -EINVAL;
     }
-    rb->_head   = 0;
-    rb->_tail   = 0;
-    rb->_config = config;
-    memset(rb->_config->buffer, 0, config->size);
+    rb->_head            = 0;
+    rb->_tail            = 0;
     rb->_was_initialized = true;
     return 0;
 }
