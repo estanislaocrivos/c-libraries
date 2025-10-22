@@ -15,7 +15,7 @@ TEST_SOURCE_FILE("../../libraries/crc/src/crc.c")
 
 /* ============================================================================================== */
 
-void test_example(void)
+void test_build_frame(void)
 {
     uint8_t            _rx_raw_buffer[128]   = {0};
     uint8_t            _tx_frame_buffer[128] = {0};
