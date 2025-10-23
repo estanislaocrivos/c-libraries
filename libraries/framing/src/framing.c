@@ -142,7 +142,7 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
     uint8_t byte;
     if (pop(self->rx_raw_buffer, &byte, 1))
     {
-        return -EIO;
+        return -ENODATA;
     }
     self->_current_state = state_table[self->_current_state].handler(self, byte);
     if (self->_current_state == FRAMING_COMPLETE_STATE)
