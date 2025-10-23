@@ -22,8 +22,9 @@ int8_t ring_buffer_init(struct ring_buffer* rb)
     {
         return -EINVAL;
     }
-    rb->_head            = 0;
-    rb->_tail            = 0;
+    rb->_head = 0;
+    rb->_tail = 0;
+    memset(rb->buffer, 0, rb->size);
     rb->_was_initialized = true;
     return 0;
 }

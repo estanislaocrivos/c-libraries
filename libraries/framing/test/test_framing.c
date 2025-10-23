@@ -40,8 +40,10 @@ void test_build_frame(void)
                                        .stop_delimiter       = 0x55};
 
     TEST_ASSERT_EQUAL(0, framing_init(&framing_instance));
-    TEST_ASSERT_EQUAL(0, build_frame(&framing_instance, (uint8_t[]){0x01, 0x02}, 2));
-    for (size_t i = 0; i < 6; i++)
+    const uint8_t payload[] = {0x01, 0x02, 0x03, 0x04};
+    uint8_t       frame_size;
+    TEST_ASSERT_EQUAL(0, build_frame(&framing_instance, payload, sizeof(payload), &frame_size));
+    for (size_t i = 0; i < frame_size; i++)
     {
         uint8_t byte;
         TEST_ASSERT_EQUAL(0, pop(framing_instance.tx_frame_buffer, &byte, 1));

@@ -81,7 +81,10 @@ int8_t framing_init(struct framing* self);
 
 /* ============================================================================================== */
 
-int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload_size);
+int8_t build_frame(struct framing* self,
+                   const uint8_t*  payload,
+                   uint8_t         payload_size,
+                   uint8_t*        frame_size);
 
 /* ============================================================================================== */
 

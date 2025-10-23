@@ -2,6 +2,10 @@
 
 /* ============================================================================================== */
 
+#include <string.h>
+
+/* ============================================================================================== */
+
 static int8_t _fill_internal_buffer(struct framing* self, uint8_t byte)
 {
     if (self->_buffer_index < self->internal_buffer_size)
@@ -115,7 +119,9 @@ int8_t framing_init(struct framing* self)
     {
         return -EFAULT;
     }
-    _reset_framing(self);
+    memset(self->internal_buffer, 0, self->internal_buffer_size);
+    self->_buffer_index    = 0;
+    self->_current_state   = FRAMING_START_STATE;
     self->_was_initialized = true;
     return 0;
 }
@@ -159,9 +165,12 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
 
 /* ============================================================================================== */
 
-int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload_size)
+int8_t build_frame(struct framing* self,
+                   const uint8_t*  payload,
+                   uint8_t         payload_size,
+                   uint8_t*        frame_size)
 {
-    if (self == NULL || payload == NULL)
+    if (self == NULL || payload == NULL || frame_size == NULL)
     {
         return -EFAULT;
     }
@@ -200,6 +209,7 @@ int8_t build_frame(struct framing* self, const uint8_t* payload, uint8_t payload
     {
         return -EIO;
     }
+    *frame_size = self->_buffer_index;
     return 0;
 }
 
