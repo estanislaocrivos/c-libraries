@@ -134,7 +134,7 @@ int8_t process_incoming_data(struct framing* self)
         return -EPERM;
     }
     uint8_t byte;
-    if (pop(self->rx_raw_buffer, &byte, 1))
+    if (ring_buffer_pop(self->rx_raw_buffer, &byte, 1))
     {
         return -ENODATA;
     }

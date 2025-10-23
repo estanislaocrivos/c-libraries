@@ -95,7 +95,7 @@ void test_retrieve_payload_no_error(void)
     TEST_ASSERT_EQUAL(0, framing_init(&framing_instance));
 
     const uint8_t frame[] = {0xAA, 0x04, 0x01, 0x02, 0x03, 0x04, 0x55, 0x33};
-    push(framing_instance.rx_raw_buffer, frame, sizeof(frame));
+    ring_buffer_push(framing_instance.rx_raw_buffer, frame, sizeof(frame));
 
     uint8_t payload[64]  = {0};
     uint8_t payload_size = 0;
@@ -157,7 +157,7 @@ void test_retrieve_payload_error(void)
     TEST_ASSERT_EQUAL(0, framing_init(&framing_instance));
 
     const uint8_t frame[] = {0xAA, 0x04, 0x01, 0x02, 0x03, 0x04, 0x55, 0x34};  // Incorrect CRC
-    push(framing_instance.rx_raw_buffer, frame, sizeof(frame));
+    ring_buffer_push(framing_instance.rx_raw_buffer, frame, sizeof(frame));
 
     uint8_t payload[64]  = {0};
     uint8_t payload_size = 0;

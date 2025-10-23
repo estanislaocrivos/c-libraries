@@ -21,12 +21,12 @@ void main(void)
         // Handle error
     }
     const uint8_t data_to_push[] = {1, 2, 3, 4, 5};
-    if (push(&rb, data_to_push, sizeof(data_to_push)))
+    if (ring_buffer_push(&rb, data_to_push, sizeof(data_to_push)))
     {
         // Handle error
     }
     uint8_t popped_data[5] = {0};
-    if (pop(&rb, popped_data, sizeof(popped_data)))
+    if (ring_buffer_pop(&rb, popped_data, sizeof(popped_data)))
     {
         // Handle error
     }
