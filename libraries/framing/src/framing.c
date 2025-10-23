@@ -118,9 +118,9 @@ int8_t framing_init(struct framing* self)
 
 /* ============================================================================================== */
 
-int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload_size)
+int8_t process_incoming_data(struct framing* self)
 {
-    if (self == NULL || payload == NULL || payload_size == NULL)
+    if (self == NULL)
     {
         return -EFAULT;
     }
@@ -134,6 +134,18 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
         return -ENODATA;
     }
     self->_current_state = state_table[self->_current_state].handler(self, byte);
+    if (self->_current_state == FRAMING_COMPLETE_STATE
+        || self->_current_state == FRAMING_ERROR_STATE)
+    {
+        return 0;
+    }
+    return -EAGAIN;
+}
+
+/* ============================================================================================== */
+
+int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload_size)
+{
     if (self->_current_state == FRAMING_COMPLETE_STATE)
     {
         *payload_size = self->_payload_size;
@@ -148,9 +160,9 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
     else if (self->_current_state == FRAMING_ERROR_STATE)
     {
         _reset_framing_fsm(self);
-        return -EIO;
+        return -EILSEQ;
     }
-    return -EAGAIN;
+    return -ENODATA;
 }
 
 /* ============================================================================================== */

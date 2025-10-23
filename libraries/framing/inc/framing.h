@@ -81,6 +81,14 @@ int8_t framing_init(struct framing* self);
 
 /* ============================================================================================== */
 
+/**
+ * @brief Build a frame from the given payload and push it into the TX frame buffer.
+ * @param self Pointer to the framing instance.
+ * @param payload Pointer to the payload data to be framed.
+ * @param payload_size Size of the payload data.
+ * @param frame_size Pointer to store the size of the built frame.
+ * @return 0 on success, -ERRNO on failure.
+ */
 int8_t build_frame(struct framing* self,
                    const uint8_t*  payload,
                    uint8_t         payload_size,
@@ -88,6 +96,26 @@ int8_t build_frame(struct framing* self,
 
 /* ============================================================================================== */
 
+/**
+ * @brief Process incoming data from the RX raw data buffer. Must be called repeatedly to parse
+ * incoming bytes.
+ * @param self Pointer to the framing instance.
+ * @return 0 on success, -ERRNO on failure.
+ */
+int8_t process_incoming_data(struct framing* self);
+
+/* ============================================================================================== */
+
+/**
+ * @brief Retrieve a complete payload from the RX raw data buffer if available. Must be called after
+ * `process_incoming_data` returns successfully (0), indicating that a full frame has been
+ * processed.
+ * @param self Pointer to the framing instance.
+ * @param payload Pointer to store the retrieved payload.
+ * @param payload_size Pointer to store the size of the retrieved payload.
+ * @return 0 on success, -ENODATA if no complete frame is available, -EILSEQ if a framing error
+ * occurred, -ERRNO on other failures.
+ */
 int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload_size);
 
 /* ============================================================================================== */

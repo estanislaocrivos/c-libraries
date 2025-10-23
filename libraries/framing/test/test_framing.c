@@ -87,13 +87,15 @@ void test_retrieve_payload_no_error(void)
 
     uint8_t payload[64]  = {0};
     uint8_t payload_size = 0;
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
+
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(0, process_incoming_data(&framing_instance));
     TEST_ASSERT_EQUAL(0, retrieve_payload(&framing_instance, payload, &payload_size));
 
     for (size_t i = 0; i < payload_size; i++)
@@ -135,14 +137,15 @@ void test_retrieve_payload_error(void)
 
     uint8_t payload[64]  = {0};
     uint8_t payload_size = 0;
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EAGAIN, retrieve_payload(&framing_instance, payload, &payload_size));
-    TEST_ASSERT_EQUAL(-EIO, retrieve_payload(&framing_instance, payload, &payload_size));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EAGAIN, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(0, process_incoming_data(&framing_instance));
+    TEST_ASSERT_EQUAL(-EILSEQ, retrieve_payload(&framing_instance, payload, &payload_size));
 
     for (size_t i = 0; i < payload_size; i++)
     {
