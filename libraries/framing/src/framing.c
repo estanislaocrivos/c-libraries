@@ -48,6 +48,7 @@ static enum framing_state start_state_handler(struct framing* self, uint8_t byte
     {
         return FRAMING_ERROR_STATE;
     }
+    self->_buffer_index = 0;
     _fill_internal_buffer(self, byte);
     return FRAMING_LENGTH_STATE;
 }
@@ -62,7 +63,7 @@ static enum framing_state length_state_handler(struct framing* self, uint8_t byt
 static enum framing_state payload_state_handler(struct framing* self, uint8_t byte)
 {
     _fill_internal_buffer(self, byte);
-    if (self->_buffer_index == self->_payload_size + 1)
+    if (self->_buffer_index == self->_payload_size + 2)  // +2 for start delimiter and length byte
     {
         /* If payload is full, expect ETX */
         return FRAMING_STOP_STATE;
@@ -178,7 +179,7 @@ int8_t build_frame(struct framing* self,
     {
         return -EPERM;
     }
-    if (payload_size + 4 > self->internal_buffer_size)  // 4 bytes for delimiters and length
+    if ((payload_size + 4) > self->internal_buffer_size)  // 4 bytes for delimiters, length and crc
     {
         return -EMSGSIZE;
     }

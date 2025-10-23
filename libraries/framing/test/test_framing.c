@@ -7,11 +7,14 @@
 #include "../inc/framing.h"
 TEST_SOURCE_FILE("../src/framing.c")
 
-#include "../../libraries/ring-buffer/inc/ring_buffer.h"
-TEST_SOURCE_FILE("../../libraries/ring-buffer/src/ring_buffer.c")
+#include "../../ring-buffer/inc/ring_buffer.h"
+TEST_SOURCE_FILE("../../ring-buffer/src/ring_buffer.c")
 
-#include "../../libraries/crc/inc/crc.h"
-TEST_SOURCE_FILE("../../libraries/crc/src/crc.c")
+#include "../../ring-buffer/inc/ring_buffer.h"
+TEST_SOURCE_FILE("../../ring-buffer/src/ring_buffer.c")
+
+#include "../../crc/inc/crc.h"
+TEST_SOURCE_FILE("../../crc/src/crc.c")
 
 /* ============================================================================================== */
 

@@ -157,7 +157,7 @@ void test_crc8_lte(void)
 
 /* ============================================================================================== */
 
-void test_crc8_propietary(void)
+void test_crc8_proprietary(void)
 {
     const struct crc crc8 = {.crc8_final_xor_value = 0x00,
                              .crc8_initial_value   = 0x00,
@@ -169,7 +169,7 @@ void test_crc8_propietary(void)
     uint8_t       result   = 0;
     int8_t        status   = crc8_calculate(&crc8, data_1, sizeof(data_1), &result);
     TEST_ASSERT_EQUAL_INT8(0, status);
-    printf("CRC8 Propietary Test Result: 0x%02X\n", result);
+    printf("CRC8 Proprietary Test Result: 0x%02X\n", result);
 }
 
 /* ============================================================================================== */
