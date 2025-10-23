@@ -51,7 +51,7 @@ void test_clear_buffer(void)
         buffer_push(&buf, (uint8_t)i);
     }
     TEST_ASSERT_EQUAL(buf.size, buf.index);
-    TEST_ASSERT_EQUAL(0, buffer_clear(&buf));
+    TEST_ASSERT_EQUAL(0, buffer_reset(&buf));
     TEST_ASSERT_EQUAL(0, buf.index);
     for (size_t i = 0; i < buf.size; i++)
     {

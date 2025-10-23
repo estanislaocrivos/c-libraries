@@ -36,7 +36,7 @@ int8_t buffer_push(struct buffer* self, uint8_t byte)
 
 /* ============================================================================================== */
 
-int8_t buffer_clear(struct buffer* self)
+int8_t buffer_reset(struct buffer* self)
 {
     if (self == NULL || self->buffer == NULL)
     {
