@@ -55,7 +55,7 @@ void test_build_frame(void)
     TEST_ASSERT_EQUAL(0, build_frame(&framing_instance, payload, sizeof(payload), &frame_size));
     for (size_t i = 0; i < frame_size; i++)
     {
-        printf("Frame byte %zu: 0x%02X\n", i, framing_instance.parsing_buffer->buffer[i]);
+        printf("Frame byte %zu: 0x%02X\n", i, framing_instance.tx_frame_buffer->buffer[i]);
     }
 }
 

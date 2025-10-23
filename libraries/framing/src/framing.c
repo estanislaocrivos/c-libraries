@@ -187,31 +187,31 @@ int8_t build_frame(struct framing* self,
     }
     if ((payload_size + 4) > self->tx_frame_buffer->size)  // 4 bytes for delimiters, length and crc
     {
-        return -EMSGSIZE;
+        return -ENOBUFS;
     }
     buffer_reset_index(self->tx_frame_buffer);
     if (buffer_push(self->tx_frame_buffer, self->start_delimiter)
         || buffer_push(self->tx_frame_buffer, payload_size))
     {
-        return -EMSGSIZE;
+        return -ENOBUFS;
     }
     for (size_t i = 0; i < payload_size; i++)
     {
         if (buffer_push(self->tx_frame_buffer, payload[i]))
         {
-            return -EMSGSIZE;
+            return -ENOBUFS;
         }
     }
     if (buffer_push(self->tx_frame_buffer, self->stop_delimiter))
     {
-        return -EMSGSIZE;
+        return -ENOBUFS;
     }
     uint8_t crc;
-    crc8_calculate(self->crc8_calculator, self->parsing_buffer->buffer,
+    crc8_calculate(self->crc8_calculator, self->tx_frame_buffer->buffer,
                    self->tx_frame_buffer->index, &crc);
     if (buffer_push(self->tx_frame_buffer, crc))
     {
-        return -EMSGSIZE;
+        return -ENOBUFS;
     }
     *frame_size = self->tx_frame_buffer->index;
     return 0;
