@@ -49,8 +49,8 @@ struct framing
     struct buffer* tx_frame_buffer;
 
     /**
-     * @brief Internal buffer to build frames and parse incoming data. The size must match the
-     * maximum expected frame size.
+     * @brief Internal buffer to parse incoming data. Must have capacity for at least one full
+     * frame.
      */
     struct buffer* parsing_buffer;
 

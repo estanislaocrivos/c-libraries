@@ -6,6 +6,10 @@
 
 /* ============================================================================================== */
 
+/* PRIVATE */
+
+/* ============================================================================================== */
+
 /* RX state machine implementation */
 
 typedef enum framing_state (*framing_state_handler_t)(struct framing* self, uint8_t byte);
@@ -43,7 +47,7 @@ static enum framing_state start_state_handler(struct framing* self, uint8_t byte
 static enum framing_state length_state_handler(struct framing* self, uint8_t byte)
 {
     self->_payload_size = byte;
-    _fill_internal_buffer(self, byte);
+    buffer_push(self->parsing_buffer, byte);
     return FRAMING_PAYLOAD_STATE;
 }
 
@@ -72,7 +76,7 @@ static enum framing_state stop_state_handler(struct framing* self, uint8_t byte)
 static enum framing_state crc_state_handler(struct framing* self, uint8_t byte)
 {
     uint8_t calculated_crc;
-    crc8_calculate(self->crc8_calculator, self->parsing_buffer, self->parsing_buffer->index,
+    crc8_calculate(self->crc8_calculator, self->parsing_buffer->buffer, self->parsing_buffer->index,
                    &calculated_crc);
     if (byte == calculated_crc)
     {
@@ -87,6 +91,10 @@ static void _reset_framing_fsm(struct framing* self)
 {
     self->_current_state = FRAMING_START_STATE;
 }
+
+/* ============================================================================================== */
+
+/* PUBLIC */
 
 /* ============================================================================================== */
 
@@ -199,7 +207,8 @@ int8_t build_frame(struct framing* self,
         return -EMSGSIZE;
     }
     uint8_t crc;
-    crc8_calculate(self->crc8_calculator, self->parsing_buffer, self->tx_frame_buffer->index, &crc);
+    crc8_calculate(self->crc8_calculator, self->parsing_buffer->buffer,
+                   self->tx_frame_buffer->index, &crc);
     if (buffer_push(self->tx_frame_buffer, crc))
     {
         return -EMSGSIZE;
