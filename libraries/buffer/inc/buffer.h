@@ -14,16 +14,27 @@
 
 struct buffer
 {
+    /**
+     * @brief Pointer to the buffer memory.
+     */
     uint8_t* buffer;
-    size_t   size;
-    size_t   index;
+
+    /**
+     * @brief Size of the buffer. Must match the allocated memory size.
+     */
+    size_t size;
+
+    /**
+     * @brief Current index in the buffer.
+     */
+    size_t index;
 };
 
 /* ============================================================================================== */
 
 /**
- * @brief Initialize the buffer instance. This function checks for valid pointers and resets the
- * buffer.
+ * @brief Initializes the buffer instance. This function checks for valid pointers in the buffer
+ * struct and resets the buffer.
  * @param self Pointer to the buffer instance.
  * @return 0 on success, -EFAULT on invalid pointers or null size.
  */
