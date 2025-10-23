@@ -10,6 +10,7 @@
 
 #include "../../libraries/crc/inc/crc.h"
 #include "../../libraries/ring-buffer/inc/ring_buffer.h"
+#include "../../libraries/buffer/inc/buffer.h"
 #include "../../inc/errno.h"
 
 /* ============================================================================================== */
@@ -51,12 +52,7 @@ struct framing
      * @brief Internal buffer to build frames and parse incoming data. The size must match the
      * maximum expected frame size.
      */
-    uint8_t* internal_buffer;
-
-    /**
-     * @brief Size of the internal buffer. Must match the buffer size allocated for `buffer`.
-     */
-    size_t internal_buffer_size;
+    struct buffer* internal_buffer;
 
     /**
      * @brief Start delimiter byte value.
@@ -70,13 +66,17 @@ struct framing
 
     // Private
     uint8_t            _payload_size;   // Stores the payload length byte retrieved from frame
-    size_t             _buffer_index;   // Current index in the internal buffer
     enum framing_state _current_state;  // Current state of the framing state machine
     bool _was_initialized;              // Flag to indicate if the framing instance was initialized
 };
 
 /* ============================================================================================== */
 
+/**
+ * @brief Initialize the framing instance.
+ * @param self Pointer to the framing instance.
+ * @return 0 on success, -ERRNO on failure.
+ */
 int8_t framing_init(struct framing* self);
 
 /* ============================================================================================== */
