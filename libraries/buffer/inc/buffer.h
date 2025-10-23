@@ -21,19 +21,19 @@ struct buffer
 
 /* ============================================================================================== */
 
-int8_t buffer_init(struct buffer* buf);
+int8_t buffer_init(struct buffer* self);
 
 /* ============================================================================================== */
 
-int8_t buffer_push(struct buffer* buf, uint8_t byte);
+int8_t buffer_push(struct buffer* self, uint8_t byte);
 
 /* ============================================================================================== */
 
-int8_t buffer_clear(struct buffer* buf);
+int8_t buffer_clear(struct buffer* self);
 
 /* ============================================================================================== */
 
-int8_t buffer_reset_index(struct buffer* buf);
+int8_t buffer_reset_index(struct buffer* self);
 
 /* ============================================================================================== */
 
