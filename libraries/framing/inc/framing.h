@@ -8,10 +8,10 @@
 
 /* ============================================================================================== */
 
-#include "../../libraries/crc/inc/crc.h"
-#include "../../libraries/ring-buffer/inc/ring_buffer.h"
-#include "../../libraries/buffer/inc/buffer.h"
-#include "../../inc/errno.h"
+#include "../../crc/inc/crc.h"
+#include "../../ring-buffer/inc/ring_buffer.h"
+#include "../../buffer/inc/buffer.h"
+#include "../../../inc/errno.h"
 
 /* ============================================================================================== */
 
