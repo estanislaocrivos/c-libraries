@@ -38,8 +38,8 @@ static enum framing_state error_state_handler(struct framing* self, uint8_t byte
 
 /* State table. State handlers are in order according to the enum framing_state enum */
 static const framing_state_table_entry_t state_table[] = {
-    {start_state_handler}, {length_state_handler},   {payload_state_handler}, {stop_state_handler},
-    {crc_state_handler},   {complete_state_handler}, {error_state_handler},
+    {start_state_handler}, {length_state_handler}, {payload_state_handler},
+    {stop_state_handler},  {crc_state_handler},
 };
 
 static enum framing_state start_state_handler(struct framing* self, uint8_t byte)
@@ -93,21 +93,10 @@ static enum framing_state crc_state_handler(struct framing* self, uint8_t byte)
     return FRAMING_ERROR_STATE;
 }
 
-static enum framing_state error_state_handler(struct framing* self, uint8_t byte)
-{
-    return FRAMING_ERROR_STATE;
-}
-
-static enum framing_state complete_state_handler(struct framing* self, uint8_t byte)
-{
-    return FRAMING_COMPLETE_STATE;
-}
-
 /* ============================================================================================== */
 
-static void _reset_framing(struct framing* self)
+static void _reset_framing_fsm(struct framing* self)
 {
-    self->_buffer_index  = 0;
     self->_current_state = FRAMING_START_STATE;
 }
 
@@ -153,12 +142,12 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
             payload[i]
                 = self->internal_buffer[i + 2];  // Offset by 2 to skip start delimiter and length
         }
-        _reset_framing(self);
+        _reset_framing_fsm(self);
         return 0;
     }
     else if (self->_current_state == FRAMING_ERROR_STATE)
     {
-        _reset_framing(self);
+        _reset_framing_fsm(self);
         return -EIO;
     }
     return -EAGAIN;
