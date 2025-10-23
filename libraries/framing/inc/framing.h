@@ -8,9 +8,10 @@
 
 /* ============================================================================================== */
 
-#include "../../libraries/crc/inc/crc.h"
-#include "../../libraries/ring-buffer/inc/ring_buffer.h"
-#include "../../inc/errno.h"
+#include "../../crc/inc/crc.h"
+#include "../../ring-buffer/inc/ring_buffer.h"
+#include "../../buffer/inc/buffer.h"
+#include "../../../inc/errno.h"
 
 /* ============================================================================================== */
 
@@ -42,21 +43,16 @@ struct framing
     struct ring_buffer* rx_raw_buffer;
 
     /**
-     * @brief Pointer to the TX frame ring buffer. Built frames will be pushed into this buffer
-     * for transmission. Must have capacity for at least one full frame.
+     * @brief Pointer to the TX frame linear buffer. Built frame will be pushed into this
+     * buffer for transmission. Must have capacity for at least one full frame.
      */
-    struct ring_buffer* tx_frame_buffer;
+    struct buffer* tx_frame_buffer;
 
     /**
-     * @brief Internal buffer to build frames and parse incoming data. The size must match the
-     * maximum expected frame size.
+     * @brief Internal buffer to parse incoming data. Must have capacity for at least one full
+     * frame.
      */
-    uint8_t* internal_buffer;
-
-    /**
-     * @brief Size of the internal buffer. Must match the buffer size allocated for `buffer`.
-     */
-    size_t internal_buffer_size;
+    struct buffer* parsing_buffer;
 
     /**
      * @brief Start delimiter byte value.
@@ -70,13 +66,17 @@ struct framing
 
     // Private
     uint8_t            _payload_size;   // Stores the payload length byte retrieved from frame
-    size_t             _buffer_index;   // Current index in the internal buffer
     enum framing_state _current_state;  // Current state of the framing state machine
     bool _was_initialized;              // Flag to indicate if the framing instance was initialized
 };
 
 /* ============================================================================================== */
 
+/**
+ * @brief Initialize the framing instance.
+ * @param self Pointer to the framing instance.
+ * @return 0 on success, -ERRNO on failure.
+ */
 int8_t framing_init(struct framing* self);
 
 /* ============================================================================================== */

@@ -56,7 +56,7 @@ int8_t ring_buffer_init(struct ring_buffer* rb);
  * @param len Length of the data to be pushed.
  * @return 0 on success, -ERRNO on failure.
  */
-int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len);
+int8_t ring_buffer_push(struct ring_buffer* self, const uint8_t* data, size_t len);
 
 /* ============================================================================================== */
 
@@ -67,7 +67,7 @@ int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len);
  * @param len Length of the data to be popped. Must match (or be less than) the dest buffer size.
  * @return 0 on success, -ERRNO on failure.
  */
-int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len);
+int8_t ring_buffer_pop(struct ring_buffer* self, uint8_t* dest, size_t len);
 
 /* ============================================================================================== */
 
@@ -78,7 +78,7 @@ int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len);
  * otherwise.
  * @return 0 on success, -ERRNO on failure.
  */
-int8_t is_empty(const struct ring_buffer* self, bool* empty);
+int8_t ring_buffer_is_empty(const struct ring_buffer* self, bool* empty);
 
 /* ============================================================================================== */
 
@@ -89,7 +89,7 @@ int8_t is_empty(const struct ring_buffer* self, bool* empty);
  * otherwise.
  * @return 0 on success, -ERRNO on failure.
  */
-int8_t is_full(const struct ring_buffer* self, bool* full);
+int8_t ring_buffer_is_full(const struct ring_buffer* self, bool* full);
 
 /* ============================================================================================== */
 
@@ -99,7 +99,7 @@ int8_t is_full(const struct ring_buffer* self, bool* full);
  * @param available Pointer to a size_t that will be set to the number of available bytes.
  * @return 0 on success, -ERRNO on failure.
  */
-int8_t available(const struct ring_buffer* self, size_t* available);
+int8_t ring_buffer_available(const struct ring_buffer* self, size_t* available);
 
 /* ============================================================================================== */
 

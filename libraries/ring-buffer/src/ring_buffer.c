@@ -12,6 +12,10 @@
 
 /* ============================================================================================== */
 
+/* PUBLIC */
+
+/* ============================================================================================== */
+
 int8_t ring_buffer_init(struct ring_buffer* rb)
 {
     if (rb == NULL || rb->buffer == NULL)
@@ -31,7 +35,7 @@ int8_t ring_buffer_init(struct ring_buffer* rb)
 
 /* ============================================================================================== */
 
-int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
+int8_t ring_buffer_push(struct ring_buffer* self, const uint8_t* data, size_t len)
 {
     if (self == NULL || data == NULL)
     {
@@ -86,7 +90,7 @@ int8_t push(struct ring_buffer* self, const uint8_t* data, size_t len)
 
 /* ============================================================================================== */
 
-int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len)
+int8_t ring_buffer_pop(struct ring_buffer* self, uint8_t* dest, size_t len)
 {
     if (self == NULL || dest == NULL || len == 0)
     {
@@ -120,7 +124,7 @@ int8_t pop(struct ring_buffer* self, uint8_t* dest, size_t len)
 
 /* ============================================================================================== */
 
-int8_t is_empty(const struct ring_buffer* self, bool* empty)
+int8_t ring_buffer_is_empty(const struct ring_buffer* self, bool* empty)
 {
     if (self == NULL || empty == NULL)
     {
@@ -136,7 +140,7 @@ int8_t is_empty(const struct ring_buffer* self, bool* empty)
 
 /* ============================================================================================== */
 
-int8_t is_full(const struct ring_buffer* self, bool* full)
+int8_t ring_buffer_is_full(const struct ring_buffer* self, bool* full)
 {
     if (self == NULL || full == NULL)
     {
@@ -161,7 +165,7 @@ int8_t is_full(const struct ring_buffer* self, bool* full)
 
 /* ============================================================================================== */
 
-int8_t available(const struct ring_buffer* self, size_t* available)
+int8_t ring_buffer_available(const struct ring_buffer* self, size_t* available)
 {
     if (self == NULL || available == NULL)
     {
