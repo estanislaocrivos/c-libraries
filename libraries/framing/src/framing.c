@@ -6,19 +6,6 @@
 
 /* ============================================================================================== */
 
-static int8_t _fill_internal_buffer(struct framing* self, uint8_t byte)
-{
-    if (self->_buffer_index < self->internal_buffer_size)
-    {
-        self->internal_buffer[self->_buffer_index] = byte;
-        self->_buffer_index += 1;
-        return 0;
-    }
-    return -EMSGSIZE;
-}
-
-/* ============================================================================================== */
-
 /* RX state machine implementation */
 
 typedef enum framing_state (*framing_state_handler_t)(struct framing* self, uint8_t byte);
@@ -48,8 +35,8 @@ static enum framing_state start_state_handler(struct framing* self, uint8_t byte
     {
         return FRAMING_ERROR_STATE;
     }
-    self->_buffer_index = 0;
-    _fill_internal_buffer(self, byte);
+    buffer_reset_index(self->parsing_buffer);
+    buffer_push(self->parsing_buffer, byte);
     return FRAMING_LENGTH_STATE;
 }
 
@@ -62,8 +49,9 @@ static enum framing_state length_state_handler(struct framing* self, uint8_t byt
 
 static enum framing_state payload_state_handler(struct framing* self, uint8_t byte)
 {
-    _fill_internal_buffer(self, byte);
-    if (self->_buffer_index == self->_payload_size + 2)  // +2 for start delimiter and length byte
+    buffer_push(self->parsing_buffer, byte);
+    if (self->parsing_buffer->index
+        == self->_payload_size + 2)  // +2 for start delimiter and length byte
     {
         /* If payload is full, expect ETX */
         return FRAMING_STOP_STATE;
@@ -77,14 +65,14 @@ static enum framing_state stop_state_handler(struct framing* self, uint8_t byte)
     {
         return FRAMING_ERROR_STATE;
     }
-    _fill_internal_buffer(self, byte);
+    buffer_push(self->parsing_buffer, byte);
     return FRAMING_CRC_STATE;
 }
 
 static enum framing_state crc_state_handler(struct framing* self, uint8_t byte)
 {
     uint8_t calculated_crc;
-    crc8_calculate(self->crc8_calculator, self->internal_buffer, self->_buffer_index,
+    crc8_calculate(self->crc8_calculator, self->parsing_buffer, self->parsing_buffer->index,
                    &calculated_crc);
     if (byte == calculated_crc)
     {
@@ -104,13 +92,22 @@ static void _reset_framing_fsm(struct framing* self)
 
 int8_t framing_init(struct framing* self)
 {
-    if (self == NULL || self->rx_raw_buffer == NULL || self->tx_frame_buffer == NULL
-        || self->internal_buffer == NULL || self->crc8_calculator == NULL)
+    if (self == NULL || self->crc8_calculator == NULL)
     {
         return -EFAULT;
     }
-    memset(self->internal_buffer, 0, self->internal_buffer_size);
-    self->_buffer_index    = 0;
+    if (self->parsing_buffer == NULL || self->parsing_buffer->buffer == NULL)
+    {
+        return -EFAULT;
+    }
+    if (self->tx_frame_buffer == NULL || self->tx_frame_buffer->buffer == NULL)
+    {
+        return -EFAULT;
+    }
+    if (self->rx_raw_buffer == NULL || self->rx_raw_buffer->buffer == NULL)
+    {
+        return -EFAULT;
+    }
     self->_current_state   = FRAMING_START_STATE;
     self->_was_initialized = true;
     return 0;
@@ -151,8 +148,8 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
         *payload_size = self->_payload_size;
         for (size_t i = 0; i < self->_payload_size; i++)
         {
-            payload[i]
-                = self->internal_buffer[i + 2];  // Offset by 2 to skip start delimiter and length
+            payload[i] = self->parsing_buffer
+                             ->buffer[i + 2];  // Offset by 2 to skip start delimiter and length
         }
         _reset_framing_fsm(self);
         return 0;
@@ -180,38 +177,34 @@ int8_t build_frame(struct framing* self,
     {
         return -EPERM;
     }
-    if ((payload_size + 4) > self->internal_buffer_size)  // 4 bytes for delimiters, length and crc
+    if ((payload_size + 4) > self->tx_frame_buffer->size)  // 4 bytes for delimiters, length and crc
     {
         return -EMSGSIZE;
     }
-    self->_buffer_index = 0;
-    if (_fill_internal_buffer(self, self->start_delimiter)
-        || _fill_internal_buffer(self, payload_size))
+    buffer_reset_index(self->tx_frame_buffer);
+    if (buffer_push(self->tx_frame_buffer, self->start_delimiter)
+        || buffer_push(self->tx_frame_buffer, payload_size))
     {
         return -EMSGSIZE;
     }
     for (size_t i = 0; i < payload_size; i++)
     {
-        if (_fill_internal_buffer(self, payload[i]))
+        if (buffer_push(self->tx_frame_buffer, payload[i]))
         {
             return -EMSGSIZE;
         }
     }
-    if (_fill_internal_buffer(self, self->stop_delimiter))
+    if (buffer_push(self->tx_frame_buffer, self->stop_delimiter))
     {
         return -EMSGSIZE;
     }
     uint8_t crc;
-    crc8_calculate(self->crc8_calculator, self->internal_buffer, self->_buffer_index, &crc);
-    if (_fill_internal_buffer(self, crc))
+    crc8_calculate(self->crc8_calculator, self->parsing_buffer, self->tx_frame_buffer->index, &crc);
+    if (buffer_push(self->tx_frame_buffer, crc))
     {
         return -EMSGSIZE;
     }
-    if (push(self->tx_frame_buffer, self->internal_buffer, self->_buffer_index))
-    {
-        return -EIO;
-    }
-    *frame_size = self->_buffer_index;
+    *frame_size = self->tx_frame_buffer->index;
     return 0;
 }
 

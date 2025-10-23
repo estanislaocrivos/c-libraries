@@ -43,16 +43,16 @@ struct framing
     struct ring_buffer* rx_raw_buffer;
 
     /**
-     * @brief Pointer to the TX frame ring buffer. Built frames will be pushed into this buffer
-     * for transmission. Must have capacity for at least one full frame.
+     * @brief Pointer to the TX frame linear buffer. Built frame will be pushed into this
+     * buffer for transmission. Must have capacity for at least one full frame.
      */
-    struct ring_buffer* tx_frame_buffer;
+    struct buffer* tx_frame_buffer;
 
     /**
      * @brief Internal buffer to build frames and parse incoming data. The size must match the
      * maximum expected frame size.
      */
-    struct buffer* internal_buffer;
+    struct buffer* parsing_buffer;
 
     /**
      * @brief Start delimiter byte value.
