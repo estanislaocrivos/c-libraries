@@ -125,10 +125,12 @@ int8_t process_incoming_data(struct framing* self)
         return -EPERM;
     }
     uint8_t byte;
+    // Retrieve next byte from RX raw buffer
     if (ring_buffer_pop(self->rx_raw_buffer, &byte, 1))
     {
         return -ENODATA;
     }
+    // Process byte through state machine
     self->_current_state = state_table[self->_current_state].handler(self, byte);
     if (self->_current_state == FRAMING_COMPLETE_STATE
         || self->_current_state == FRAMING_ERROR_STATE)
@@ -152,12 +154,12 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
                 payload[i] = self->parsing_buffer
                                  ->buffer[i + 2];  // Offset by 2 to skip start delimiter and length
             }
-            self->_current_state = FRAMING_START_STATE;  // Resets FSM
+            self->_current_state = FRAMING_START_STATE;  // Resets FSM upon successful retrieval
             return 0;
         }
         case FRAMING_ERROR_STATE:
         {
-            self->_current_state = FRAMING_START_STATE;  // Resets FSM
+            self->_current_state = FRAMING_START_STATE;  // Resets FSM upon erroneous CRC
             return -EILSEQ;
         }
         default:
