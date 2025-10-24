@@ -10,7 +10,8 @@
 
 /* ============================================================================================== */
 
-/* RX state machine implementation */
+// RX state machine implementation. Each state takes the instance and the incoming byte and
+// processes it, going one state forward or resetting the FSM
 
 typedef enum framing_state (*framing_state_handler_t)(struct framing* self, uint8_t byte);
 
@@ -25,7 +26,7 @@ static enum framing_state payload_state_handler(struct framing* self, uint8_t by
 static enum framing_state stop_state_handler(struct framing* self, uint8_t byte);
 static enum framing_state crc_state_handler(struct framing* self, uint8_t byte);
 
-/* State table. State handlers are in order according to the enum framing_state enum */
+// State table mapping states to their handlers
 static const framing_state_table_entry_t state_table[] = {
     {start_state_handler}, {length_state_handler}, {payload_state_handler},
     {stop_state_handler},  {crc_state_handler},
@@ -144,6 +145,14 @@ int8_t process_incoming_data(struct framing* self)
 
 int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload_size)
 {
+    if (self == NULL || payload == NULL || payload_size == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->_was_initialized)
+    {
+        return -EPERM;
+    }
     switch (self->_current_state)
     {
         case FRAMING_COMPLETE_STATE:
@@ -159,6 +168,7 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
         }
         case FRAMING_ERROR_STATE:
         {
+            self->lost_frames += 1;
             self->_current_state = FRAMING_START_STATE;  // Resets FSM upon erroneous CRC
             return -EILSEQ;
         }
