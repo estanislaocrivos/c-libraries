@@ -10,7 +10,8 @@
 
 /* ============================================================================================== */
 
-/* RX state machine implementation */
+// RX state machine implementation. Each state takes the instance and the incoming byte and
+// processes it, going one state forward or resetting the FSM
 
 typedef enum framing_state (*framing_state_handler_t)(struct framing* self, uint8_t byte);
 
@@ -24,10 +25,8 @@ static enum framing_state length_state_handler(struct framing* self, uint8_t byt
 static enum framing_state payload_state_handler(struct framing* self, uint8_t byte);
 static enum framing_state stop_state_handler(struct framing* self, uint8_t byte);
 static enum framing_state crc_state_handler(struct framing* self, uint8_t byte);
-static enum framing_state complete_state_handler(struct framing* self, uint8_t byte);
-static enum framing_state error_state_handler(struct framing* self, uint8_t byte);
 
-/* State table. State handlers are in order according to the enum framing_state enum */
+// State table mapping states to their handlers
 static const framing_state_table_entry_t state_table[] = {
     {start_state_handler}, {length_state_handler}, {payload_state_handler},
     {stop_state_handler},  {crc_state_handler},
@@ -37,7 +36,7 @@ static enum framing_state start_state_handler(struct framing* self, uint8_t byte
 {
     if (byte != self->start_delimiter)
     {
-        return FRAMING_ERROR_STATE;
+        return FRAMING_START_STATE;
     }
     buffer_reset_index(self->parsing_buffer);
     buffer_push(self->parsing_buffer, byte);
@@ -46,6 +45,10 @@ static enum framing_state start_state_handler(struct framing* self, uint8_t byte
 
 static enum framing_state length_state_handler(struct framing* self, uint8_t byte)
 {
+    if (byte == 0 || byte > self->max_payload_size)
+    {
+        return FRAMING_START_STATE;  // Invalid length, reset FSM
+    }
     self->_payload_size = byte;
     buffer_push(self->parsing_buffer, byte);
     return FRAMING_PAYLOAD_STATE;
@@ -67,7 +70,7 @@ static enum framing_state stop_state_handler(struct framing* self, uint8_t byte)
 {
     if (byte != self->stop_delimiter)
     {
-        return FRAMING_ERROR_STATE;
+        return FRAMING_START_STATE;  // Invalid frame, reset FSM
     }
     buffer_push(self->parsing_buffer, byte);
     return FRAMING_CRC_STATE;
@@ -83,13 +86,6 @@ static enum framing_state crc_state_handler(struct framing* self, uint8_t byte)
         return FRAMING_COMPLETE_STATE;
     }
     return FRAMING_ERROR_STATE;
-}
-
-/* ============================================================================================== */
-
-static void _reset_framing_fsm(struct framing* self)
-{
-    self->_current_state = FRAMING_START_STATE;
 }
 
 /* ============================================================================================== */
@@ -134,10 +130,12 @@ int8_t process_incoming_data(struct framing* self)
         return -EPERM;
     }
     uint8_t byte;
+    // Retrieve next byte from RX raw buffer
     if (ring_buffer_pop(self->rx_raw_buffer, &byte, 1))
     {
         return -ENODATA;
     }
+    // Process byte through state machine
     self->_current_state = state_table[self->_current_state].handler(self, byte);
     if (self->_current_state == FRAMING_COMPLETE_STATE
         || self->_current_state == FRAMING_ERROR_STATE)
@@ -151,23 +149,38 @@ int8_t process_incoming_data(struct framing* self)
 
 int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload_size)
 {
-    if (self->_current_state == FRAMING_COMPLETE_STATE)
+    if (self == NULL || payload == NULL || payload_size == NULL)
     {
-        *payload_size = self->_payload_size;
-        for (size_t i = 0; i < self->_payload_size; i++)
+        return -EFAULT;
+    }
+    if (!self->_was_initialized)
+    {
+        return -EPERM;
+    }
+    switch (self->_current_state)
+    {
+        case FRAMING_COMPLETE_STATE:
         {
-            payload[i] = self->parsing_buffer
-                             ->buffer[i + 2];  // Offset by 2 to skip start delimiter and length
+            *payload_size = self->_payload_size;
+            for (size_t i = 0; i < self->_payload_size; i++)
+            {
+                payload[i] = self->parsing_buffer
+                                 ->buffer[i + 2];  // Offset by 2 to skip start delimiter and length
+            }
+            self->_current_state = FRAMING_START_STATE;  // Resets FSM upon successful retrieval
+            return 0;
         }
-        _reset_framing_fsm(self);
-        return 0;
+        case FRAMING_ERROR_STATE:
+        {
+            self->lost_frames += 1;
+            self->_current_state = FRAMING_START_STATE;  // Resets FSM upon erroneous CRC
+            return -EILSEQ;
+        }
+        default:
+        {
+            return -ENODATA;
+        }
     }
-    else if (self->_current_state == FRAMING_ERROR_STATE)
-    {
-        _reset_framing_fsm(self);
-        return -EILSEQ;
-    }
-    return -ENODATA;
 }
 
 /* ============================================================================================== */

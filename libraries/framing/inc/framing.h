@@ -64,6 +64,16 @@ struct framing
      */
     uint8_t stop_delimiter;
 
+    /**
+     * @brief Maximum allowed payload size.
+     */
+    uint8_t max_payload_size;
+
+    /**
+     * @brief Count of lost frames due to errors.
+     */
+    uint8_t lost_frames;
+
     // Private
     uint8_t            _payload_size;   // Stores the payload length byte retrieved from frame
     enum framing_state _current_state;  // Current state of the framing state machine
@@ -100,7 +110,7 @@ int8_t build_frame(struct framing* self,
  * @brief Process incoming data from the RX raw data buffer. Must be called repeatedly to parse
  * incoming bytes.
  * @param self Pointer to the framing instance.
- * @return 0 on success, -ERRNO on failure.
+ * @return 0 on success, indicating that a full frame has been processed, -ERRNO on failure.
  */
 int8_t process_incoming_data(struct framing* self);
 
