@@ -65,6 +65,11 @@ struct framing
     uint8_t stop_delimiter;
 
     /**
+     * @brief Maximum allowed payload size.
+     */
+    uint8_t max_payload_size;
+
+    /**
      * @brief Count of lost frames due to errors.
      */
     uint8_t lost_frames;

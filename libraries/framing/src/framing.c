@@ -45,6 +45,10 @@ static enum framing_state start_state_handler(struct framing* self, uint8_t byte
 
 static enum framing_state length_state_handler(struct framing* self, uint8_t byte)
 {
+    if (byte == 0 || byte > self->max_payload_size)
+    {
+        return FRAMING_START_STATE;  // Invalid length, reset FSM
+    }
     self->_payload_size = byte;
     buffer_push(self->parsing_buffer, byte);
     return FRAMING_PAYLOAD_STATE;
