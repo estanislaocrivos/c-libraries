@@ -100,18 +100,6 @@ int8_t framing_init(struct framing* self)
     {
         return -EFAULT;
     }
-    if (self->parsing_buffer == NULL || self->parsing_buffer->buffer == NULL)
-    {
-        return -EFAULT;
-    }
-    if (self->tx_frame_buffer == NULL || self->tx_frame_buffer->buffer == NULL)
-    {
-        return -EFAULT;
-    }
-    if (self->rx_raw_buffer == NULL || self->rx_raw_buffer->buffer == NULL)
-    {
-        return -EFAULT;
-    }
     self->_current_state   = FRAMING_START_STATE;
     self->_was_initialized = true;
     return 0;
@@ -122,6 +110,14 @@ int8_t framing_init(struct framing* self)
 int8_t process_incoming_data(struct framing* self)
 {
     if (self == NULL)
+    {
+        return -EFAULT;
+    }
+    if (self->rx_raw_buffer == NULL || self->rx_raw_buffer->buffer == NULL)
+    {
+        return -EFAULT;
+    }
+    if (self->parsing_buffer == NULL || self->parsing_buffer->buffer == NULL)
     {
         return -EFAULT;
     }
@@ -150,6 +146,10 @@ int8_t process_incoming_data(struct framing* self)
 int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload_size)
 {
     if (self == NULL || payload == NULL || payload_size == NULL)
+    {
+        return -EFAULT;
+    }
+    if (self->parsing_buffer == NULL || self->parsing_buffer->buffer == NULL)
     {
         return -EFAULT;
     }
@@ -191,6 +191,10 @@ int8_t build_frame(struct framing* self,
                    uint8_t*        frame_size)
 {
     if (self == NULL || payload == NULL || frame_size == NULL)
+    {
+        return -EFAULT;
+    }
+    if (self->tx_frame_buffer == NULL || self->tx_frame_buffer->buffer == NULL)
     {
         return -EFAULT;
     }
