@@ -9,30 +9,32 @@ static serial_rx_callback_t usart1_callback;
 
 /* ============================================================================================== */
 
-static inline void usart0_initialize(const struct serial_port* port)
+static inline int8_t usart0_initialize(const struct serial_port* port)
 {
     uint16_t ubrr = (F_CPU / (16UL * port->baud_rate)) - 1;
     if (ubrr > 4095)
     {
-        return;
+        return -EINVAL;
     }
     UBRR0H = (uint8_t)(ubrr >> 8);
     UBRR0L = (uint8_t)ubrr;
     UCSR0B = (uint8_t)((1 << RXEN0) | (1 << TXEN0));
     UCSR0C = (1 << USBS0) | (3 << UCSZ00);
+    return 0;
 }
 
-static inline void usart1_initialize(const struct serial_port* port)
+static inline int8_t usart1_initialize(const struct serial_port* port)
 {
     uint16_t ubrr = (F_CPU / (16UL * port->baud_rate)) - 1;
     if (ubrr > 4095)
     {
-        return;
+        return -EINVAL;
     }
     UBRR1H = (uint8_t)(ubrr >> 8);
     UBRR1L = (uint8_t)ubrr;
     UCSR1B = (uint8_t)((1 << RXEN1) | (1 << TXEN1));
     UCSR1C = (1 << USBS1) | (3 << UCSZ10);
+    return 0;
 }
 
 int8_t usart_initialize(const struct serial_port* port)
@@ -44,11 +46,17 @@ int8_t usart_initialize(const struct serial_port* port)
     switch (port->port_id)
     {
         case 0:
-            usart0_initialize(port);
+            if (usart0_initialize(port))
+            {
+                return -EINVAL;
+            }
             break;
 
         case 1:
-            usart1_initialize(port);
+            if (usart1_initialize(port))
+            {
+                return -EINVAL;
+            }
             break;
 
         default:
@@ -119,6 +127,14 @@ static inline uint8_t _usart0_receive_byte(void)
     {
     }
     return UDR0;
+}
+
+static inline uint8_t _usart1_receive_byte(void)
+{
+    while (!(UCSR1A & (1 << RXC1)))
+    {
+    }
+    return UDR1;
 }
 
 int8_t usart_receive(const struct serial_port* port, uint8_t* buffer, size_t size)
@@ -233,7 +249,7 @@ ISR(USART0_RX_vect)
     uint8_t data = UDR0;
     if (usart0_callback)
     {
-        usart0_callback(usart0_callback_context, &data);
+        usart0_callback(usart0_callback_context, data);
     }
 }
 
@@ -242,7 +258,7 @@ ISR(USART1_RX_vect)
     uint8_t data = UDR1;
     if (usart1_callback)
     {
-        usart1_callback(usart1_callback_context, &data);
+        usart1_callback(usart1_callback_context, data);
     }
 }
 
