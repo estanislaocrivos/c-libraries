@@ -26,21 +26,21 @@ struct gpio_ops
      * @param state Desired state (true for high, false for low).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*set_state)(struct gpio* self, bool state);
+    int8_t (*set_state)(const struct gpio* self, bool state);
 
     /**
      * @brief Sets the GPIO pin to high.
      * @param self Pointer to the GPIO structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*get_state)(struct gpio* self, bool* state);
+    int8_t (*get_state)(const struct gpio* self, bool* state);
 
     /**
      * @brief Toggles the GPIO pin state.
      * @param self Pointer to the GPIO structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*toggle)(struct gpio* self);
+    int8_t (*toggle)(const struct gpio* self);
 };
 
 /* ============================================================================================== */

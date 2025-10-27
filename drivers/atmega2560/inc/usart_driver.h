@@ -15,7 +15,7 @@ int8_t usart_transmit(const struct serial_port* port, const uint8_t* buffer, siz
 
 /* ============================================================================================== */
 
-int8_t usart_receive(const struct serial_port* port, uint8_t* buffer, size_t size);
+int8_t usart_receive(const struct serial_port* port, uint8_t* byte);
 
 /* ============================================================================================== */
 

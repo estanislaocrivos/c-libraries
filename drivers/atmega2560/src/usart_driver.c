@@ -137,30 +137,20 @@ static inline uint8_t _usart1_receive_byte(void)
     return UDR1;
 }
 
-int8_t usart_receive(const struct serial_port* port, uint8_t* buffer, size_t size)
+int8_t usart_receive(const struct serial_port* port, uint8_t* byte)
 {
-    if (port == NULL || buffer == NULL)
+    if (port == NULL || byte == NULL)
     {
         return -EFAULT;
-    }
-    if (size == 0)
-    {
-        return -EINVAL;
     }
     switch (port->port_id)
     {
         case 0:
-            for (size_t i = 0; i < size; i++)
-            {
-                buffer[i] = _usart0_receive_byte();
-            }
+            *byte = _usart0_receive_byte();
             break;
 
         case 1:
-            for (size_t i = 0; i < size; i++)
-            {
-                buffer[i] = _usart1_receive_byte();
-            }
+            *byte = _usart1_receive_byte();
             break;
 
         default:
