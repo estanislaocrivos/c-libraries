@@ -39,7 +39,7 @@ struct serial_ops
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*initialize)(struct serial_port* self);
+    int8_t (*initialize)(const struct serial_port* self);
 
     /**
      * @brief Transmits data through the serial interface.
@@ -48,7 +48,7 @@ struct serial_ops
      * @param size Size of the buffer to be transmitted.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*transmit)(struct serial_port* self, const uint8_t* buffer, size_t size);
+    int8_t (*transmit)(const struct serial_port* self, const uint8_t* buffer, size_t size);
 
     /**
      * @brief Receives data through the serial interface.
@@ -56,7 +56,7 @@ struct serial_ops
      * @param data Pointer to the data byte where the received data will be stored.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct serial_port* self, uint8_t* data);
+    int8_t (*receive)(const struct serial_port* self, uint8_t* data);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
@@ -66,9 +66,9 @@ struct serial_ops
      * @param callback_context Pointer to user-defined callback_context data (can be NULL).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*set_rx_callback)(struct serial_port*  self,
-                              serial_rx_callback_t callback,
-                              void*                callback_context);
+    int8_t (*set_rx_callback)(const struct serial_port* self,
+                              serial_rx_callback_t      callback,
+                              void*                     callback_context);
 
     /**
      * @brief Enables or disables the serial receive interrupt.
@@ -76,21 +76,21 @@ struct serial_ops
      * @param enable Set to true to enable the interrupt, false to disable it.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*enable_rx_interrupt)(struct serial_port* self, bool enable);
+    int8_t (*enable_rx_interrupt)(const struct serial_port* self, bool enable);
 
     /**
      * @brief Flushes the transmit buffer.
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_tx)(struct serial_port* self);
+    int8_t (*flush_tx)(const struct serial_port* self);
 
     /**
      * @brief Flushes the receive buffer.
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_rx)(struct serial_port* self);
+    int8_t (*flush_rx)(const struct serial_port* self);
 };
 
 /* ============================================================================================== */

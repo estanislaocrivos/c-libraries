@@ -105,15 +105,15 @@ int8_t gpio_set_as_input(struct gpio* self, bool input);
 
 /* ============================================================================================== */
 
-int8_t gpio_set_state(struct gpio* self, bool state);
+int8_t gpio_set_state(const struct gpio* self, bool state);
 
 /* ============================================================================================== */
 
-int8_t gpio_get_state(struct gpio* self, bool* state);
+int8_t gpio_get_state(const struct gpio* self, bool* state);
 
 /* ============================================================================================== */
 
-int8_t gpio_toggle(struct gpio* self);
+int8_t gpio_toggle(const struct gpio* self);
 
 /* ============================================================================================== */
 
