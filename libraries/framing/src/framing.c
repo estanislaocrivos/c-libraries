@@ -149,10 +149,6 @@ int8_t retrieve_payload(struct framing* self, uint8_t* payload, uint8_t* payload
     {
         return -EFAULT;
     }
-    if (self->parsing_buffer == NULL || self->parsing_buffer->buffer == NULL)
-    {
-        return -EFAULT;
-    }
     if (!self->_was_initialized)
     {
         return -EPERM;
