@@ -25,11 +25,11 @@ int8_t usart_set_rx_callback(const struct serial_port* port,
 
 /* ============================================================================================== */
 
-void usart_enable_rx_interrupt(const struct serial_port* port, bool enable);
+int8_t usart_enable_rx_interrupt(const struct serial_port* port, bool enable);
 
 /* ============================================================================================== */
 
-void usart_clear_buffers(const struct serial_port* port);
+int8_t usart_clear_buffers(const struct serial_port* port);
 
 /* ============================================================================================== */
 

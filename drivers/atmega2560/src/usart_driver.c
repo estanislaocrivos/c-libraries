@@ -19,7 +19,7 @@ static inline int8_t usart0_initialize(const struct serial_port* port)
     UBRR0H = (uint8_t)(ubrr >> 8);
     UBRR0L = (uint8_t)ubrr;
     UCSR0B = (uint8_t)((1 << RXEN0) | (1 << TXEN0));
-    UCSR0C = (1 << USBS0) | (3 << UCSZ00);
+    UCSR0C = (1 << USBS0) | (1 << UCSZ00);
     return 0;
 }
 
@@ -33,7 +33,7 @@ static inline int8_t usart1_initialize(const struct serial_port* port)
     UBRR1H = (uint8_t)(ubrr >> 8);
     UBRR1L = (uint8_t)ubrr;
     UCSR1B = (uint8_t)((1 << RXEN1) | (1 << TXEN1));
-    UCSR1C = (1 << USBS1) | (3 << UCSZ10);
+    UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);
     return 0;
 }
 
@@ -189,11 +189,11 @@ int8_t usart_set_rx_callback(const struct serial_port* port,
 
 /* ============================================================================================== */
 
-void usart_enable_rx_interrupt(const struct serial_port* port, bool enable)
+int8_t usart_enable_rx_interrupt(const struct serial_port* port, bool enable)
 {
     if (port == NULL)
     {
-        return;
+        return -EFAULT;
     }
     switch (port->port_id)
     {
@@ -222,14 +222,31 @@ void usart_enable_rx_interrupt(const struct serial_port* port, bool enable)
         default:
             break;
     }
+    return 0;
 }
 
 /* ============================================================================================== */
 
-void usart_clear_buffers(const struct serial_port* port)
+int8_t usart_clear_buffers(const struct serial_port* port)
 {
-    (void)port;
-    // No buffers to clear in this implementation
+    if (port == NULL)
+    {
+        return -EFAULT;
+    }
+    switch (port->port_id)
+    {
+        case 0:
+            // Clear USART0 buffers
+            break;
+
+        case 1:
+            // Clear USART1 buffers
+            break;
+
+        default:
+            break;
+    }
+    return 0;
 }
 
 /* ============================================================================================== */
