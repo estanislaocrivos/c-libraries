@@ -19,7 +19,7 @@ static inline int8_t usart0_initialize(const struct serial_port* port)
     UBRR0H = (uint8_t)(ubrr >> 8);
     UBRR0L = (uint8_t)ubrr;
     UCSR0B = (uint8_t)((1 << RXEN0) | (1 << TXEN0));
-    UCSR0C = (1 << USBS0) | (1 << UCSZ00);
+    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
     return 0;
 }
 
