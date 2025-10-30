@@ -11,7 +11,7 @@
 #include "../../crc/inc/crc.h"
 #include "../../ring-buffer/inc/ring_buffer.h"
 #include "../../buffer/inc/buffer.h"
-#include "../../../inc/errno.h"
+#include "../../inc/errno.h"
 
 /* ============================================================================================== */
 
