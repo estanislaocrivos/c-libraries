@@ -27,33 +27,33 @@ static spi_rx_callback_t spi1_callback;
 
 /* ============================================================================================== */
 
-int8_t spi1_initialize(struct spi_port* spi1_port);
+int8_t spi1_initialize(struct spi_port* port);
 
 /* ============================================================================================== */
 
-int8_t spi1_transmit(struct spi_port* port, const uint8_t* buffer, size_t size);
+int8_t spi1_transmit(const struct spi_port* port, const uint8_t* buffer, size_t size);
 
 /* ============================================================================================== */
 
-int8_t spi1_receive(struct spi_port* port, uint8_t* buffer);
+int8_t spi1_receive(const struct spi_port* port, uint8_t* buffer);
 
 /* ============================================================================================== */
 
-int8_t spi1_set_rx_callback(struct spi_port*  port,
-                            spi_rx_callback_t callback,
-                            void*             callback_context);
+int8_t spi1_set_rx_callback(const struct spi_port* port,
+                            spi_rx_callback_t      callback,
+                            void*                  callback_context);
 
 /* ============================================================================================== */
 
-int8_t spi1_enable_rx_interrupt(struct spi_port* port, bool enable);
+int8_t spi1_enable_rx_interrupt(const struct spi_port* port, bool enable);
 
 /* ============================================================================================== */
 
-int8_t spi1_flush_tx(struct spi_port* port);
+int8_t spi1_flush_tx(const struct spi_port* port);
 
 /* ============================================================================================== */
 
-int8_t spi1_flush_rx(struct spi_port* port);
+int8_t spi1_flush_rx(const struct spi_port* port);
 
 /* ============================================================================================== */
 

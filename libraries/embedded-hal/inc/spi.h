@@ -9,7 +9,7 @@
 
 /* ============================================================================================== */
 
-#include "../../../inc/errno.h"
+#include "../../inc/errno.h"
 
 /* ============================================================================================== */
 
@@ -46,7 +46,7 @@ struct spi_ops
      * @param size Size of the buffer to be transmitted.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*transmit)(struct spi_port* self, const uint8_t* buffer, size_t size);
+    int8_t (*transmit)(const struct spi_port* self, const uint8_t* buffer, size_t size);
 
     /**
      * @brief Receives data through the SPI interface.
@@ -54,7 +54,7 @@ struct spi_ops
      * @param data Pointer to the data byte where the received data will be stored.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(struct spi_port* self, uint8_t* data);
+    int8_t (*receive)(const struct spi_port* self, uint8_t* data);
 
     /**
      * @brief Performs a full-duplex transfer (simultaneous transmit and receive).
@@ -64,10 +64,10 @@ struct spi_ops
      * @param size Number of bytes to transfer.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*transfer)(struct spi_port* self,
-                       const uint8_t*   tx_buffer,
-                       uint8_t*         rx_buffer,
-                       size_t           size);
+    int8_t (*transfer)(const struct spi_port* self,
+                       const uint8_t*         tx_buffer,
+                       uint8_t*               rx_buffer,
+                       size_t                 size);
 
     /**
      * @brief Controls the Chip Select (CS) line manually.
@@ -75,7 +75,7 @@ struct spi_ops
      * @param active true to activate CS, false to deactivate.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*set_cs)(struct spi_port* self, bool active);
+    int8_t (*set_cs)(const struct spi_port* self, bool active);
 
     /**
      * @brief Changes SPI frequency dynamically (useful for multi-device communication).
@@ -83,7 +83,7 @@ struct spi_ops
      * @param frequency New frequency in Hz.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*set_frequency)(struct spi_port* self, uint32_t frequency);
+    int8_t (*set_frequency)(const struct spi_port* self, uint32_t frequency);
 
     /**
      * @brief Sets the callback function to be called when a full word has been received.
@@ -93,9 +93,9 @@ struct spi_ops
      * @param callback_context Pointer to user-defined callback_context data (can be NULL).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*set_rx_callback)(struct spi_port*  self,
-                              spi_rx_callback_t callback,
-                              void*             callback_context);
+    int8_t (*set_rx_callback)(const struct spi_port* self,
+                              spi_rx_callback_t      callback,
+                              void*                  callback_context);
 
     /**
      * @brief Enables or disables the SPI receive interrupt.
@@ -103,21 +103,21 @@ struct spi_ops
      * @param enable Set to true to enable the interrupt, false to disable it.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*enable_rx_interrupt)(struct spi_port* self, bool enable);
+    int8_t (*enable_rx_interrupt)(const struct spi_port* self, bool enable);
 
     /**
      * @brief Flushes the transmit buffer.
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_tx)(struct spi_port* self);
+    int8_t (*flush_tx)(const struct spi_port* self);
 
     /**
      * @brief Flushes the receive buffer.
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_rx)(struct spi_port* self);
+    int8_t (*flush_rx)(const struct spi_port* self);
 };
 
 /* ============================================================================================== */
