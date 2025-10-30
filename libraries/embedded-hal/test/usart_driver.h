@@ -31,29 +31,29 @@ int8_t usart1_initialize(struct serial_port* usart1_port);
 
 /* ============================================================================================== */
 
-int8_t usart1_transmit(struct serial_port* port, const uint8_t* buffer, size_t size);
+int8_t usart1_transmit(const struct serial_port* port, const uint8_t* buffer, size_t size);
 
 /* ============================================================================================== */
 
-int8_t usart1_receive(struct serial_port* port, uint8_t* buffer);
+int8_t usart1_receive(const struct serial_port* port, uint8_t* buffer);
 
 /* ============================================================================================== */
 
-int8_t usart1_set_rx_callback(struct serial_port*  port,
-                              serial_rx_callback_t callback,
-                              void*                callback_context);
+int8_t usart1_set_rx_callback(const struct serial_port* port,
+                              serial_rx_callback_t      callback,
+                              void*                     callback_context);
 
 /* ============================================================================================== */
 
-int8_t usart1_enable_rx_interrupt(struct serial_port* port, bool enable);
+int8_t usart1_enable_rx_interrupt(const struct serial_port* port, bool enable);
 
 /* ============================================================================================== */
 
-int8_t usart1_flush_tx(struct serial_port* port);
+int8_t usart1_flush_tx(const struct serial_port* port);
 
 /* ============================================================================================== */
 
-int8_t usart1_flush_rx(struct serial_port* port);
+int8_t usart1_flush_rx(const struct serial_port* port);
 
 /* ============================================================================================== */
 

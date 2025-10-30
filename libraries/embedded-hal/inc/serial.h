@@ -39,7 +39,7 @@ struct serial_ops
      * @param self Pointer to the serial port structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*initialize)(const struct serial_port* self);
+    int8_t (*initialize)(struct serial_port* self);
 
     /**
      * @brief Transmits data through the serial interface.
