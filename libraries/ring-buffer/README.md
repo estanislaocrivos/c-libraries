@@ -1,34 +1,29 @@
-# Ring Buffer 💍
+# Ring Buffer
 
 A ring buffer (also known as a circular buffer) is a fixed-size data structure that uses a single, contiguous block of memory as if it were connected end-to-end. It is particularly useful for buffering data streams, such as audio or network packets, where the producer and consumer operate at different rates.
 
-## Usage
+## Usage Example
 
 ```c
 #include "ring_buffer.h"
 
+#define BUFFER_SIZE 10
+
 void main(void)
 {
-    uint8_t                   buffer[10] = {0};
-    struct ring_buffer        rb         = {0};
-    struct ring_buffer_config config     = {
-            .buffer    = buffer,
-            .size      = sizeof(buffer),
-            .overwrite = true,
-    };
-    if (initialize(&rb, &config))
+    /* 1. Create a raw buffer */
+    uint8_t rx_raw_buffer[BUFFER_SIZE];
+
+    /* 2. Initialize the ring buffer */
+    struct ring_buffer rx_buffer
+        = {.buffer = rx_raw_buffer, .size = sizeof(rx_raw_buffer), .overwrite = true};
+    if (ring_buffer_init(&rx_buffer))
     {
-        // Handle error
+        /* Handle error */
     }
-    const uint8_t data_to_push[] = {1, 2, 3, 4, 5};
-    if (ring_buffer_push(&rb, data_to_push, sizeof(data_to_push)))
-    {
-        // Handle error
-    }
-    uint8_t popped_data[5] = {0};
-    if (ring_buffer_pop(&rb, popped_data, sizeof(popped_data)))
-    {
-        // Handle error
-    }
+
+    /* 3. Add data to the ring buffer and use! */
+    uint8_t data_to_add[] = {1, 2, 3, 4, 5};
+    ring_buffer_push(&rx_buffer, data_to_add, sizeof(data_to_add));
 }
 ```

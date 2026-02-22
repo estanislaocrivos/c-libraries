@@ -1,19 +1,23 @@
 #include "../inc/crc.h"
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 /* PRIVATE */
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 static inline uint8_t _reverse_8bits(uint8_t byte)
 {
-    byte = (uint8_t)((byte & 0xF0) >> 4) | (uint8_t)((byte & 0x0F) << 4);  // Swap nibbles
-    byte = (uint8_t)((byte & 0xCC) >> 2) | (uint8_t)((byte & 0x33) << 2);  // Swap pairs
-    byte = (uint8_t)((byte & 0xAA) >> 1) | (uint8_t)((byte & 0x55) << 1);  // Swap bits
+    byte = (uint8_t)((byte & 0xF0) >> 4)
+           | (uint8_t)((byte & 0x0F) << 4);  // Swap nibbles
+    byte = (uint8_t)((byte & 0xCC) >> 2)
+           | (uint8_t)((byte & 0x33) << 2);  // Swap pairs
+    byte = (uint8_t)((byte & 0xAA) >> 1)
+           | (uint8_t)((byte & 0x55) << 1);  // Swap bits
     return byte;
 }
 
+#if 0 /* Reserved for future CRC16 implementation */
 static inline uint16_t _reverse_16bits(uint16_t value)
 {
     value = (uint16_t)((value & 0xFF00) >> 8) | (uint16_t)((value & 0x00FF) << 8);  // Swap bytes
@@ -22,14 +26,16 @@ static inline uint16_t _reverse_16bits(uint16_t value)
     value = (uint16_t)((value & 0xAAAA) >> 1) | (uint16_t)((value & 0x5555) << 1);  // Swap bits
     return value;
 }
+#endif
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 /* PUBLIC */
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-int8_t crc8_calculate(const struct crc* crc, const uint8_t* data, size_t length, uint8_t* result)
+int8_t crc8_calculate(
+    const struct crc* crc, const uint8_t* data, size_t length, uint8_t* result)
 {
     if (crc == NULL || data == NULL || result == NULL)
     {
@@ -69,4 +75,4 @@ int8_t crc8_calculate(const struct crc* crc, const uint8_t* data, size_t length,
     return 0;
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */

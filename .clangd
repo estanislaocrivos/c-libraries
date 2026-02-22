@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://json.schemastore.org/clangd.json
+CompileFlags:
+  Add: [-xc]
+
+# Hover and completion
+Hover:
+  ShowAKA: true
+
+Completion:
+  AllScopes: true
+
+# Inlay hints (inferred types, parameter names)
+InlayHints:
+  Enabled: true
+  ParameterNames: true
+  DeducedTypes: true
+  Designators: true

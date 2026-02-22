@@ -1,88 +1,88 @@
 #ifndef ERRNO_H
 #define ERRNO_H
 
-/* Definition of the error codes returned by all functions/methods across the project */
+/* Definition of the error codes returned by all functions/methods across the
+ * project. Compatible with Zephyr RTOS v4.3.99 & POSIX standard (IEEE Std
+ * 1003.1-2017) */
 
-#define EACCES          1  /* Permission denied */
-#define EIO             2  /* Input/output error */
-#define ENOENT          3  /* Resource not found */
-#define EAGAIN          4  /* Resource temporarily unavailable */
-#define EBUSY           5  /* Device or resource busy */
-#define EINVAL          6  /* Invalid argument */
-#define EFAULT          7  /* Invalid pointer */
-#define ETIMEDOUT       8  /* Operation timed out */
-#define ENOTCONN        9  /* The device is not connected */
-#define ENOMEM          10 /* Not enough space */
-#define EEXIST          11 /* File exists */
-#define ENOSPC          12 /* No space left on device */
-#define ENOTDIR         13 /* Not a directory */
-#define EISDIR          14 /* Is a directory */
-#define ENFILE          15 /* Too many files open in system */
-#define EMFILE          16 /* Too many open files */
-#define EPIPE           17 /* Broken pipe */
-#define ESRCH           18 /* No such process */
-#define EPERM           19 /* Operation not permitted */
-#define ENXIO           20 /* No such device or address */
-#define E2BIG           21 /* Argument list too long */
-#define ENOEXEC         22 /* Exec format error */
-#define ECHILD          23 /* No child processes */
-#define EDEADLK         24 /* Resource deadlock avoided */
-#define ENOTEMPTY       25 /* Directory not empty */
-#define ENAMETOOLONG    26 /* File name too long */
-#define ENOTTY          27 /* Inappropriate I/O control operation */
-#define EFBIG           28 /* File too large */
-#define EROFS           29 /* Read-only file system */
-#define EMLINK          30 /* Too many links */
-#define EDOM            31 /* Mathematics argument out of domain of function */
-#define ERANGE          32 /* Result too large */
-#define ENOSYS          33 /* Function not implemented */
-#define ELOOP           34 /* Too many levels of symbolic links */
-#define ENOTBLK         35 /* Block device required */
-#define EADDRINUSE      36 /* Address already in use */
-#define EADDRNOTAVAIL   37 /* Cannot assign requested address */
-#define ENETDOWN        38 /* Network is down */
-#define ENETUNREACH     39 /* Network is unreachable */
-#define ENETRESET       40 /* Network dropped connection on reset */
-#define ECONNABORTED    41 /* Software caused connection abort */
-#define ECONNRESET      42 /* Connection reset by peer */
-#define ENOBUFS         43 /* No buffer space available */
-#define EISCONN         44 /* Socket is connected */
-#define ENOTSOCK        45 /* Socket operation on non-socket */
-#define EDESTADDRREQ    46 /* Destination address required */
-#define EMSGSIZE        47 /* Message too long */
-#define EPROTOTYPE      48 /* Protocol wrong type for socket */
-#define ENOPROTOOPT     49 /* Protocol not available */
-#define EPROTONOSUPPORT 50 /* Protocol not supported */
-#define ESOCKTNOSUPPORT 51 /* Socket type not supported */
-#define EOPNOTSUPP      52 /* Operation not supported */
-#define EPFNOSUPPORT    53 /* Protocol family not supported */
-#define EAFNOSUPPORT    54 /* Address family not supported by protocol */
-#define ESHUTDOWN       55 /* Cannot send after socket shutdown */
-#define ECONNREFUSED    56 /* Connection refused */
-#define EHOSTDOWN       57 /* Host is down */
-#define EHOSTUNREACH    58 /* No route to host */
-#define EALREADY        59 /* Operation already in progress */
-#define EINPROGRESS     60 /* Operation now in progress */
-#define ESTALE          61 /* Stale file handle */
-#define EUCLEAN         62 /* Structure needs cleaning */
-#define ENOTNAM         63 /* Not a XENIX named type file */
-#define ENAVAIL         64 /* No XENIX semaphores available */
-#define EREMOTE         65 /* Object is remote */
-#define ENOLINK         66 /* Link has been severed */
-#define EADV            67 /* Advertise error */
-#define ESRMNT          68 /* Srmount error */
-#define ECANCELED       69 /* Operation canceled */
-#define ENOTSUP         70 /* Operation not supported */
-#define EIDRM           71 /* Identifier removed */
-#define ENOMSG          72 /* No message of desired type */
-#define EOVERFLOW       73 /* Value too large for defined data type */
-#define EILSEQ          74 /* Illegal byte sequence */
-#define EBADMSG         75 /* Bad message */
-#define EMULTIHOP       76 /* Multihop attempted */
-#define ENODATA         77 /* No data available */
-#define ENOSR           78 /* No stream resources */
-#define ENOSTR          79 /* Not a stream */
-#define ETIME           80 /* Stream ioctl timeout */
-#define EPROTO          81 /* Protocol error */
+#define EPERM           1   /**< Not owner */
+#define ENOENT          2   /**< No such file or directory */
+#define ESRCH           3   /**< No such context */
+#define EINTR           4   /**< Interrupted system call */
+#define EIO             5   /**< I/O error */
+#define ENXIO           6   /**< No such device or address */
+#define E2BIG           7   /**< Arg list too long */
+#define ENOEXEC         8   /**< Exec format error */
+#define EBADF           9   /**< Bad file number */
+#define ECHILD          10  /**< No children */
+#define EAGAIN          11  /**< No more contexts */
+#define ENOMEM          12  /**< Not enough core */
+#define EACCES          13  /**< Permission denied */
+#define EFAULT          14  /**< Bad address */
+#define ENOTBLK         15  /**< Block device required */
+#define EBUSY           16  /**< Mount device busy */
+#define EEXIST          17  /**< File exists */
+#define EXDEV           18  /**< Cross-device link */
+#define ENODEV          19  /**< No such device */
+#define ENOTDIR         20  /**< Not a directory */
+#define EISDIR          21  /**< Is a directory */
+#define EINVAL          22  /**< Invalid argument */
+#define ENFILE          23  /**< File table overflow */
+#define EMFILE          24  /**< Too many open files */
+#define ENOTTY          25  /**< Not a typewriter */
+#define ETXTBSY         26  /**< Text file busy */
+#define EFBIG           27  /**< File too large */
+#define ENOSPC          28  /**< No space left on device */
+#define ESPIPE          29  /**< Illegal seek */
+#define EROFS           30  /**< Read-only file system */
+#define EMLINK          31  /**< Too many links */
+#define EPIPE           32  /**< Broken pipe */
+#define EDOM            33  /**< Argument too large */
+#define ERANGE          34  /**< Result too large */
+#define ENOMSG          35  /**< Unexpected message type */
+#define EDEADLK         45  /**< Resource deadlock avoided */
+#define ENOLCK          46  /**< No locks available */
+#define ENOSTR          60  /**< STREAMS device required */
+#define ENODATA         61  /**< Missing expected message data */
+#define ETIME           62  /**< STREAMS timeout occurred */
+#define ENOSR           63  /**< Insufficient memory */
+#define EPROTO          71  /**< Generic STREAMS error */
+#define EBADMSG         77  /**< Invalid STREAMS message */
+#define ENOSYS          88  /**< Function not implemented */
+#define ENOTEMPTY       90  /**< Directory not empty */
+#define ENAMETOOLONG    91  /**< File name too long */
+#define ELOOP           92  /**< Too many levels of symbolic links */
+#define EOPNOTSUPP      95  /**< Operation not supported on socket */
+#define EPFNOSUPPORT    96  /**< Protocol family not supported */
+#define ECONNRESET      104 /**< Connection reset by peer */
+#define ENOBUFS         105 /**< No buffer space available */
+#define EAFNOSUPPORT    106 /**< Addr family not supported */
+#define EPROTOTYPE      107 /**< Protocol wrong type for socket */
+#define ENOTSOCK        108 /**< Socket operation on non-socket */
+#define ENOPROTOOPT     109 /**< Protocol not available */
+#define ESHUTDOWN       110 /**< Can't send after socket shutdown */
+#define ECONNREFUSED    111 /**< Connection refused */
+#define EADDRINUSE      112 /**< Address already in use */
+#define ECONNABORTED    113 /**< Software caused connection abort */
+#define ENETUNREACH     114 /**< Network is unreachable */
+#define ENETDOWN        115 /**< Network is down */
+#define ETIMEDOUT       116 /**< Connection timed out */
+#define EHOSTDOWN       117 /**< Host is down */
+#define EHOSTUNREACH    118 /**< No route to host */
+#define EINPROGRESS     119 /**< Operation now in progress */
+#define EALREADY        120 /**< Operation already in progress */
+#define EDESTADDRREQ    121 /**< Destination address required */
+#define EMSGSIZE        122 /**< Message size */
+#define EPROTONOSUPPORT 123 /**< Protocol not supported */
+#define ESOCKTNOSUPPORT 124 /**< Socket type not supported */
+#define EADDRNOTAVAIL   125 /**< Can't assign requested address */
+#define ENETRESET       126 /**< Network dropped connection on reset */
+#define EISCONN         127 /**< Socket is already connected */
+#define ENOTCONN        128 /**< Socket is not connected */
+#define ETOOMANYREFS    129 /**< Too many references: can't splice */
+#define ENOTSUP         134 /**< Unsupported value */
+#define EILSEQ          138 /**< Illegal byte sequence */
+#define EOVERFLOW       139 /**< Value overflow */
+#define ECANCELED       140 /**< Operation canceled */
 
 #endif /* ERRNO_H */

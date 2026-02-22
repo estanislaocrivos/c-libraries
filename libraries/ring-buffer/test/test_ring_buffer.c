@@ -1,19 +1,15 @@
-#include "../../test/support/unity.h"
+#include "ring_buffer.h"
+#include "unity.h"
 
-/* ============================================================================================== */
-
-#include "../inc/ring_buffer.h"
-
-TEST_SOURCE_FILE("../src/ring_buffer.c")
-
-/* ============================================================================================== */
+/* ========================================================================== */
 
 #define RING_BUFFER_SIZE      20
 #define TEST_DATA_BUFFER_SIZE 13
 
-static const uint8_t test_data_buffer[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+static const uint8_t test_data_buffer[]
+    = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
-void test_initialize(void)
+void test_create_ring_buffer(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -24,9 +20,9 @@ void test_initialize(void)
     TEST_ASSERT_EQUAL(0, ring_buffer_init(&rb));
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_use_not_initialized(void)
+void test_use_ring_buffer_not_initialized(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -34,10 +30,13 @@ void test_use_not_initialized(void)
         .size      = RING_BUFFER_SIZE,
         .overwrite = true,
     };
-    TEST_ASSERT_EQUAL(-EPERM, ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
+    TEST_ASSERT_EQUAL(
+        -EPERM,
+        ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
 
     uint8_t pop_buffer[TEST_DATA_BUFFER_SIZE] = {0};
-    TEST_ASSERT_EQUAL(-EPERM, ring_buffer_pop(&rb, pop_buffer, sizeof(pop_buffer)));
+    TEST_ASSERT_EQUAL(
+        -EPERM, ring_buffer_pop(&rb, pop_buffer, sizeof(pop_buffer)));
 
     bool empty = false;
     TEST_ASSERT_EQUAL(-EPERM, ring_buffer_is_empty(&rb, &empty));
@@ -49,9 +48,9 @@ void test_use_not_initialized(void)
     TEST_ASSERT_EQUAL(-EPERM, ring_buffer_available(&rb, &available_space));
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_push_data(void)
+void test_ring_buffer_push_data(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -61,12 +60,13 @@ void test_push_data(void)
     };
     TEST_ASSERT_EQUAL(0, ring_buffer_init(&rb));
 
-    TEST_ASSERT_EQUAL(0, ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
+    TEST_ASSERT_EQUAL(
+        0, ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_pop_data(void)
+void test_ring_buffer_pop_data(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -76,17 +76,19 @@ void test_pop_data(void)
     };
     TEST_ASSERT_EQUAL(0, ring_buffer_init(&rb));
 
-    TEST_ASSERT_EQUAL(0, ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
+    TEST_ASSERT_EQUAL(
+        0, ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
 
     uint8_t pop_buffer[TEST_DATA_BUFFER_SIZE] = {0};
     TEST_ASSERT_EQUAL(0, ring_buffer_pop(&rb, pop_buffer, sizeof(pop_buffer)));
 
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(test_data_buffer, pop_buffer, sizeof(test_data_buffer));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(
+        test_data_buffer, pop_buffer, sizeof(test_data_buffer));
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_is_empty(void)
+void test_ring_buffer_is_empty(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -100,15 +102,16 @@ void test_is_empty(void)
     ring_buffer_is_empty(&rb, &empty);
     TEST_ASSERT_TRUE(empty);
 
-    TEST_ASSERT_EQUAL(0, ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
+    TEST_ASSERT_EQUAL(
+        0, ring_buffer_push(&rb, test_data_buffer, sizeof(test_data_buffer)));
 
     ring_buffer_is_empty(&rb, &empty);
     TEST_ASSERT_FALSE(empty);
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_is_full(void)
+void test_ring_buffer_is_full(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -124,15 +127,17 @@ void test_is_full(void)
 
     static const uint8_t buffer_to_full_occupancy[RING_BUFFER_SIZE - 1] = {1};
     TEST_ASSERT_EQUAL(
-        0, ring_buffer_push(&rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
+        0,
+        ring_buffer_push(
+            &rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
 
     ring_buffer_is_full(&rb, &full);
     TEST_ASSERT_TRUE(full);
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_overwrite_data(void)
+void test_ring_buffer_overwrite_data(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -144,19 +149,26 @@ void test_overwrite_data(void)
 
     static const uint8_t buffer_to_full_occupancy[RING_BUFFER_SIZE - 1] = {1};
     TEST_ASSERT_EQUAL(
-        0, ring_buffer_push(&rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
+        0,
+        ring_buffer_push(
+            &rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
 
-    TEST_ASSERT_EQUAL(0, ring_buffer_push(&rb, (const uint8_t[]){0xFF},
-                                          1));  // This should overwrite the first value (1)
+    TEST_ASSERT_EQUAL(
+        0,
+        ring_buffer_push(
+            &rb,
+            (const uint8_t[]){0xFF},
+            1));  // This should overwrite the first value (1)
 
     uint8_t pop_buffer[RING_BUFFER_SIZE] = {0};
-    TEST_ASSERT_EQUAL(0, ring_buffer_pop(&rb, pop_buffer, RING_BUFFER_SIZE - 1));
+    TEST_ASSERT_EQUAL(
+        0, ring_buffer_pop(&rb, pop_buffer, RING_BUFFER_SIZE - 1));
     TEST_ASSERT_EQUAL_UINT8(0xFF, pop_buffer[RING_BUFFER_SIZE - 2]);
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_not_overwrite_data(void)
+void test_ring_buffer_not_overwrite_data(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -168,14 +180,17 @@ void test_not_overwrite_data(void)
 
     static const uint8_t buffer_to_full_occupancy[RING_BUFFER_SIZE - 1] = {1};
     TEST_ASSERT_EQUAL(
-        0, ring_buffer_push(&rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
+        0,
+        ring_buffer_push(
+            &rb, buffer_to_full_occupancy, sizeof(buffer_to_full_occupancy)));
 
-    TEST_ASSERT_EQUAL(-ENOSPC, ring_buffer_push(&rb, (const uint8_t[]){0xAA}, 1));
+    TEST_ASSERT_EQUAL(
+        -ENOSPC, ring_buffer_push(&rb, (const uint8_t[]){0xAA}, 1));
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_available(void)
+void test_ring_buffer_available(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -193,9 +208,9 @@ void test_available(void)
     TEST_ASSERT_EQUAL(RING_BUFFER_SIZE - sizeof(test_data), available_space);
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_pop_partial(void)
+void test_ring_buffer_pop_partial(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -213,9 +228,9 @@ void test_pop_partial(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(test_data, pop_buffer, 3);
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-void test_push_pop_alternated(void)
+void test_ring_buffer_push_pop_alternated(void)
 {
     uint8_t            buffer[RING_BUFFER_SIZE];
     struct ring_buffer rb = {
@@ -242,4 +257,185 @@ void test_push_pop_alternated(void)
     TEST_ASSERT_EQUAL_UINT8_ARRAY(expected, pop2, 4);
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
+
+void test_ring_buffer_pop_empty_buffer(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = buffer,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = false,
+    };
+    TEST_ASSERT_EQUAL(0, ring_buffer_init(&rb));
+
+    uint8_t pop_buffer[1] = {0};
+    TEST_ASSERT_EQUAL(-ENODATA, ring_buffer_pop(&rb, pop_buffer, 1));
+}
+
+/* ========================================================================== */
+
+void test_ring_buffer_null_pointer_on_creation_errors(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = NULL,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = false,
+    };
+
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_init(NULL));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_init(&rb));
+}
+
+/* ========================================================================== */
+
+void test_ring_buffer_null_pointer_errors(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = buffer,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = false,
+    };
+
+    ring_buffer_init(&rb);
+
+    uint8_t data[1] = {0};
+    bool    flag    = false;
+    size_t  count   = 0;
+
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_push(NULL, data, 1));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_push(&rb, NULL, 1));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_pop(NULL, data, 1));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_pop(&rb, NULL, 1));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_peek(NULL, data, 1));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_peek(&rb, NULL, 1));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_is_empty(NULL, &flag));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_is_empty(&rb, NULL));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_is_full(NULL, &flag));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_is_full(&rb, NULL));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_available(NULL, &count));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_available(&rb, NULL));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_count(NULL, &count));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_count(&rb, NULL));
+    TEST_ASSERT_EQUAL(-EFAULT, ring_buffer_reset(NULL));
+}
+
+/* ========================================================================== */
+
+void test_ring_buffer_invalid_size_init(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = buffer,
+        .size      = 0,
+        .overwrite = false,
+    };
+    TEST_ASSERT_EQUAL(-EINVAL, ring_buffer_init(&rb));
+}
+
+/* ========================================================================== */
+
+void test_ring_buffer_invalid_len_push_pop(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = buffer,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = false,
+    };
+    ring_buffer_init(&rb);
+
+    uint8_t data[1] = {0};
+    TEST_ASSERT_EQUAL(-EINVAL, ring_buffer_push(&rb, data, 0));
+    TEST_ASSERT_EQUAL(-EINVAL, ring_buffer_pop(&rb, data, 0));
+    TEST_ASSERT_EQUAL(-EINVAL, ring_buffer_peek(&rb, data, 0));
+}
+
+/* ========================================================================== */
+
+void test_ring_buffer_count(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = buffer,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = false,
+    };
+    ring_buffer_init(&rb);
+
+    size_t count = 0;
+    ring_buffer_count(&rb, &count);
+    TEST_ASSERT_EQUAL(0, count);
+
+    static const uint8_t data[] = {1, 2, 3, 4, 5};
+    ring_buffer_push(&rb, data, sizeof(data));
+
+    ring_buffer_count(&rb, &count);
+    TEST_ASSERT_EQUAL(sizeof(data), count);
+
+    uint8_t pop[2];
+    ring_buffer_pop(&rb, pop, 2);
+
+    ring_buffer_count(&rb, &count);
+    TEST_ASSERT_EQUAL(sizeof(data) - 2, count);
+}
+
+/* ========================================================================== */
+
+void test_ring_buffer_peek(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = buffer,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = false,
+    };
+    ring_buffer_init(&rb);
+
+    static const uint8_t data[] = {10, 20, 30, 40, 50};
+    ring_buffer_push(&rb, data, sizeof(data));
+
+    uint8_t peek_buf[3] = {0};
+    TEST_ASSERT_EQUAL(0, ring_buffer_peek(&rb, peek_buf, 3));
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(data, peek_buf, 3);
+
+    size_t count = 0;
+    ring_buffer_count(&rb, &count);
+    TEST_ASSERT_EQUAL(sizeof(data), count);
+
+    TEST_ASSERT_EQUAL(
+        -ENODATA, ring_buffer_peek(&rb, peek_buf, sizeof(data) + 1));
+}
+
+/* ========================================================================== */
+
+void test_ring_buffer_reset(void)
+{
+    uint8_t            buffer[RING_BUFFER_SIZE];
+    struct ring_buffer rb = {
+        .buffer    = buffer,
+        .size      = RING_BUFFER_SIZE,
+        .overwrite = false,
+    };
+    ring_buffer_init(&rb);
+
+    static const uint8_t data[] = {1, 2, 3, 4, 5};
+    ring_buffer_push(&rb, data, sizeof(data));
+
+    size_t count = 0;
+    ring_buffer_count(&rb, &count);
+    TEST_ASSERT_EQUAL(sizeof(data), count);
+
+    TEST_ASSERT_EQUAL(0, ring_buffer_reset(&rb));
+
+    ring_buffer_count(&rb, &count);
+    TEST_ASSERT_EQUAL(0, count);
+
+    bool empty = false;
+    ring_buffer_is_empty(&rb, &empty);
+    TEST_ASSERT_TRUE(empty);
+}
+
+/* ========================================================================== */
