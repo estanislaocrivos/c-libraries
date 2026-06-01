@@ -1,34 +1,36 @@
 #ifndef SPI_H
 #define SPI_H
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-#include <stdint.h>
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 #include "../../inc/errno.h"
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 /**
  * @brief Prototype for the SPI receive callback function.
- * @param callback_context Pointer to user-defined callback_context data (can be NULL).
+ * @param callback_context Pointer to user-defined callback_context data (can be
+ * NULL).
  * @param byte The received byte.
  */
 typedef void (*spi_rx_callback_t)(void* callback_context, uint8_t byte);
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 /**
- * @brief SPI port structure. This structure holds the configuration and state of a SPI port.
+ * @brief SPI interface structure.
  */
-struct spi_port;
+struct spi;
 
 /**
- * @brief SPI operations structure. This structure holds function pointers for SPI operations.
+ * @brief SPI operations structure. This structure holds function pointers for
+ * SPI operations.
  */
 struct spi_ops
 {
@@ -37,7 +39,7 @@ struct spi_ops
      * @param self Pointer to the SPI port structure.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*initialize)(struct spi_port* self);
+    int8_t (*initialize)(struct spi* self);
 
     /**
      * @brief Transmits data through the SPI interface.
@@ -46,28 +48,32 @@ struct spi_ops
      * @param size Size of the buffer to be transmitted.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*transmit)(const struct spi_port* self, const uint8_t* buffer, size_t size);
+    int8_t (*transmit)(
+        const struct spi* self, const uint8_t* buffer, size_t size);
 
     /**
      * @brief Receives data through the SPI interface.
      * @param self Pointer to the SPI port structure.
-     * @param data Pointer to the data byte where the received data will be stored.
+     * @param data Pointer to the data byte where the received data will be
+     * stored.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*receive)(const struct spi_port* self, uint8_t* data);
+    int8_t (*receive)(const struct spi* self, uint8_t* data);
 
     /**
-     * @brief Performs a full-duplex transfer (simultaneous transmit and receive).
+     * @brief Performs a full-duplex transfer (simultaneous transmit and
+     * receive).
      * @param self Pointer to the SPI port structure.
      * @param tx_buffer Pointer to transmit buffer.
      * @param rx_buffer Pointer to receive buffer.
      * @param size Number of bytes to transfer.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*transfer)(const struct spi_port* self,
-                       const uint8_t*         tx_buffer,
-                       uint8_t*               rx_buffer,
-                       size_t                 size);
+    int8_t (*transfer)(
+        const struct spi* self,
+        const uint8_t*    tx_buffer,
+        uint8_t*          rx_buffer,
+        size_t            size);
 
     /**
      * @brief Controls the Chip Select (CS) line manually.
@@ -75,27 +81,31 @@ struct spi_ops
      * @param active true to activate CS, false to deactivate.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*set_cs)(const struct spi_port* self, bool active);
+    int8_t (*set_cs)(const struct spi* self, bool active);
 
     /**
-     * @brief Changes SPI frequency dynamically (useful for multi-device communication).
+     * @brief Changes SPI frequency dynamically (useful for multi-device
+     * communication).
      * @param self Pointer to the SPI port structure.
      * @param frequency New frequency in Hz.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*set_frequency)(const struct spi_port* self, uint32_t frequency);
+    int8_t (*set_frequency)(const struct spi* self, uint32_t frequency);
 
     /**
-     * @brief Sets the callback function to be called when a full word has been received.
+     * @brief Sets the callback function to be called when a full word has been
+     * received.
      * @param self Pointer to the SPI port structure.
-     * @param callback The callback function to set. Its prototype must match the spi_rx_callback_t
-     * type.
-     * @param callback_context Pointer to user-defined callback_context data (can be NULL).
+     * @param callback The callback function to set. Its prototype must match
+     * the spi_rx_callback_t type.
+     * @param callback_context Pointer to user-defined callback_context data
+     * (can be NULL).
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*set_rx_callback)(const struct spi_port* self,
-                              spi_rx_callback_t      callback,
-                              void*                  callback_context);
+    int8_t (*set_rx_callback)(
+        const struct spi* self,
+        spi_rx_callback_t callback,
+        void*             callback_context);
 
     /**
      * @brief Enables or disables the SPI receive interrupt.
@@ -103,32 +113,27 @@ struct spi_ops
      * @param enable Set to true to enable the interrupt, false to disable it.
      * @return int8_t Returns 0 on success or -ERR on failure (see errno.h).
      */
-    int8_t (*enable_rx_interrupt)(const struct spi_port* self, bool enable);
+    int8_t (*enable_rx_interrupt)(const struct spi* self, bool enable);
 
     /**
      * @brief Flushes the transmit buffer.
-     * @param self Pointer to the serial port structure.
+     * @param self Pointer to the SPI structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_tx)(const struct spi_port* self);
+    int8_t (*flush_tx)(const struct spi* self);
 
     /**
      * @brief Flushes the receive buffer.
-     * @param self Pointer to the serial port structure.
+     * @param self Pointer to the SPI structure.
      * @return int8_t Returns 0 on success or -ERR on failure.
      */
-    int8_t (*flush_rx)(const struct spi_port* self);
+    int8_t (*flush_rx)(const struct spi* self);
 };
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-struct spi_port
+struct spi
 {
-    /**
-     * @brief SPI port identifier (e.g., 0 for SPI1, 1 for SPI2, etc.).
-     */
-    uint8_t port_id;
-
     /**
      * @brief SPI mode (0-3): CPOL and CPHA configuration.
      * Mode 0: CPOL=0, CPHA=0
@@ -154,26 +159,27 @@ struct spi_port
     bool msb_first;
 
     /**
-     * @brief Chip Select (CS) polarity: true for active high, false for active low.
+     * @brief Chip Select (CS) polarity: true for active high, false for active
+     * low.
      */
     bool cs_active_high;
 
     /**
-     * @brief Enable/disable hardware CS control. If false, user must control CS manually.
+     * @brief Enable/disable hardware CS control. If false, user must control CS
+     * manually.
      */
     bool hardware_cs;
 
-    bool  _was_initialized;   // Internal flag to prevent reinitialization or misuse.
-    void* _callback_context;  // Pointer to user-defined callback_context data (can be NULL).
-
     /**
-     * @brief Pointer to the SPI operations structure. This structure must be first created and
-     * initialized by the user. This structure must be of type 'const struct spi_ops', which
-     * ensures that the function pointers cannot be modified after initialization.
+     * @brief Pointer to the SPI operations structure.
      */
-    const struct spi_ops* ops;
+    const struct spi_ops* const ops;
+
+    /* private: internal state - do not access directly */
+    bool  was_initialized;
+    void* callback_context;
 };
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 #endif  // SPI_H

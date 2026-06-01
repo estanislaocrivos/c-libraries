@@ -1,20 +1,20 @@
 #include "../inc/ring_buffer.h"
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 #include <string.h>
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 #define AVOID_MOD_OPERATION \
-    1  // If true, uses if statements instead of modulo operations (avoids division, faster on
-       // smaller MCUs)
+    1  // If true, uses if statements instead of modulo operations (avoids
+       // division, faster on smaller MCUs)
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 /* PUBLIC */
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 int8_t ring_buffer_init(struct ring_buffer* rb)
 {
@@ -26,22 +26,23 @@ int8_t ring_buffer_init(struct ring_buffer* rb)
     {
         return -EINVAL;
     }
-    rb->_head = 0;
-    rb->_tail = 0;
+    rb->head = 0;
+    rb->tail = 0;
     memset(rb->buffer, 0, rb->size);
-    rb->_was_initialized = true;
+    rb->was_initialized = true;
     return 0;
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
-int8_t ring_buffer_push(struct ring_buffer* self, const uint8_t* data, size_t len)
+int8_t ring_buffer_push(
+    struct ring_buffer* self, const uint8_t* data, size_t len)
 {
     if (self == NULL || data == NULL)
     {
         return -EFAULT;
     }
-    if (!self->_was_initialized)
+    if (!self->was_initialized)
     {
         return -EPERM;
     }
@@ -54,15 +55,15 @@ int8_t ring_buffer_push(struct ring_buffer* self, const uint8_t* data, size_t le
     {
         size_t next;
 #if AVOID_MOD_OPERATION
-        next = self->_head + 1;
+        next = self->head + 1;
         if (next >= self->size)
         {
             next = 0;
         }
 #else
-        next = (self->_head + 1) % self->size;
+        next = (self->head + 1) % self->size;
 #endif
-        if (next == self->_tail)
+        if (next == self->tail)
         {
             if (!self->overwrite)
             {
@@ -71,58 +72,62 @@ int8_t ring_buffer_push(struct ring_buffer* self, const uint8_t* data, size_t le
             else
             {
 #if AVOID_MOD_OPERATION
-                self->_tail += 1;
-                if (self->_tail >= self->size)
+                self->tail += 1;
+                if (self->tail >= self->size)
                 {
-                    self->_tail = 0;
+                    self->tail = 0;
                 }
 #else
-                self->_tail = (self->_tail + 1) % self->size;
+                self->tail = (self->tail + 1) % self->size;
 #endif
             }
         }
-        self->buffer[self->_head] = data[count];
-        self->_head               = next;
+        self->buffer[self->head] = data[count];
+        self->head               = next;
         count += 1;
     }
     return 0;
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 int8_t ring_buffer_pop(struct ring_buffer* self, uint8_t* dest, size_t len)
 {
-    if (self == NULL || dest == NULL || len == 0)
+    if (self == NULL || dest == NULL)
     {
         return -EFAULT;
     }
-    if (!self->_was_initialized)
+    if (!self->was_initialized)
     {
         return -EPERM;
+    }
+    if (len == 0)
+    {
+        return -EINVAL;
     }
     size_t count = 0;
     while (count < len)
     {
-        if (self->_tail == self->_head)
+        if (self->tail == self->head)
         {
             return -ENODATA;
         }
-        dest[count] = self->buffer[self->_tail];
+        dest[count] = self->buffer[self->tail];
 #if AVOID_MOD_OPERATION
-        self->_tail += 1;
-        if (self->_tail >= self->size)
+        self->tail += 1;
+        if (self->tail >= self->size)
         {
-            self->_tail = 0;
+            self->tail = 0;
         }
 #else
-        self->_tail = (self->_tail + 1) % self->size;
+        self->tail = (self->tail + 1) % self->size;
 #endif
         count += 1;
     }
     return 0;
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 int8_t ring_buffer_is_empty(const struct ring_buffer* self, bool* empty)
 {
@@ -130,15 +135,15 @@ int8_t ring_buffer_is_empty(const struct ring_buffer* self, bool* empty)
     {
         return -EFAULT;
     }
-    if (!self->_was_initialized)
+    if (!self->was_initialized)
     {
         return -EPERM;
     }
-    *empty = (self->_head == self->_tail);
+    *empty = (self->head == self->tail);
     return 0;
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 int8_t ring_buffer_is_full(const struct ring_buffer* self, bool* full)
 {
@@ -146,24 +151,24 @@ int8_t ring_buffer_is_full(const struct ring_buffer* self, bool* full)
     {
         return -EFAULT;
     }
-    if (!self->_was_initialized)
+    if (!self->was_initialized)
     {
         return -EPERM;
     }
 #if AVOID_MOD_OPERATION
-    size_t next_head = self->_head + 1;
-    if (next_head >= self->size)
+    size_t nexthead = self->head + 1;
+    if (nexthead >= self->size)
     {
-        next_head = 0;
+        nexthead = 0;
     }
-    *full = (next_head == self->_tail);
+    *full = (nexthead == self->tail);
 #else
-    *full = ((self->_head + 1) % self->size) == self->_tail;
+    *full = ((self->head + 1) % self->size) == self->tail;
 #endif
     return 0;
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
 
 int8_t ring_buffer_available(const struct ring_buffer* self, size_t* available)
 {
@@ -171,21 +176,101 @@ int8_t ring_buffer_available(const struct ring_buffer* self, size_t* available)
     {
         return -EFAULT;
     }
-    if (!self->_was_initialized)
+    if (!self->was_initialized)
     {
         return -EPERM;
     }
     size_t used;
-    if (self->_head >= self->_tail)
+    if (self->head >= self->tail)
     {
-        used = self->_head - self->_tail;
+        used = self->head - self->tail;
     }
     else
     {
-        used = self->size - (self->_tail - self->_head);
+        used = self->size - (self->tail - self->head);
     }
     *available = self->size - used;
     return 0;
 }
 
-/* ============================================================================================== */
+/* ========================================================================== */
+
+int8_t ring_buffer_count(const struct ring_buffer* self, size_t* count)
+{
+    if (self == NULL || count == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+    if (self->head >= self->tail)
+    {
+        *count = self->head - self->tail;
+    }
+    else
+    {
+        *count = self->size - (self->tail - self->head);
+    }
+    return 0;
+}
+
+/* ========================================================================== */
+
+int8_t ring_buffer_peek(
+    const struct ring_buffer* self, uint8_t* dest, size_t len)
+{
+    if (self == NULL || dest == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+    if (len == 0)
+    {
+        return -EINVAL;
+    }
+    size_t count     = 0;
+    size_t temp_tail = self->tail;
+    while (count < len)
+    {
+        if (temp_tail == self->head)
+        {
+            return -ENODATA;
+        }
+        dest[count] = self->buffer[temp_tail];
+#if AVOID_MOD_OPERATION
+        temp_tail += 1;
+        if (temp_tail >= self->size)
+        {
+            temp_tail = 0;
+        }
+#else
+        temp_tail = (temp_tail + 1) % self->size;
+#endif
+        count += 1;
+    }
+    return 0;
+}
+
+/* ========================================================================== */
+
+int8_t ring_buffer_reset(struct ring_buffer* self)
+{
+    if (self == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+    self->head = 0;
+    self->tail = 0;
+    return 0;
+}
+
+/* ========================================================================== */

@@ -1,8 +1,31 @@
+# Virtual environment
+.venv/
+
+# AI assistant files
+.claude/
+CLAUDE.md
+
+# Cache files
+.cache/
+.DS_Store
+__pycache__/
+.pytest_cache/
+
+# Build output directories
 build/
 docs/
-.cache/
-deploy.sh
+
+# Local scripts
+scripts/
+
+# Output files
 checkers.txt
-build.sh
-generate_docs.sh
-run_workflow.sh
+
+# XC8 installer and DFP packs (too large for git)
+*.run
+*.atpack
+
+# IDE
+.vscode/
+
+# Miscellaneous

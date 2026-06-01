@@ -12,41 +12,34 @@ git submodule add <repository-url> <path>
 
 ## Prerequisites
 
-### Install CMake
+### Essential tools
 
-Follow the instructions on the [CMake website](https://cmake.org/download/) to install CMake for your platform. On Linux-based systems, you can install it using your package manager. For example, on Ubuntu:
+| Tool | Version | Purpose |
+| ------ | --------- | --------- |
+| [GCC / Clang](https://gcc.gnu.org/) | ≥ 9.0 | C/C++ compiler |
+| [CMake](https://cmake.org/) | ≥ 3.16 | Build toolchain |
 
-```bash
-sudo apt install cmake
-```
+### Additional tools
 
-### Install a C/C++ compiler
+| Tool | Version | Purpose |
+| ------ | --------- | --------- |
+| [Python](https://www.python.org/downloads/) | ≥ 3.8 | Pre-commit hooks |
+| [Ruby](https://www.ruby-lang.org/en/documentation/installation/) | ≥ 3.0.0 | Ceedling tool (only for testing) |
 
-You need a C/C++ compiler installed on your system. If you are on MacOS, you may already have Apple Clang installed. If you are on Linux, you can install GCC using your package manager. For example, on Ubuntu:
+## Setup and configuration
 
-```bash
-sudo apt install build-essential
-```
-
-### Install Pre-Commit
-
-Install [Pre-Commit](https://pre-commit.com/) to manage and maintain multi-language pre-commit hooks. You can install it using pip:
+### Create a Python virtual environment
 
 ```bash
-pip install pre-commit
+python -m venv .venv
+source .venv/bin/activate
 ```
 
-On the root directory of the project, you can run the following command to install the pre-commit hooks:
+Install required Python packages:
 
 ```bash
-pre-commit install
+pip install -r requirements.txt
 ```
-
-### Customize the project
-
-#### Visual Studio Code paths configuration
-
-This project includes a `.vscode` directory with a `c_cpp_properties.json` file that configures the C/C++ extension for Visual Studio Code. You may need to update the `compilerPath` to match your system's C/C++ compiler path. For example, if you are using GCC, you can set it to `/usr/bin/gcc` or `/usr/bin/g++`.
 
 ## Building the libraries
 
@@ -91,12 +84,6 @@ Once Doxygen is installed, you can generate the documentation by running the fol
 
 ```bash
 doxygen Doxyfile
-```
-
-Or you may use the provided `generate-docs.sh` script, which will run Doxygen and open the generated documentation in your web browser:
-
-```bash
-./generate-docs.sh
 ```
 
 ## Adding a new library to the project
