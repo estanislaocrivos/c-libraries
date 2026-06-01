@@ -44,6 +44,10 @@
 #error "Platform must define CRITICAL_SECTION_EXIT(state)"
 #endif
 
+#ifndef CLEAR_WDT
+#error "Platform must define CLEAR_WDT()"
+#endif
+
 /* Optional convenience macro for scoped critical sections */
 #ifndef CRITICAL_SECTION
 #define CRITICAL_SECTION(code)                 \
