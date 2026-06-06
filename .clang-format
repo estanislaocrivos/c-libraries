@@ -70,9 +70,9 @@ SpacesInSquareBrackets: false
 SortIncludes: CaseSensitive
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:    '^".*"'
+  - Regex: '^".*"'
     Priority: 1
-  - Regex:    '^<.*>'
+  - Regex: "^<.*>"
     Priority: 2
 
 # --- Comments ---

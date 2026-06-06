@@ -1,16 +1,14 @@
-#include "../../test/support/unity.h"
+#include "rc522.h"
 
-/* ========================================================================== */
-
-#include "../inc/library.h"
-
-TEST_SOURCE_FILE("../src/library.c")
+#include "errno.h"
+#include "unity.h"
 
 /* ========================================================================== */
 
 void test_example(void)
 {
     TEST_ASSERT_TRUE(1);
+    int a = -EIO;
 }
 
 /* ========================================================================== */
