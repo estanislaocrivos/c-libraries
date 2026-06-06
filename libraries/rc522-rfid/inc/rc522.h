@@ -1,6 +1,6 @@
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#ifndef RC522_H
+#define RC522_H
 
 /* ========================================================================== */
 
-#endif /* LIBRARY_H */
+#endif /* RC522_H */

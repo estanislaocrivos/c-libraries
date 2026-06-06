@@ -1,11 +1,13 @@
 #include "../inc/esp8266ex.h"
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 static void _esp8266ex_send_command(struct esp8266ex* self, const char* command)
 {
@@ -15,13 +17,15 @@ static void _esp8266ex_send_command(struct esp8266ex* self, const char* command)
     }
 
     // Send the AT command via UART
-    self->uart->ops->transmit(self->uart, (const uint8_t*)command, strlen(command));
+    self->uart->ops->transmit(
+        self->uart, (const uint8_t*)command, strlen(command));
 
     // Send carriage return and line feed
     self->uart->ops->transmit(self->uart, (const uint8_t*)"\r\n", 2);
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 int8_t esp8266ex_initialize(struct esp8266ex* self)
 {
@@ -48,8 +52,10 @@ int8_t esp8266ex_initialize(struct esp8266ex* self)
     return 0;
 }
 
-/* ============================================================================================== */
-int8_t esp8266ex_connect(struct esp8266ex* self, const char* ssid, const char* password)
+/* ==============================================================================================
+ */
+int8_t esp8266ex_connect(
+    struct esp8266ex* self, const char* ssid, const char* password)
 {
     if (self == NULL || ssid == NULL || password == NULL)
     {
@@ -70,7 +76,12 @@ int8_t esp8266ex_connect(struct esp8266ex* self, const char* ssid, const char* p
 
     // Create connect command
     char connect_cmd[128];
-    snprintf(connect_cmd, sizeof(connect_cmd), "AT+CWJAP=\"%s\",\"%s\"", ssid, password);
+    snprintf(
+        connect_cmd,
+        sizeof(connect_cmd),
+        "AT+CWJAP=\"%s\",\"%s\"",
+        ssid,
+        password);
 
     // Send connect command
     _esp8266ex_send_command(self, connect_cmd);
@@ -83,7 +94,8 @@ int8_t esp8266ex_connect(struct esp8266ex* self, const char* ssid, const char* p
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 int8_t esp8266ex_disconnect(struct esp8266ex* self)
 {
@@ -109,9 +121,11 @@ int8_t esp8266ex_disconnect(struct esp8266ex* self)
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
-int8_t esp8266ex_send_data(struct esp8266ex* self, const uint8_t* data, size_t length)
+int8_t esp8266ex_send_data(
+    struct esp8266ex* self, const uint8_t* data, size_t length)
 {
     if (self == NULL || data == NULL || length == 0)
     {
@@ -136,4 +150,5 @@ int8_t esp8266ex_send_data(struct esp8266ex* self, const uint8_t* data, size_t l
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */

@@ -1,6 +1,3 @@
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#include "rc522.h"
 
 /* ========================================================================== */
-
-#endif /* LIBRARY_H */
