@@ -20,35 +20,28 @@ static GPIO_TypeDef* const port_regs[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOH};
 
 uint8_t get_pin_from_id(uint8_t id)
 {
-    if (id == GPIO_D2_ID) return 2;
-    if (id == GPIO_H0_ID) return 0;
-    if (id == GPIO_H1_ID) return 1;
+    if (id == GPIO_D2_ID)
+        return 2;
+    if (id == GPIO_H0_ID)
+        return 0;
+    if (id == GPIO_H1_ID)
+        return 1;
     return id % 16;
 }
 
 uint8_t get_port_from_id(uint8_t id)
 {
-    if (id <= GPIO_A15_ID) return PORT_A;
-    if (id <= GPIO_B15_ID) return PORT_B;
-    if (id <= GPIO_C15_ID) return PORT_C;
-    if (id == GPIO_D2_ID)  return PORT_D;
-    if (id == GPIO_H0_ID || id == GPIO_H1_ID) return PORT_H;
+    if (id <= GPIO_A15_ID)
+        return PORT_A;
+    if (id <= GPIO_B15_ID)
+        return PORT_B;
+    if (id <= GPIO_C15_ID)
+        return PORT_C;
+    if (id == GPIO_D2_ID)
+        return PORT_D;
+    if (id == GPIO_H0_ID || id == GPIO_H1_ID)
+        return PORT_H;
     return PORT_INVALID;
-}
-
-/* ========================================================================== */
-
-static void enable_port_clock(uint8_t port)
-{
-    switch (port)
-    {
-        case PORT_A: RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; break;
-        case PORT_B: RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN; break;
-        case PORT_C: RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN; break;
-        case PORT_D: RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN; break;
-        case PORT_H: RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN; break;
-        default: break;
-    }
 }
 
 /* ========================================================================== */
@@ -87,7 +80,7 @@ int8_t gpio_initialize(struct gpio* self)
     }
 
     p->MODER &= ~(3U << (pin * 2));
-    p->MODER |=  (moder_val << (pin * 2));
+    p->MODER |= (moder_val << (pin * 2));
 
     self->was_initialized = true;
     return 0;

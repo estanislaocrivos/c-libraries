@@ -371,6 +371,31 @@ extern const struct gpio_ops gpio_ops;
 /* ========================================================================== */
 
 /**
+ * @brief Per-port active-pin checks. Non-zero if any pin on the port is not NC.
+ *        Requires GPIO_Ax, GPIO_Bx, etc. to be defined (via pinout_config.h).
+ */
+#define ANY_GPIO_A_IS_NOT_NC                                                   \
+    (GPIO_A0 | GPIO_A1 | GPIO_A2 | GPIO_A3 | GPIO_A4 | GPIO_A5 | GPIO_A6       \
+     | GPIO_A7 | GPIO_A8 | GPIO_A9 | GPIO_A10 | GPIO_A11 | GPIO_A12 | GPIO_A13 \
+     | GPIO_A14 | GPIO_A15)
+
+#define ANY_GPIO_B_IS_NOT_NC                                                   \
+    (GPIO_B0 | GPIO_B1 | GPIO_B2 | GPIO_B3 | GPIO_B4 | GPIO_B5 | GPIO_B6       \
+     | GPIO_B7 | GPIO_B8 | GPIO_B9 | GPIO_B10 | GPIO_B11 | GPIO_B12 | GPIO_B13 \
+     | GPIO_B14 | GPIO_B15)
+
+#define ANY_GPIO_C_IS_NOT_NC                                                   \
+    (GPIO_C0 | GPIO_C1 | GPIO_C2 | GPIO_C3 | GPIO_C4 | GPIO_C5 | GPIO_C6       \
+     | GPIO_C7 | GPIO_C8 | GPIO_C9 | GPIO_C10 | GPIO_C11 | GPIO_C12 | GPIO_C13 \
+     | GPIO_C14 | GPIO_C15)
+
+#define ANY_GPIO_D_IS_NOT_NC (GPIO_D2)
+
+#define ANY_GPIO_H_IS_NOT_NC (GPIO_H0 | GPIO_H1)
+
+/* ========================================================================== */
+
+/**
  * @brief Retrieves the pin number (0-15) from the GPIO ID.
  */
 uint8_t get_pin_from_id(uint8_t id);
