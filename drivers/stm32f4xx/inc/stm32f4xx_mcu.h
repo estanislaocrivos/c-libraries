@@ -9,11 +9,10 @@
 /* ========================================================================== */
 
 #include "../../../libraries/embedded-hal/inc/mcu.h"
-#include "../../../libraries/inc/errno.h"
 
 /* ========================================================================== */
 
-extern const struct mcu_ops stm32f4xx_mcu_ops;
+extern const struct mcu_ops STM32F4XX_MCU_OPS;
 
 /* ========================================================================== */
 

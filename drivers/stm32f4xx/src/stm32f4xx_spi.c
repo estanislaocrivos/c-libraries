@@ -1,4 +1,4 @@
-#include "../inc/spi.h"
+#include "../inc/stm32f4xx_spi.h"
 
 #include "../../../libraries/inc/errno.h"
 #include "stm32f4xx.h"

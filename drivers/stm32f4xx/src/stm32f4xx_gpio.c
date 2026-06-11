@@ -1,4 +1,4 @@
-#include "../inc/gpio.h"
+#include "../inc/stm32f4xx_gpio.h"
 
 #include "stm32f4xx.h"
 
@@ -18,7 +18,7 @@ static GPIO_TypeDef* const port_regs[] = {GPIOA, GPIOB, GPIOC, GPIOD, GPIOH};
 
 /* ========================================================================== */
 
-uint8_t get_pin_from_id(uint8_t id)
+static uint8_t get_pin_from_id(uint8_t id)
 {
     if (id == GPIO_D2_ID)
         return 2;
@@ -29,7 +29,7 @@ uint8_t get_pin_from_id(uint8_t id)
     return id % 16;
 }
 
-uint8_t get_port_from_id(uint8_t id)
+static uint8_t get_port_from_id(uint8_t id)
 {
     if (id <= GPIO_A15_ID)
         return PORT_A;
@@ -60,8 +60,6 @@ int8_t gpio_initialize(struct gpio* self)
     {
         return -EINVAL;
     }
-
-    enable_port_clock(port);
 
     GPIO_TypeDef* p = port_regs[port];
 
