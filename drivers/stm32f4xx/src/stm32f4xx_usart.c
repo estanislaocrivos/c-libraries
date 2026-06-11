@@ -300,7 +300,7 @@ static int8_t usart1_flush_rx(const struct serial* self)
     return flush_rx_ctx(&g_usart1_ctx);
 }
 
-const struct serial_ops USART1_OPS = {
+const struct serial_ops stm32f4xx_usart1_ops = {
     .initialize                = usart1_initialize,
     .transmit                  = usart1_transmit,
     .receive                   = usart1_receive,
@@ -366,7 +366,7 @@ static int8_t usart2_flush_rx(const struct serial* self)
     return flush_rx_ctx(&g_usart2_ctx);
 }
 
-const struct serial_ops USART2_OPS = {
+const struct serial_ops stm32f4xx_usart2_ops = {
     .initialize                = usart2_initialize,
     .transmit                  = usart2_transmit,
     .receive                   = usart2_receive,
@@ -432,7 +432,7 @@ static int8_t usart6_flush_rx(const struct serial* self)
     return flush_rx_ctx(&g_usart6_ctx);
 }
 
-const struct serial_ops USART6_OPS = {
+const struct serial_ops stm32f4xx_usart6_ops = {
     .initialize                = usart6_initialize,
     .transmit                  = usart6_transmit,
     .receive                   = usart6_receive,

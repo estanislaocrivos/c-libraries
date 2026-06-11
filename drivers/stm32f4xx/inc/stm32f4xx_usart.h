@@ -39,9 +39,9 @@
  * @note  Requires CMSIS-Device (stm32f4xx.h) to be available on the include
  *        path of the consuming project. This driver does not vendor CMSIS.
  */
-extern const struct serial_ops USART1_OPS;
-extern const struct serial_ops USART2_OPS;
-extern const struct serial_ops USART6_OPS;
+extern const struct serial_ops stm32f4xx_usart1_ops;
+extern const struct serial_ops stm32f4xx_usart2_ops;
+extern const struct serial_ops stm32f4xx_usart6_ops;
 
 /* ========================================================================== */
 

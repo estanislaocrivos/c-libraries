@@ -45,10 +45,10 @@
  * @note  Requires CMSIS-Device (stm32f4xx.h) to be available on the include
  *        path of the consuming project. This driver does not vendor CMSIS.
  */
-extern const struct spi_ops SPI1_OPS;
-extern const struct spi_ops SPI2_OPS;
-extern const struct spi_ops SPI3_OPS;
-extern const struct spi_ops SPI4_OPS;
+extern const struct spi_ops stm32f4xx_spi1_ops;
+extern const struct spi_ops stm32f4xx_spi2_ops;
+extern const struct spi_ops stm32f4xx_spi3_ops;
+extern const struct spi_ops stm32f4xx_spi4_ops;
 
 /* ========================================================================== */
 

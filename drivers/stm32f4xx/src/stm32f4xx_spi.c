@@ -408,7 +408,7 @@ static int8_t spi1_flush_rx(const struct spi* self)
     return flush_rx_ctx(&g_spi1_ctx);
 }
 
-const struct spi_ops SPI1_OPS = {
+const struct spi_ops stm32f4xx_spi1_ops = {
     .initialize          = spi1_initialize,
     .transmit            = spi1_transmit,
     .receive             = spi1_receive,
@@ -489,7 +489,7 @@ static int8_t spi2_flush_rx(const struct spi* self)
     return flush_rx_ctx(&g_spi2_ctx);
 }
 
-const struct spi_ops SPI2_OPS = {
+const struct spi_ops stm32f4xx_spi2_ops = {
     .initialize          = spi2_initialize,
     .transmit            = spi2_transmit,
     .receive             = spi2_receive,
@@ -570,7 +570,7 @@ static int8_t spi3_flush_rx(const struct spi* self)
     return flush_rx_ctx(&g_spi3_ctx);
 }
 
-const struct spi_ops SPI3_OPS = {
+const struct spi_ops stm32f4xx_spi3_ops = {
     .initialize          = spi3_initialize,
     .transmit            = spi3_transmit,
     .receive             = spi3_receive,
@@ -651,7 +651,7 @@ static int8_t spi4_flush_rx(const struct spi* self)
     return flush_rx_ctx(&g_spi4_ctx);
 }
 
-const struct spi_ops SPI4_OPS = {
+const struct spi_ops stm32f4xx_spi4_ops = {
     .initialize          = spi4_initialize,
     .transmit            = spi4_transmit,
     .receive             = spi4_receive,

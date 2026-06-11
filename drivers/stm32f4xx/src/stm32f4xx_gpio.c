@@ -4,7 +4,7 @@
 
 /* ========================================================================== */
 
-const struct gpio_ops gpio_ops = {
+const struct gpio_ops stm32f4xx_gpio_ops = {
     .initialize    = gpio_initialize,
     .set_direction = gpio_set_direction,
     .set_state     = gpio_set_state,
