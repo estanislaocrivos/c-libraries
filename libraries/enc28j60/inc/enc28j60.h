@@ -32,11 +32,12 @@ struct enc28j60
 {
     const struct gpio* const spi_cs;
     const struct spi* const  spi_bus;
+    bool                     was_initialized;
 };
 
 /* ========================================================================== */
 
-int8_t enc28j60_init(const struct enc28j60* self);
+int8_t enc28j60_init(struct enc28j60* self);
 
 int8_t enc28j60_write_register(
     const struct enc28j60* self, uint16_t address, uint8_t value);

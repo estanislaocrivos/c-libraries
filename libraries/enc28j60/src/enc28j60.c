@@ -72,6 +72,11 @@ static int8_t enc28j60_select_bank(
 int8_t enc28j60_write_register(
     const struct enc28j60* self, uint16_t address, uint8_t value)
 {
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+
     uint8_t bank = (uint8_t)(address >> 8);
     enc28j60_select_bank(self, bank);
 
@@ -92,6 +97,11 @@ int8_t enc28j60_write_register(
 int8_t enc28j60_read_register(
     const struct enc28j60* self, uint16_t address, uint8_t* value)
 {
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+
     uint8_t bank = (uint8_t)(address >> 8);
     enc28j60_select_bank(self, bank);
 
@@ -112,7 +122,7 @@ int8_t enc28j60_read_register(
 
 /* ========================================================================== */
 
-int8_t enc28j60_init(const struct enc28j60* self)
+int8_t enc28j60_init(struct enc28j60* self)
 {
     if (self == NULL)
     {
@@ -122,4 +132,6 @@ int8_t enc28j60_init(const struct enc28j60* self)
     {
         return -EFAULT;
     }
+    self->was_initialized = true;
+    return 0;
 }
