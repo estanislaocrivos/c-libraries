@@ -19,6 +19,7 @@ enum ENC28J60_MEM_BANK
 
 typedef uint16_t enc28j60_reg_t;
 
+#define ERDPTL ((enc28j60_reg_t)(BANK_0 << 8) | 0x00)
 #define EREVID ((enc28j60_reg_t)(BANK_3 << 8) | 0x12)
 #define EIE    ((enc28j60_reg_t)(NO_BANK << 8) | 0x1B)
 #define EIR    ((enc28j60_reg_t)(NO_BANK << 8) | 0x1C)
