@@ -59,12 +59,6 @@ struct enc28j60
 
 int8_t enc28j60_init(struct enc28j60* self);
 
-int8_t enc28j60_write_register(
-    const struct enc28j60* self, uint16_t address, uint8_t value);
-
-int8_t enc28j60_read_eth_register(
-    const struct enc28j60* self, uint16_t address, uint8_t* value);
-
 /* ========================================================================== */
 
 #endif /* ENC28J60_H */

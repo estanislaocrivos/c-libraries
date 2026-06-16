@@ -70,7 +70,7 @@ static int8_t enc28j60_select_bank(
 
 /* ========================================================================== */
 
-int8_t enc28j60_write_register(
+static int8_t enc28j60_write_register(
     const struct enc28j60* self, uint16_t address, uint8_t value)
 {
     if (self == NULL)
@@ -98,7 +98,7 @@ done:
 
 /* ========================================================================== */
 
-int8_t enc28j60_read_eth_register(
+static int8_t enc28j60_read_eth_register(
     const struct enc28j60* self, uint16_t address, uint8_t* value)
 {
     if (self == NULL)
@@ -126,6 +126,8 @@ done:
     self->spi_cs->ops->set_state(self->spi_cs, true);
     return ret;
 }
+
+/* ========================================================================== */
 
 /* Set bit through hardware operations. Only available for ETH registers. */
 static int8_t enc28j60_set_eth_bit(
@@ -166,7 +168,7 @@ done:
 
 /* ========================================================================== */
 
-int8_t enc28j60_read_register(
+static int8_t enc28j60_read_register(
     const struct enc28j60* self, uint16_t address, uint8_t* value)
 {
     if (self == NULL)
@@ -197,6 +199,8 @@ done:
     return ret;
 }
 
+/* ========================================================================== */
+
 /* Set bit through software operations. Available for all registers. */
 static int8_t enc28j60_set_bit(
     const struct enc28j60* self, uint16_t address, uint8_t mask, bool state)
@@ -223,6 +227,8 @@ static int8_t enc28j60_set_bit(
     enc28j60_write_register(self, address, value);
     return 0;
 }
+
+/* ========================================================================== */
 
 static int8_t enc28j60_get_bit(
     const struct enc28j60* self, uint16_t address, uint8_t mask, bool* state)
@@ -255,8 +261,11 @@ static int8_t enc28j60_mac_init(const struct enc28j60* self)
     return 0;
 }
 
+/* ========================================================================== */
+
 static int8_t enc28j60_phy_init(const struct enc28j60* self)
 {
+    /* Configure PHY for half-duplex operation */
     enc28j60_write_register(self, MIREGADR, 0x10);
     enc28j60_write_register(self, MIWRL, 0x00);
     enc28j60_write_register(self, MIWRH, 0x01);
