@@ -77,10 +77,7 @@ int8_t enc28j60_write_register(
     {
         return -EFAULT;
     }
-    if (!self->was_initialized)
-    {
-        return -EPERM;
-    }
+
     int8_t                 ret  = 0;
     enum ENC28J60_MEM_BANK bank = (enum ENC28J60_MEM_BANK)(address >> 8);
     enc28j60_select_bank(self, bank);
@@ -101,16 +98,12 @@ done:
 
 /* ========================================================================== */
 
-int8_t enc28j60_read_register(
+int8_t enc28j60_read_eth_register(
     const struct enc28j60* self, uint16_t address, uint8_t* value)
 {
     if (self == NULL)
     {
         return -EFAULT;
-    }
-    if (!self->was_initialized)
-    {
-        return -EPERM;
     }
 
     int8_t                 ret  = 0;
@@ -134,18 +127,13 @@ done:
     return ret;
 }
 
-/* ========================================================================== */
-
-int8_t enc28j60_set_bit(
+/* Set bit through hardware operations. Only available for ETH registers. */
+static int8_t enc28j60_set_eth_bit(
     const struct enc28j60* self, uint16_t address, uint8_t mask, bool state)
 {
     if (self == NULL)
     {
         return -EFAULT;
-    }
-    if (!self->was_initialized)
-    {
-        return -EPERM;
     }
 
     enc28j60_select_bank(self, (enum ENC28J60_MEM_BANK)(address >> 8));
@@ -178,6 +166,76 @@ done:
 
 /* ========================================================================== */
 
+int8_t enc28j60_read_register(
+    const struct enc28j60* self, uint16_t address, uint8_t* value)
+{
+    if (self == NULL)
+    {
+        return -EFAULT;
+    }
+
+    int8_t                 ret  = 0;
+    enum ENC28J60_MEM_BANK bank = (enum ENC28J60_MEM_BANK)(address >> 8);
+    enc28j60_select_bank(self, bank);
+
+    /* Need to exchange 3 bytes */
+    uint8_t tx_payload[]
+        = {(uint8_t)((READ_CTRL_REG << 5) | address), 0x00, 0x00};
+    uint8_t rx_payload[3];
+
+    self->spi_cs->ops->set_state(self->spi_cs, false);
+    if (self->spi_bus->ops->transfer(
+            self->spi_bus, tx_payload, rx_payload, sizeof(rx_payload)))
+    {
+        ret = -EIO;
+        goto done;
+    }
+    *value = rx_payload[2];
+
+done:
+    self->spi_cs->ops->set_state(self->spi_cs, true);
+    return ret;
+}
+
+/* Set bit through software operations. Available for all registers. */
+static int8_t enc28j60_set_bit(
+    const struct enc28j60* self, uint16_t address, uint8_t mask, bool state)
+{
+    if (self == NULL)
+    {
+        return -EFAULT;
+    }
+
+    enc28j60_select_bank(self, (enum ENC28J60_MEM_BANK)(address >> 8));
+
+    uint8_t value = 0;
+    enc28j60_read_register(self, address, &value);
+
+    if (state)
+    {
+        value |= mask;
+    }
+    else
+    {
+        value &= ~mask;
+    }
+
+    enc28j60_write_register(self, address, value);
+    return 0;
+}
+
+static int8_t enc28j60_get_bit(
+    const struct enc28j60* self, uint16_t address, uint8_t mask, bool* state)
+{
+    uint8_t value = 0;
+    enc28j60_read_register(self, address, &value);
+
+    *state = (bool)(value & mask);
+    return 0;
+}
+
+/* ========================================================================== */
+
 static int8_t enc28j60_mac_init(const struct enc28j60* self)
 {
     enc28j60_set_bit(self, MACON1, 0x01, true);
@@ -194,7 +252,21 @@ static int8_t enc28j60_mac_init(const struct enc28j60* self)
     enc28j60_write_register(self, MAADR4, self->mac_address[3]);
     enc28j60_write_register(self, MAADR5, self->mac_address[4]);
     enc28j60_write_register(self, MAADR6, self->mac_address[5]);
+    return 0;
+}
 
+static int8_t enc28j60_phy_init(const struct enc28j60* self)
+{
+    enc28j60_write_register(self, MIREGADR, 0x10);
+    enc28j60_write_register(self, MIWRL, 0x00);
+    enc28j60_write_register(self, MIWRH, 0x01);
+
+    /* Read busy bit */
+    bool state = true;
+    while (state)
+    {
+        enc28j60_get_bit(self, MISTAT, 0x01, &state);
+    }
     return 0;
 }
 
@@ -211,6 +283,7 @@ int8_t enc28j60_init(struct enc28j60* self)
         return -EFAULT;
     }
     enc28j60_mac_init(self);
+    enc28j60_phy_init(self);
     self->was_initialized = true;
     return 0;
 }
