@@ -328,6 +328,23 @@ int8_t enc28j60_init(struct enc28j60* self)
     return 0;
 }
 
+int8_t enc28j60_reset(const struct enc28j60* self)
+{
+    if (self == NULL)
+    {
+        return -EFAULT;
+    }
+
+    self->spi_cs->ops->set_state(self->spi_cs, false);
+
+    /* Issue RESET command */
+    uint8_t reset_cmd[] = {(uint8_t)((SYSTEM_RESET << 5) | 0x1F)};
+    self->spi_bus->ops->transmit(self->spi_bus, reset_cmd, sizeof(reset_cmd));
+
+    self->spi_cs->ops->set_state(self->spi_cs, true);
+    return 0;
+}
+
 int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt)
 {
     if (self == NULL)
