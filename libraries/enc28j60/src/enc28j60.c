@@ -1,10 +1,14 @@
 #include "../inc/enc28j60.h"
 
 #include "../../inc/errno.h"
-#include "spi.h"
 
 #include <stdbool.h>
 #include <stdint.h>
+
+/* ========================================================================== */
+
+#define ENC28J60_RXBUF_START 0x0000U
+#define ENC28J60_TXBUF_END   0x1FFFU
 
 /* ========================================================================== */
 
@@ -282,19 +286,23 @@ static int8_t enc28j60_rxbuf_init(const struct enc28j60* self)
     enc28j60_write_register(
         self, ERXSTL, (uint8_t)(ENC28J60_RXBUF_START & 0xFF));
     enc28j60_write_register(self, ERXSTH, (uint8_t)(ENC28J60_RXBUF_START >> 8));
-    enc28j60_write_register(self, ERXNDL, (uint8_t)(ENC28J60_RXBUF_END & 0xFF));
-    enc28j60_write_register(self, ERXNDH, (uint8_t)(ENC28J60_RXBUF_END >> 8));
     enc28j60_write_register(
-        self, ERXRDPTL, (uint8_t)(ENC28J60_RXBUF_END & 0xFF));
-    enc28j60_write_register(self, ERXRDPTH, (uint8_t)(ENC28J60_RXBUF_END >> 8));
+        self, ERXNDL, (uint8_t)(self->rx_buf_end_addr & 0xFF));
+    enc28j60_write_register(
+        self, ERXNDH, (uint8_t)(self->rx_buf_end_addr >> 8));
+    enc28j60_write_register(
+        self, ERXRDPTL, (uint8_t)(self->rx_buf_end_addr & 0xFF));
+    enc28j60_write_register(
+        self, ERXRDPTH, (uint8_t)(self->rx_buf_end_addr >> 8));
     return 0;
 }
 
 static int8_t enc28j60_txbuf_init(const struct enc28j60* self)
 {
     enc28j60_write_register(
-        self, ETXSTL, (uint8_t)(ENC28J60_TXBUF_START & 0xFF));
-    enc28j60_write_register(self, ETXSTH, (uint8_t)(ENC28J60_TXBUF_START >> 8));
+        self, ETXSTL, (uint8_t)((self->rx_buf_end_addr + 1) & 0xFF));
+    enc28j60_write_register(
+        self, ETXSTH, (uint8_t)((self->rx_buf_end_addr + 1) >> 8));
     return 0;
 }
 
@@ -343,6 +351,15 @@ int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt)
 int8_t enc28j60_receive_packet(
     struct enc28j60* self, uint8_t* buffer, uint16_t size)
 {
+    if (self == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+
     uint8_t epktcnt = 0;
     enc28j60_get_epktcnt(self, &epktcnt);
     if (epktcnt == 0)
@@ -355,17 +372,20 @@ int8_t enc28j60_receive_packet(
 
     self->spi_cs->ops->set_state(self->spi_cs, false);
 
+    /* Issue READ BUF MEM command */
     uint8_t read_buf_mem_cmd[] = {(uint8_t)((READ_BUF_MEM << 5) | 0x1A)};
     self->spi_bus->ops->transmit(
         self->spi_bus, read_buf_mem_cmd, sizeof(read_buf_mem_cmd));
 
-    uint8_t tx_buffer[6] = {};
+    /* Read first 6 bytes corresponding to next pkt pointer and receive status
+     * vector */
     uint8_t rx_buffer[6] = {};
     self->spi_bus->ops->transfer(
-        self->spi_bus, tx_buffer, rx_buffer, sizeof(tx_buffer));
+        self->spi_bus, rx_buffer, rx_buffer, sizeof(rx_buffer));
 
-    uint16_t next_packet_ptr = ((uint16_t)(rx_buffer[1]) << 8)
-                               | (uint16_t)rx_buffer[0];
+    uint16_t next_pkt_ptr = ((uint16_t)(rx_buffer[1]) << 8)
+                            | (uint16_t)rx_buffer[0];
+
     uint16_t eth_pkt_size = ((uint16_t)(rx_buffer[3]) << 8)
                             | (uint16_t)rx_buffer[2];
 
@@ -380,13 +400,13 @@ int8_t enc28j60_receive_packet(
     self->spi_cs->ops->set_state(self->spi_cs, true);
 
     /* Update ERXRDPT (must be odd per silicon errata) */
-    uint16_t erxrdpt = (next_packet_ptr == ENC28J60_RXBUF_START) ?
-                           ENC28J60_RXBUF_END :
-                           next_packet_ptr - 1;
+    uint16_t erxrdpt = (next_pkt_ptr == ENC28J60_RXBUF_START) ?
+                           self->rx_buf_end_addr :
+                           next_pkt_ptr - 1;
     enc28j60_write_register(self, ERXRDPTL, (uint8_t)(erxrdpt & 0xFF));
     enc28j60_write_register(self, ERXRDPTH, (uint8_t)(erxrdpt >> 8));
 
-    self->erdpt = next_packet_ptr;
+    self->erdpt = next_pkt_ptr;
 
     enc28j60_set_eth_bit(self, ECON2, 0x40, true);
 
