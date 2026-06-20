@@ -71,6 +71,7 @@ struct enc28j60
     const struct gpio* const spi_cs;
     const struct spi* const  spi_bus;
     const uint8_t            mac_address[6];
+    uint16_t                 erdpt; /* Next RX buffer packet pointer */
     bool                     was_initialized;
 };
 
@@ -79,6 +80,9 @@ struct enc28j60
 int8_t enc28j60_init(struct enc28j60* self);
 
 int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt);
+
+int8_t enc28j60_receive_packet(
+    struct enc28j60* self, uint8_t* buffer, uint16_t size);
 
 /* ========================================================================== */
 

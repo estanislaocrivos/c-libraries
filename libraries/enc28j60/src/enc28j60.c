@@ -315,6 +315,7 @@ int8_t enc28j60_init(struct enc28j60* self)
     enc28j60_mac_init(self);
     enc28j60_phy_init(self);
     enc28j60_set_eth_bit(self, ECON1, 0x04, true);
+    self->erdpt           = ENC28J60_RXBUF_START;
     self->was_initialized = true;
     return 0;
 }
@@ -336,6 +337,59 @@ int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt)
         return -EIO;
     }
     *epktcnt = value;
+    return 0;
+}
+
+int8_t enc28j60_receive_packet(
+    struct enc28j60* self, uint8_t* buffer, uint16_t size)
+{
+    uint8_t epktcnt = 0;
+    enc28j60_get_epktcnt(self, &epktcnt);
+    if (epktcnt == 0)
+    {
+        return -ENODATA;
+    }
+
+    enc28j60_write_register(self, ERDPTL, (uint8_t)(self->erdpt & 0xFF));
+    enc28j60_write_register(self, ERDPTH, (uint8_t)(self->erdpt >> 8));
+
+    self->spi_cs->ops->set_state(self->spi_cs, false);
+
+    uint8_t read_buf_mem_cmd[] = {(uint8_t)((READ_BUF_MEM << 5) | 0x1A)};
+    self->spi_bus->ops->transmit(
+        self->spi_bus, read_buf_mem_cmd, sizeof(read_buf_mem_cmd));
+
+    uint8_t tx_buffer[6] = {};
+    uint8_t rx_buffer[6] = {};
+    self->spi_bus->ops->transfer(
+        self->spi_bus, tx_buffer, rx_buffer, sizeof(tx_buffer));
+
+    uint16_t next_packet_ptr = ((uint16_t)(rx_buffer[1]) << 8)
+                               | (uint16_t)rx_buffer[0];
+    uint16_t eth_pkt_size = ((uint16_t)(rx_buffer[3]) << 8)
+                            | (uint16_t)rx_buffer[2];
+
+    if (eth_pkt_size > size)
+    {
+        self->spi_cs->ops->set_state(self->spi_cs, true);
+        return -EMSGSIZE;
+    }
+
+    self->spi_bus->ops->transfer(self->spi_bus, buffer, buffer, eth_pkt_size);
+
+    self->spi_cs->ops->set_state(self->spi_cs, true);
+
+    /* Update ERXRDPT (must be odd per silicon errata) */
+    uint16_t erxrdpt = (next_packet_ptr == ENC28J60_RXBUF_START) ?
+                           ENC28J60_RXBUF_END :
+                           next_packet_ptr - 1;
+    enc28j60_write_register(self, ERXRDPTL, (uint8_t)(erxrdpt & 0xFF));
+    enc28j60_write_register(self, ERXRDPTH, (uint8_t)(erxrdpt >> 8));
+
+    self->erdpt = next_packet_ptr;
+
+    enc28j60_set_eth_bit(self, ECON2, 0x40, true);
+
     return 0;
 }
 
