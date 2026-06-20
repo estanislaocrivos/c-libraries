@@ -83,7 +83,10 @@ int8_t enc28j60_reset(const struct enc28j60* self);
 int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt);
 
 int8_t enc28j60_receive_packet(
-    struct enc28j60* self, uint8_t* buffer, uint16_t size);
+    struct enc28j60* self, uint8_t* buffer, uint16_t* size);
+
+int8_t enc28j60_transmit_packet(
+    struct enc28j60* self, uint8_t* frame, uint16_t size);
 
 /* ========================================================================== */
 

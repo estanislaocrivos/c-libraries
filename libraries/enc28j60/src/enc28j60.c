@@ -303,6 +303,10 @@ static int8_t enc28j60_txbuf_init(const struct enc28j60* self)
         self, ETXSTL, (uint8_t)((self->rx_buf_end_addr + 1) & 0xFF));
     enc28j60_write_register(
         self, ETXSTH, (uint8_t)((self->rx_buf_end_addr + 1) >> 8));
+    enc28j60_write_register(
+        self, EWRPTL, (uint8_t)((self->rx_buf_end_addr + 1) & 0xFF));
+    enc28j60_write_register(
+        self, EWRPTH, (uint8_t)((self->rx_buf_end_addr + 1) >> 8));
     return 0;
 }
 
@@ -366,7 +370,7 @@ int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt)
 }
 
 int8_t enc28j60_receive_packet(
-    struct enc28j60* self, uint8_t* buffer, uint16_t size)
+    struct enc28j60* self, uint8_t* buffer, uint16_t* size)
 {
     if (self == NULL)
     {
@@ -406,12 +410,6 @@ int8_t enc28j60_receive_packet(
     uint16_t eth_pkt_size = ((uint16_t)(rx_buffer[3]) << 8)
                             | (uint16_t)rx_buffer[2];
 
-    if (eth_pkt_size > size)
-    {
-        self->spi_cs->ops->set_state(self->spi_cs, true);
-        return -EMSGSIZE;
-    }
-
     self->spi_bus->ops->transfer(self->spi_bus, buffer, buffer, eth_pkt_size);
 
     self->spi_cs->ops->set_state(self->spi_cs, true);
@@ -426,6 +424,51 @@ int8_t enc28j60_receive_packet(
     self->erdpt = next_pkt_ptr;
 
     enc28j60_set_eth_bit(self, ECON2, 0x40, true);
+
+    *size = eth_pkt_size;
+
+    return 0;
+}
+
+int8_t enc28j60_transmit_packet(
+    struct enc28j60* self, uint8_t* frame, uint16_t size)
+{
+    if (self == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+
+    uint16_t tx_start = self->rx_buf_end_addr + 1;
+    uint16_t tx_end   = tx_start + size; /* +1 for control byte, then size bytes
+                                          */
+
+    enc28j60_write_register(self, ETXNDL, (uint8_t)(tx_end & 0xFF));
+    enc28j60_write_register(self, ETXNDH, (uint8_t)(tx_end >> 8));
+
+    self->spi_cs->ops->set_state(self->spi_cs, false);
+
+    uint8_t write_buf_mem_cmd[] = {(uint8_t)((WRITE_BUF_MEM << 5) | 0x1A)};
+    self->spi_bus->ops->transmit(
+        self->spi_bus, write_buf_mem_cmd, sizeof(write_buf_mem_cmd));
+
+    uint8_t ctrl_byte = 0x00;
+    self->spi_bus->ops->transmit(self->spi_bus, &ctrl_byte, 1);
+
+    self->spi_bus->ops->transmit(self->spi_bus, frame, size);
+
+    self->spi_cs->ops->set_state(self->spi_cs, true);
+
+    enc28j60_set_eth_bit(self, ECON1, 0x08, true);
+
+    bool txrts = true;
+    while (txrts)
+    {
+        enc28j60_get_bit(self, ECON1, 0x08, &txrts);
+    }
 
     return 0;
 }
