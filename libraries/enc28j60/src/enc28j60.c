@@ -261,8 +261,6 @@ static int8_t enc28j60_mac_init(const struct enc28j60* self)
     return 0;
 }
 
-/* ========================================================================== */
-
 static int8_t enc28j60_phy_init(const struct enc28j60* self)
 {
     /* Configure PHY for half-duplex operation */
@@ -279,6 +277,27 @@ static int8_t enc28j60_phy_init(const struct enc28j60* self)
     return 0;
 }
 
+static int8_t enc28j60_rxbuf_init(const struct enc28j60* self)
+{
+    enc28j60_write_register(
+        self, ERXSTL, (uint8_t)(ENC28J60_RXBUF_START & 0xFF));
+    enc28j60_write_register(self, ERXSTH, (uint8_t)(ENC28J60_RXBUF_START >> 8));
+    enc28j60_write_register(self, ERXNDL, (uint8_t)(ENC28J60_RXBUF_END & 0xFF));
+    enc28j60_write_register(self, ERXNDH, (uint8_t)(ENC28J60_RXBUF_END >> 8));
+    enc28j60_write_register(
+        self, ERXRDPTL, (uint8_t)(ENC28J60_RXBUF_END & 0xFF));
+    enc28j60_write_register(self, ERXRDPTH, (uint8_t)(ENC28J60_RXBUF_END >> 8));
+    return 0;
+}
+
+static int8_t enc28j60_txbuf_init(const struct enc28j60* self)
+{
+    enc28j60_write_register(
+        self, ETXSTL, (uint8_t)(ENC28J60_TXBUF_START & 0xFF));
+    enc28j60_write_register(self, ETXSTH, (uint8_t)(ENC28J60_TXBUF_START >> 8));
+    return 0;
+}
+
 /* ========================================================================== */
 
 int8_t enc28j60_init(struct enc28j60* self)
@@ -291,9 +310,32 @@ int8_t enc28j60_init(struct enc28j60* self)
     {
         return -EFAULT;
     }
+    enc28j60_rxbuf_init(self);
+    enc28j60_txbuf_init(self);
     enc28j60_mac_init(self);
     enc28j60_phy_init(self);
+    enc28j60_set_eth_bit(self, ECON1, 0x04, true);
     self->was_initialized = true;
+    return 0;
+}
+
+int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt)
+{
+    if (self == NULL)
+    {
+        return -EFAULT;
+    }
+    if (!self->was_initialized)
+    {
+        return -EPERM;
+    }
+
+    uint8_t value = 0;
+    if (enc28j60_read_eth_register(self, EPKTCNT, &value))
+    {
+        return -EIO;
+    }
+    *epktcnt = value;
     return 0;
 }
 
