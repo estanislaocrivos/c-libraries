@@ -15,9 +15,9 @@ struct arp
 };
 
 int8_t arp_is_request_for_me(
-    const struct arp* self, uint8_t* frame, uint16_t size, bool* state);
+    const struct arp* self, uint8_t* frame, uint8_t size, bool* state);
 
-int8_t arp_reply_request(const struct arp* self, uint8_t* frame, uint16_t size);
+int8_t arp_reply_request(const struct arp* self, uint8_t* frame, uint8_t size);
 
 /* ========================================================================== */
 
