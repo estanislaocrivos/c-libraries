@@ -256,12 +256,12 @@ static int8_t enc28j60_mac_init(const struct enc28j60* self)
     enc28j60_write_register(self, MAIPGL, 0x12);
     enc28j60_write_register(self, MAIPGH, 0x0C);
 
-    enc28j60_write_register(self, MAADR1, self->mac_address[5]);
-    enc28j60_write_register(self, MAADR2, self->mac_address[4]);
-    enc28j60_write_register(self, MAADR3, self->mac_address[3]);
-    enc28j60_write_register(self, MAADR4, self->mac_address[2]);
-    enc28j60_write_register(self, MAADR5, self->mac_address[1]);
-    enc28j60_write_register(self, MAADR6, self->mac_address[0]);
+    enc28j60_write_register(self, MAADR1, self->mac_address[0]);
+    enc28j60_write_register(self, MAADR2, self->mac_address[1]);
+    enc28j60_write_register(self, MAADR3, self->mac_address[2]);
+    enc28j60_write_register(self, MAADR4, self->mac_address[3]);
+    enc28j60_write_register(self, MAADR5, self->mac_address[4]);
+    enc28j60_write_register(self, MAADR6, self->mac_address[5]);
     return 0;
 }
 
