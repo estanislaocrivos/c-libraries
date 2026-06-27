@@ -11,63 +11,69 @@
 
 #define ETH_TYPE_ARP_REQUEST_OR_REPLY 0x0806
 #define ETH_TYPE_IPV4                 0x0800
+#define ETH_TYPE_IPV6                 0x08DD
 
 int8_t eth_process_frame(
-    const struct eth*   self,
-    uint8_t*            frame,
-    uint16_t            size,
-    struct eth_payload* pld)
+    const struct eth*    self,
+    uint8_t*             rx_frame,
+    uint16_t             rx_frame_size,
+    struct eth_metadata* meta)
 {
-    if (size < MIN_ETH_PKT_SIZE || size > MAX_ETH_PKT_SIZE)
+    if (rx_frame_size < MIN_ETH_PKT_SIZE || rx_frame_size > MAX_ETH_PKT_SIZE)
     {
         return -EINVAL;
     }
 
-    if (frame[DEST_MAC_ADDR_FRAME_OFST] && 0x01)
+    if (rx_frame[DEST_MAC_ADDR_FRAME_OFST] && 0x01)
     {
-        if (frame[DEST_MAC_ADDR_FRAME_OFST] == 0xFF)
+        if (rx_frame[DEST_MAC_ADDR_FRAME_OFST] == 0xFF
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 1] == 0xFF
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 2] == 0xFF
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 3] == 0xFF
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 4] == 0xFF
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 5] == 0xFF)
         {
-            /* Broadcast */
-            pld->mac_type = BROADCAST_MAC;
+            meta->mac_type = ETH_MAC_BROADCAST;
         }
         else
         {
-            /* Multicast (check if I'm in group) */
-            pld->mac_type = MULTICAST_MAC;
+            meta->mac_type = ETH_MAC_MULTICAST;
         }
     }
     else
     {
-        if (frame[DEST_MAC_ADDR_FRAME_OFST] == self->mac_addr[0]
-            && frame[DEST_MAC_ADDR_FRAME_OFST + 1] == self->mac_addr[1]
-            && frame[DEST_MAC_ADDR_FRAME_OFST + 2] == self->mac_addr[2]
-            && frame[DEST_MAC_ADDR_FRAME_OFST + 3] == self->mac_addr[3]
-            && frame[DEST_MAC_ADDR_FRAME_OFST + 4] == self->mac_addr[4]
-            && frame[DEST_MAC_ADDR_FRAME_OFST + 5] == self->mac_addr[5])
+        if (rx_frame[DEST_MAC_ADDR_FRAME_OFST] == self->mac_addr[0]
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 1] == self->mac_addr[1]
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 2] == self->mac_addr[2]
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 3] == self->mac_addr[3]
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 4] == self->mac_addr[4]
+            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 5] == self->mac_addr[5])
         {
-            /* Unicast for me */
-            pld->mac_type = MY_OWN_MAC;
+            meta->mac_type = ETH_MAC_MY_OWN;
         }
         else
         {
-            /* Discard */
-            return -1;
+            meta->mac_type = ETH_MAC_UNKNOWN;
         }
     }
 
-    uint16_t eth_type = ((uint16_t)frame[ETH_TYPE_FRAME_OFST] << 8)
-                        | (uint16_t)frame[ETH_TYPE_FRAME_OFST + 1];
+    uint16_t eth_type = ((uint16_t)rx_frame[ETH_TYPE_FRAME_OFST] << 8)
+                        | (uint16_t)rx_frame[ETH_TYPE_FRAME_OFST + 1];
     if (eth_type == ETH_TYPE_ARP_REQUEST_OR_REPLY)
     {
-        pld->pld_type = ETH_TYPE_ARP_REQUEST_OR_REPLY;
+        meta->payload_type = ETH_PLD_ARP;
     }
     else if (eth_type == ETH_TYPE_IPV4)
     {
-        pld->pld_type = ETH_TYPE_IPV4;
+        meta->payload_type = ETH_PLD_IPV4;
+    }
+    else if (eth_type == ETH_TYPE_IPV6)
+    {
+        meta->payload_type = ETH_PLD_IPV6;
     }
     else
     {
-        return -1;
+        meta->payload_type = ETH_PLD_UNKNOWN;
     }
 
     return 0;

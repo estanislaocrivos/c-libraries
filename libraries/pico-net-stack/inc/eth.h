@@ -10,15 +10,18 @@
 
 enum eth_payload_type
 {
-    IPV4_PAYLOAD,
-    ARP_PAYLOAD,
+    ETH_PLD_IPV4,
+    ETH_PLD_IPV6,
+    ETH_PLD_ARP,
+    ETH_PLD_UNKNOWN,
 };
 
 enum eth_mac_type
 {
-    BROADCAST_MAC,
-    MULTICAST_MAC,
-    MY_OWN_MAC,
+    ETH_MAC_BROADCAST,
+    ETH_MAC_MULTICAST,
+    ETH_MAC_MY_OWN,
+    ETH_MAC_UNKNOWN,
 };
 
 struct eth
@@ -28,12 +31,12 @@ struct eth
     bool    calc_crc;
 };
 
-struct eth_payload
+struct eth_metadata
 {
-    enum eth_payload_type pld_type;
+    enum eth_payload_type payload_type;
     enum eth_mac_type     mac_type;
     uint8_t*              payload;
-    uint16_t              size;
+    uint16_t              payload_size;
 };
 
 /**
@@ -45,10 +48,10 @@ struct eth_payload
  * @return int8_t
  */
 int8_t eth_process_frame(
-    const struct eth*   self,
-    uint8_t*            frame,
-    uint16_t            size,
-    struct eth_payload* pld);
+    const struct eth*    self,
+    uint8_t*             rx_frame,
+    uint16_t             rx_frame_size,
+    struct eth_metadata* meta);
 
 /* ========================================================================== */
 
