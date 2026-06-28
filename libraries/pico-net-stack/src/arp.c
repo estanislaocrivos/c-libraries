@@ -24,6 +24,8 @@
 #define TARGET_MAC_ADDR_FRAME_OFST    32
 #define TARGET_IP_ADDR_FRAME_OFST     38
 
+/* ========================================================================== */
+
 int8_t arp_is_request_for_me(
     const struct arp* self, uint8_t* frame, uint8_t size, bool* state)
 {
