@@ -41,17 +41,17 @@ struct eth_metadata
 
 /**
  * @brief Process an ethernet frame
- *
- * @param self
- * @param frame
- * @param size Size of the frame to be processed (>= 64 && <= 1518)
- * @return int8_t
+ * @param self Pointer to the eth object instance
+ * @param rx_frame Pointer to the received ETH frame
+ * @param rx_frame_size Size of the frame to be processed (>= 64 && <= 1518)
+ * @param mdata Pointer to the returned rx_frame metadata
+ * @return int8_t Returns 0 in case of success, -ERRNO otherwise
  */
 int8_t eth_process_frame(
     const struct eth*    self,
-    uint8_t*             rx_frame,
+    const uint8_t*       rx_frame,
     uint16_t             rx_frame_size,
-    struct eth_metadata* meta);
+    struct eth_metadata* mdata);
 
 /* ========================================================================== */
 
