@@ -35,7 +35,7 @@ struct eth_rx_metadata
 {
     enum eth_payload_type payload_type;
     enum eth_mac_type     mac_type;
-    uint8_t*              src_mac_addr;
+    uint8_t               src_mac_addr[6];
     const uint8_t*        payload;
     uint16_t              payload_size;
 };
@@ -43,8 +43,8 @@ struct eth_rx_metadata
 struct eth_tx_metadata
 {
     enum eth_payload_type payload_type;
-    uint8_t*              dest_mac_addr;
-    uint8_t*              payload;
+    uint8_t               dest_mac_addr[6];
+    const uint8_t*        payload;
     uint16_t              payload_size;
 };
 
