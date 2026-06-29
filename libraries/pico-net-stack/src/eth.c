@@ -12,7 +12,7 @@
 #define MAX_ETH_PKT_SIZE              1518
 
 #define DEST_MAC_ADDR_FRAME_OFST      0
-#define SOURCE_MAC_ADDR_FRAME_OFST    6
+#define SRC_MAC_ADDR_FRAME_OFST       6
 #define ETH_TYPE_FRAME_OFST           12
 #define ETH_PAYLOAD_FRAME_OFST        14
 
@@ -89,12 +89,12 @@ int8_t eth_process_frame(
         mdata->payload_type = ETH_PLD_UNKNOWN;
     }
 
-    mdata->sender_mac_addr[0] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST];
-    mdata->sender_mac_addr[1] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 1];
-    mdata->sender_mac_addr[2] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 2];
-    mdata->sender_mac_addr[3] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 3];
-    mdata->sender_mac_addr[4] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 4];
-    mdata->sender_mac_addr[5] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 5];
+    mdata->src_mac_addr[0] = rx_frame[SRC_MAC_ADDR_FRAME_OFST];
+    mdata->src_mac_addr[1] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 1];
+    mdata->src_mac_addr[2] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 2];
+    mdata->src_mac_addr[3] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 3];
+    mdata->src_mac_addr[4] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 4];
+    mdata->src_mac_addr[5] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 5];
 
     mdata->payload = rx_frame + ETH_PAYLOAD_FRAME_OFST;
 
@@ -126,12 +126,12 @@ int8_t eth_build_frame(
     tx_frame[DEST_MAC_ADDR_FRAME_OFST + 4] = mdata->dest_mac_addr[4];
     tx_frame[DEST_MAC_ADDR_FRAME_OFST + 5] = mdata->dest_mac_addr[5];
 
-    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST]     = self->mac_addr[0];
-    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 1] = self->mac_addr[1];
-    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 2] = self->mac_addr[2];
-    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 3] = self->mac_addr[3];
-    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 4] = self->mac_addr[4];
-    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 5] = self->mac_addr[5];
+    tx_frame[SRC_MAC_ADDR_FRAME_OFST]     = self->mac_addr[0];
+    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 1] = self->mac_addr[1];
+    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 2] = self->mac_addr[2];
+    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 3] = self->mac_addr[3];
+    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 4] = self->mac_addr[4];
+    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 5] = self->mac_addr[5];
 
     switch (mdata->payload_type)
     {
