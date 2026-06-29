@@ -89,6 +89,13 @@ int8_t eth_process_frame(
         mdata->payload_type = ETH_PLD_UNKNOWN;
     }
 
+    mdata->sender_mac_addr[0] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST];
+    mdata->sender_mac_addr[1] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 1];
+    mdata->sender_mac_addr[2] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 2];
+    mdata->sender_mac_addr[3] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 3];
+    mdata->sender_mac_addr[4] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 4];
+    mdata->sender_mac_addr[5] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 5];
+
     return 0;
 }
 
