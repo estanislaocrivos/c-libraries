@@ -80,6 +80,7 @@ int8_t arp_process_frame(
 
     memcpy(mdata->src_ip_addr, rx_frame + SRC_IP_ADDR_FRAME_OFST, 4);
     memcpy(mdata->src_mac_addr, rx_frame + SRC_MAC_ADDR_FRAME_OFST, 6);
+    memcpy(mdata->dest_ip_addr, rx_frame + DEST_IP_ADDR_FRAME_OFST, 4);
     return 0;
 }
 
@@ -149,6 +150,22 @@ int8_t arp_build_frame(
     memcpy(tx_frame + SRC_MAC_ADDR_FRAME_OFST, self->mac_addr, 6);
     memcpy(tx_frame + SRC_IP_ADDR_FRAME_OFST, self->ip_addr, 4);
     return 0;
+}
+
+/* ========================================================================== */
+
+bool arp_is_request_for_me(
+    const struct arp* self, const struct arp_rx_metadata* mdata)
+{
+    if (self == NULL || mdata == NULL)
+    {
+        return false;
+    }
+    if (mdata->op_type != ARP_REQUEST)
+    {
+        return false;
+    }
+    return !memcmp(self->ip_addr, mdata->dest_ip_addr, 4);
 }
 
 /* ========================================================================== */
