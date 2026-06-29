@@ -89,15 +89,9 @@ int8_t eth_process_frame(
         mdata->payload_type = ETH_PLD_UNKNOWN;
     }
 
-    mdata->src_mac_addr[0] = rx_frame[SRC_MAC_ADDR_FRAME_OFST];
-    mdata->src_mac_addr[1] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 1];
-    mdata->src_mac_addr[2] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 2];
-    mdata->src_mac_addr[3] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 3];
-    mdata->src_mac_addr[4] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 4];
-    mdata->src_mac_addr[5] = rx_frame[SRC_MAC_ADDR_FRAME_OFST + 5];
-
-    mdata->payload = rx_frame + ETH_PAYLOAD_FRAME_OFST;
-
+    memcpy(mdata->src_mac_addr, rx_frame + SRC_MAC_ADDR_FRAME_OFST, 6);
+    mdata->payload      = rx_frame + ETH_PAYLOAD_FRAME_OFST;
+    mdata->payload_size = rx_frame_size - ETH_PAYLOAD_FRAME_OFST;
     return 0;
 }
 
@@ -119,19 +113,8 @@ int8_t eth_build_frame(
         return -EINVAL;
     }
 
-    tx_frame[DEST_MAC_ADDR_FRAME_OFST]     = mdata->dest_mac_addr[0];
-    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 1] = mdata->dest_mac_addr[1];
-    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 2] = mdata->dest_mac_addr[2];
-    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 3] = mdata->dest_mac_addr[3];
-    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 4] = mdata->dest_mac_addr[4];
-    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 5] = mdata->dest_mac_addr[5];
-
-    tx_frame[SRC_MAC_ADDR_FRAME_OFST]     = self->mac_addr[0];
-    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 1] = self->mac_addr[1];
-    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 2] = self->mac_addr[2];
-    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 3] = self->mac_addr[3];
-    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 4] = self->mac_addr[4];
-    tx_frame[SRC_MAC_ADDR_FRAME_OFST + 5] = self->mac_addr[5];
+    memcpy(tx_frame + DEST_MAC_ADDR_FRAME_OFST, mdata->dest_mac_addr, 6);
+    memcpy(tx_frame + SRC_MAC_ADDR_FRAME_OFST, self->mac_addr, 6);
 
     switch (mdata->payload_type)
     {
@@ -163,8 +146,6 @@ int8_t eth_build_frame(
 
     memcpy(
         tx_frame + ETH_PAYLOAD_FRAME_OFST, mdata->payload, mdata->payload_size);
-
     *tx_frame_size = mdata->payload_size + ETH_PAYLOAD_FRAME_OFST;
-
     return 0;
 }

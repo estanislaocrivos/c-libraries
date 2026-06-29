@@ -8,7 +8,7 @@
 
 /* ========================================================================== */
 
-#define MIN_ARP_FRAME_SIZE         42
+#define MIN_ARP_FRAME_SIZE         28
 
 #define ARP_REQUEST_OPCODE_VAL     ((uint16_t)0x0001)
 #define ARP_REPLY_OPCODE_VAL       ((uint16_t)0x0002)
@@ -20,15 +20,15 @@
 #define HARD_SIZE_VAL              6
 #define PROT_SIZE_VAL              4
 
-#define HARD_TYPE_FRAME_OFST       14
-#define PROT_TYPE_FRAME_OFST       16
-#define HARD_SIZE_FRAME_OFST       18
-#define PROT_SIZE_FRAME_OFST       19
-#define OPCODE_FRAME_OFST          20
-#define SRC_MAC_ADDR_FRAME_OFST    22
-#define SRC_IP_ADDR_FRAME_OFST     28
-#define DEST_MAC_ADDR_FRAME_OFST   32
-#define DEST_IP_ADDR_FRAME_OFST    38
+#define HARD_TYPE_FRAME_OFST       0
+#define PROT_TYPE_FRAME_OFST       2
+#define HARD_SIZE_FRAME_OFST       4
+#define PROT_SIZE_FRAME_OFST       5
+#define OPCODE_FRAME_OFST          6
+#define SRC_MAC_ADDR_FRAME_OFST    8
+#define SRC_IP_ADDR_FRAME_OFST     14
+#define DEST_MAC_ADDR_FRAME_OFST   18
+#define DEST_IP_ADDR_FRAME_OFST    24
 
 /* ========================================================================== */
 
