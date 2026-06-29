@@ -87,10 +87,7 @@ int8_t arp_process_frame(
 /* ========================================================================== */
 
 int8_t arp_build_frame(
-    const struct arp*       self,
-    struct arp_tx_metadata* mdata,
-    uint8_t*                tx_frame,
-    uint8_t                 tx_frame_size)
+    const struct arp* self, struct arp_tx_metadata* mdata, uint8_t* tx_frame)
 {
     if (self == NULL || mdata == NULL || tx_frame == NULL)
     {
