@@ -3,6 +3,8 @@
 #include "../../inc/errno.h"
 
 #include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 /* ========================================================================== */
 
@@ -12,6 +14,7 @@
 #define DEST_MAC_ADDR_FRAME_OFST      0
 #define SOURCE_MAC_ADDR_FRAME_OFST    6
 #define ETH_TYPE_FRAME_OFST           12
+#define ETH_PAYLOAD_FRAME_OFST        14
 
 #define ETH_TYPE_ARP_REQUEST_OR_REPLY 0x0806
 #define ETH_TYPE_IPV4                 0x0800
@@ -20,10 +23,10 @@
 /* ========================================================================== */
 
 int8_t eth_process_frame(
-    const struct eth*    self,
-    const uint8_t*       rx_frame,
-    uint16_t             rx_frame_size,
-    struct eth_metadata* mdata)
+    const struct eth*       self,
+    const uint8_t*          rx_frame,
+    uint16_t                rx_frame_size,
+    struct eth_rx_metadata* mdata)
 {
     if (self == NULL)
     {
@@ -90,3 +93,69 @@ int8_t eth_process_frame(
 }
 
 /* ========================================================================== */
+
+int8_t eth_build_frame(
+    const struct eth*       self,
+    struct eth_tx_metadata* mdata,
+    uint8_t*                tx_frame,
+    uint16_t*               tx_frame_size)
+{
+    if (self == NULL || mdata == NULL || tx_frame == NULL
+        || tx_frame_size == NULL)
+    {
+        return -EFAULT;
+    }
+    if (mdata->payload_size == 0)
+    {
+        return -EINVAL;
+    }
+
+    tx_frame[DEST_MAC_ADDR_FRAME_OFST]     = mdata->dest_mac_addr[0];
+    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 1] = mdata->dest_mac_addr[1];
+    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 2] = mdata->dest_mac_addr[2];
+    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 3] = mdata->dest_mac_addr[3];
+    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 4] = mdata->dest_mac_addr[4];
+    tx_frame[DEST_MAC_ADDR_FRAME_OFST + 5] = mdata->dest_mac_addr[5];
+
+    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST]     = self->mac_addr[0];
+    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 1] = self->mac_addr[1];
+    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 2] = self->mac_addr[2];
+    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 3] = self->mac_addr[3];
+    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 4] = self->mac_addr[4];
+    tx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 5] = self->mac_addr[5];
+
+    switch (mdata->payload_type)
+    {
+        case ETH_PLD_ARP:
+        {
+            tx_frame[ETH_TYPE_FRAME_OFST]
+                = (uint8_t)(ETH_TYPE_ARP_REQUEST_OR_REPLY >> 8);
+            tx_frame[ETH_TYPE_FRAME_OFST + 1]
+                = (uint8_t)(ETH_TYPE_ARP_REQUEST_OR_REPLY);
+            break;
+        }
+        case ETH_PLD_IPV4:
+        {
+            tx_frame[ETH_TYPE_FRAME_OFST]     = (uint8_t)(ETH_TYPE_IPV4 >> 8);
+            tx_frame[ETH_TYPE_FRAME_OFST + 1] = (uint8_t)(ETH_TYPE_IPV4);
+            break;
+        }
+        case ETH_PLD_IPV6:
+        {
+            tx_frame[ETH_TYPE_FRAME_OFST]     = (uint8_t)(ETH_TYPE_IPV6 >> 8);
+            tx_frame[ETH_TYPE_FRAME_OFST + 1] = (uint8_t)(ETH_TYPE_IPV6);
+            break;
+        }
+        default:
+        {
+            return -EINVAL;
+        }
+    }
+
+    memcpy(
+        tx_frame + ETH_PAYLOAD_FRAME_OFST, mdata->payload, mdata->payload_size);
+
+    *tx_frame_size = mdata->payload_size + ETH_PAYLOAD_FRAME_OFST;
+
+    return 0;
+}

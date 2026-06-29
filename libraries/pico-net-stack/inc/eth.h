@@ -31,10 +31,18 @@ struct eth
     bool    calc_crc;
 };
 
-struct eth_metadata
+struct eth_rx_metadata
 {
     enum eth_payload_type payload_type;
     enum eth_mac_type     mac_type;
+    uint8_t*              payload;
+    uint16_t              payload_size;
+};
+
+struct eth_tx_metadata
+{
+    enum eth_payload_type payload_type;
+    uint8_t*              dest_mac_addr;
     uint8_t*              payload;
     uint16_t              payload_size;
 };
@@ -48,10 +56,16 @@ struct eth_metadata
  * @return int8_t Returns 0 in case of success, -ERRNO otherwise
  */
 int8_t eth_process_frame(
-    const struct eth*    self,
-    const uint8_t*       rx_frame,
-    uint16_t             rx_frame_size,
-    struct eth_metadata* mdata);
+    const struct eth*       self,
+    const uint8_t*          rx_frame,
+    uint16_t                rx_frame_size,
+    struct eth_rx_metadata* mdata);
+
+int8_t eth_build_frame(
+    const struct eth*       self,
+    struct eth_tx_metadata* mdata,
+    uint8_t*                tx_frame,
+    uint16_t*               tx_frame_size);
 
 /* ========================================================================== */
 
