@@ -62,10 +62,14 @@ int8_t arp_process_frame(
  * stored.
  * @param tx_frame Pointer to the ARP frame to be built. Must have a size of
  * ARP_PAYLOAD_SIZE.
+ * @param tx_frame_size Size of the tx_frame. Must be ARP_PAYLOAD_SIZE.
  * @return int8_t Returns 0 in case of success, -ERRNO otherwise.
  */
 int8_t arp_build_frame(
-    const struct arp* self, struct arp_tx_metadata* mdata, uint8_t* tx_frame);
+    const struct arp*       self,
+    struct arp_tx_metadata* mdata,
+    uint8_t*                tx_frame,
+    uint8_t                 tx_frame_size);
 
 /**
  * @brief Process an ARP request. Must be called after arp_process_frame in
