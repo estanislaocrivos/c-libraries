@@ -96,6 +96,8 @@ int8_t eth_process_frame(
     mdata->sender_mac_addr[4] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 4];
     mdata->sender_mac_addr[5] = rx_frame[SOURCE_MAC_ADDR_FRAME_OFST + 5];
 
+    mdata->payload = rx_frame + ETH_PAYLOAD_FRAME_OFST;
+
     return 0;
 }
 
