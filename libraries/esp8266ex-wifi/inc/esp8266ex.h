@@ -20,7 +20,7 @@
 
 struct esp8266ex
 {
-    struct uart_port* uart;
+    struct serial* uart;
     char              ssid[32];
     char              password[64];
     char              ipv4_address[16];
