@@ -8,6 +8,8 @@
 
 /* ========================================================================== */
 
+#define MAX_ETH_FRAME_SIZE 1518
+
 enum eth_payload_type
 {
     ETH_PLD_IPV4,
@@ -49,12 +51,12 @@ struct eth_tx_metadata
 };
 
 /**
- * @brief Process an ethernet frame
- * @param self Pointer to the eth object instance
- * @param rx_frame Pointer to the received ETH frame
- * @param rx_frame_size Size of the frame to be processed (>= 64 && <= 1518)
- * @param mdata Pointer to the returned rx_frame metadata
- * @return int8_t Returns 0 in case of success, -ERRNO otherwise
+ * @brief Process an ethernet frame.
+ * @param self Pointer to the eth object instance.
+ * @param rx_frame Pointer to the received ETH frame.
+ * @param rx_frame_size Size of the frame to be processed (>= 64 && <= 1518).
+ * @param mdata Pointer to the obtained rx_frame metadata.
+ * @return int8_t Returns 0 in case of success, -ERRNO otherwise.
  */
 int8_t eth_process_frame(
     const struct eth*       self,
@@ -62,6 +64,15 @@ int8_t eth_process_frame(
     uint16_t                rx_frame_size,
     struct eth_rx_metadata* mdata);
 
+/**
+ * @brief Process an ethernet frame.
+ * @param self Pointer to the eth object instance.
+ * @param mdata Pointer to the tx_frame metadata.
+ * @param tx_frame Pointer to the tx buffer ETH frame.
+ * @param tx_frame_size Size of the tx buffer ETH frame. Must be
+ * MAX_ETH_FRAME_SIZE to avoid size issues.
+ * @return int8_t Returns 0 in case of success, -ERRNO otherwise.
+ */
 int8_t eth_build_frame(
     const struct eth*       self,
     struct eth_tx_metadata* mdata,

@@ -20,6 +20,9 @@
 #define ETH_TYPE_IPV4                 0x0800
 #define ETH_TYPE_IPV6                 0x08DD
 
+static const uint8_t BROADCAST_MAC_ADDR[6]
+    = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
 /* ========================================================================== */
 
 int8_t eth_process_frame(
@@ -39,12 +42,7 @@ int8_t eth_process_frame(
 
     if (rx_frame[DEST_MAC_ADDR_FRAME_OFST] & 0x01)
     {
-        if (rx_frame[DEST_MAC_ADDR_FRAME_OFST] == 0xFF
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 1] == 0xFF
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 2] == 0xFF
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 3] == 0xFF
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 4] == 0xFF
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 5] == 0xFF)
+        if (!memcmp(rx_frame + DEST_MAC_ADDR_FRAME_OFST, BROADCAST_MAC_ADDR, 6))
         {
             mdata->mac_type = ETH_MAC_BROADCAST;
         }
@@ -55,12 +53,7 @@ int8_t eth_process_frame(
     }
     else
     {
-        if (rx_frame[DEST_MAC_ADDR_FRAME_OFST] == self->mac_addr[0]
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 1] == self->mac_addr[1]
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 2] == self->mac_addr[2]
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 3] == self->mac_addr[3]
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 4] == self->mac_addr[4]
-            && rx_frame[DEST_MAC_ADDR_FRAME_OFST + 5] == self->mac_addr[5])
+        if (!memcmp(rx_frame + DEST_MAC_ADDR_FRAME_OFST, self->mac_addr, 6))
         {
             mdata->mac_type = ETH_MAC_MY_OWN;
         }
@@ -72,21 +65,29 @@ int8_t eth_process_frame(
 
     uint16_t eth_type = ((uint16_t)rx_frame[ETH_TYPE_FRAME_OFST] << 8)
                         | (uint16_t)rx_frame[ETH_TYPE_FRAME_OFST + 1];
-    if (eth_type == ETH_TYPE_ARP_REQUEST_OR_REPLY)
+
+    switch (eth_type)
     {
-        mdata->payload_type = ETH_PLD_ARP;
-    }
-    else if (eth_type == ETH_TYPE_IPV4)
-    {
-        mdata->payload_type = ETH_PLD_IPV4;
-    }
-    else if (eth_type == ETH_TYPE_IPV6)
-    {
-        mdata->payload_type = ETH_PLD_IPV6;
-    }
-    else
-    {
-        mdata->payload_type = ETH_PLD_UNKNOWN;
+        case ETH_TYPE_ARP_REQUEST_OR_REPLY:
+        {
+            mdata->payload_type = ETH_PLD_ARP;
+            break;
+        }
+        case ETH_TYPE_IPV4:
+        {
+            mdata->payload_type = ETH_PLD_IPV4;
+            break;
+        }
+        case ETH_TYPE_IPV6:
+        {
+            mdata->payload_type = ETH_PLD_IPV6;
+            break;
+        }
+        default:
+        {
+            mdata->payload_type = ETH_PLD_UNKNOWN;
+            break;
+        }
     }
 
     memcpy(mdata->src_mac_addr, rx_frame + SRC_MAC_ADDR_FRAME_OFST, 6);
@@ -149,3 +150,5 @@ int8_t eth_build_frame(
     *tx_frame_size = mdata->payload_size + ETH_PAYLOAD_FRAME_OFST;
     return 0;
 }
+
+/* ========================================================================== */
