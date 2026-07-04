@@ -76,6 +76,19 @@ int8_t ip_process_frame(
  */
 bool ip_is_pkt_for_me(const struct ip* self, const struct ip_rx_metadata* mdata);
 
+/**
+ * @brief Build an IPv4 frame from the provided metadata. Writes the IP header,
+ * copies the payload, and computes the header checksum. The source IP address
+ * is taken from the ip object instance.
+ * @param self Pointer to the ip object instance.
+ * @param mdata Pointer to the tx metadata struct containing version, protocol,
+ * destination IP, payload pointer and payload size.
+ * @param tx_frame Pointer to the output buffer where the IP frame will be
+ * written.
+ * @param tx_frame_size Output parameter. Set to IP header size + payload_size
+ * on success.
+ * @return int8_t Returns 0 in case of success, -ERRNO otherwise.
+ */
 int8_t ip_build_frame(
     const struct ip*       self,
     struct ip_tx_metadata* mdata,

@@ -8,8 +8,6 @@
 
 /* ========================================================================== */
 
-#define FIXED_ARP_FRAME_SIZE       28
-
 #define ARP_REQUEST_OPCODE_VAL     ((uint16_t)0x0001)
 #define ARP_REPLY_OPCODE_VAL       ((uint16_t)0x0002)
 #define ARP_REV_REQUEST_OPCODE_VAL ((uint16_t)0x0003)
@@ -43,7 +41,7 @@ int8_t arp_process_frame(
     {
         return -EFAULT;
     }
-    if (rx_frame_size < FIXED_ARP_FRAME_SIZE)
+    if (rx_frame_size < ARP_FRAME_SIZE)
     {
         return -EINVAL;
     }
@@ -146,7 +144,7 @@ int8_t arp_build_frame(
     memcpy(tx_frame + SRC_MAC_ADDR_FRAME_OFST, self->mac_addr, 6);
     memcpy(tx_frame + SRC_IP_ADDR_FRAME_OFST, self->ip_addr, 4);
 
-    *tx_frame_size = FIXED_ARP_FRAME_SIZE;
+    *tx_frame_size = ARP_FRAME_SIZE;
     return 0;
 }
 
