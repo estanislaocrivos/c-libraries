@@ -8,7 +8,8 @@
 
 /* ========================================================================== */
 
-#define MAX_ETH_FRAME_SIZE 1518
+#define MAX_ETH_FRAME_SIZE  1518
+#define MAX_ETH_HEADER_SIZE 14
 
 enum eth_payload_type
 {
