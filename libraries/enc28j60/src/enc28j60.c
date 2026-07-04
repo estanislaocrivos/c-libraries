@@ -443,8 +443,10 @@ int8_t enc28j60_transmit_packet(
     }
 
     uint16_t tx_start = self->rx_buf_end_addr + 1;
-    uint16_t tx_end   = tx_start + size; /* +1 for control byte, then size bytes
-                                          */
+    uint16_t tx_end   = tx_start + size;
+
+    enc28j60_write_register(self, EWRPTL, (uint8_t)(tx_start & 0xFF));
+    enc28j60_write_register(self, EWRPTH, (uint8_t)(tx_start >> 8));
 
     enc28j60_write_register(self, ETXNDL, (uint8_t)(tx_end & 0xFF));
     enc28j60_write_register(self, ETXNDH, (uint8_t)(tx_end >> 8));
