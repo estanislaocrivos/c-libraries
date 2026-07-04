@@ -38,6 +38,15 @@ struct ip_rx_metadata
     uint16_t              payload_size;
 };
 
+struct ip_tx_metadata
+{
+    enum ip_version       version;
+    enum ip_pld_prot_type pld_prot_type;
+    uint8_t               dest_ip[4];
+    const uint8_t*        payload;
+    uint16_t              payload_size;
+};
+
 /**
  * @brief Process an IPv4 frame.
  * @param self Pointer to the ip object instance.
@@ -62,6 +71,12 @@ int8_t ip_process_frame(
  * @return bool Returns true if the packet is for this node, false otherwise.
  */
 bool ip_is_pkt_for_me(const struct ip* self, const struct ip_rx_metadata* mdata);
+
+int8_t ip_build_frame(
+    const struct ip*       self,
+    struct ip_tx_metadata* mdata,
+    uint8_t*               tx_frame,
+    uint16_t*              tx_frame_size);
 
 /* ========================================================================== */
 
