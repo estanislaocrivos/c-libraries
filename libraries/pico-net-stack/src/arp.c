@@ -41,7 +41,7 @@ int8_t arp_process_frame(
     {
         return -EFAULT;
     }
-    if (rx_frame_size < ARP_FRAME_SIZE)
+    if (rx_frame_size < ARP_PACKET_SIZE)
     {
         return -EINVAL;
     }
@@ -144,7 +144,7 @@ int8_t arp_build_frame(
     memcpy(tx_frame + SRC_MAC_ADDR_FRAME_OFST, self->mac_addr, 6);
     memcpy(tx_frame + SRC_IP_ADDR_FRAME_OFST, self->ip_addr, 4);
 
-    *tx_frame_size = ARP_FRAME_SIZE;
+    *tx_frame_size = ARP_PACKET_SIZE;
     return 0;
 }
 
