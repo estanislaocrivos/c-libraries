@@ -56,18 +56,14 @@ int8_t icmp_build_frame(
     const struct icmp*       self,
     struct icmp_tx_metadata* mdata,
     uint8_t*                 tx_frame,
-    uint16_t                 tx_frame_size)
+    uint16_t*                tx_frame_size)
 {
     if (self == NULL || mdata == NULL || tx_frame == NULL)
     {
         return -EFAULT;
     }
 
-    uint16_t required = ICMP_HDR_SIZE + mdata->payload_size;
-    if (tx_frame_size < required)
-    {
-        return -EINVAL;
-    }
+    *tx_frame_size = ICMP_HDR_SIZE + mdata->payload_size;
 
     tx_frame[ICMP_TYPE_OFST]         = mdata->type;
     tx_frame[ICMP_CODE_OFST]         = mdata->code;
@@ -83,8 +79,8 @@ int8_t icmp_build_frame(
         memcpy(tx_frame + ICMP_DATA_OFST, mdata->payload, mdata->payload_size);
     }
 
-    uint16_t checksum            = compute_inet_checksum(tx_frame, required);
-    tx_frame[ICMP_CHECKSUM_OFST] = (uint8_t)(checksum >> 8);
+    uint16_t checksum = compute_inet_checksum(tx_frame, *tx_frame_size);
+    tx_frame[ICMP_CHECKSUM_OFST]     = (uint8_t)(checksum >> 8);
     tx_frame[ICMP_CHECKSUM_OFST + 1] = (uint8_t)(checksum & 0xFF);
 
     return 0;
