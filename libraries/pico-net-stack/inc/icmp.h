@@ -42,6 +42,6 @@ int8_t icmp_build_frame(
     const struct icmp*       self,
     struct icmp_tx_metadata* mdata,
     uint8_t*                 tx_frame,
-    uint16_t                 tx_frame_size);
+    uint16_t*                tx_frame_size);
 
 #endif
