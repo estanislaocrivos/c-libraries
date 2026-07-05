@@ -1,176 +1,151 @@
 #include "../inc/hd44780.h"
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
 #include "../../inc/errno.h"
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-static void _lcd_command_assert_seq(const struct lcd* self)
+static void hd44780_command_assert_seq(const struct hd44780* self)
 {
-    self->_bus->rs.ops->set_state(&self->_bus->rs, false);
-    self->_bus->en.ops->set_state(&self->_bus->en, true);
-    self->_delay->ops->delay_ms(self->_delay, 10);
-    self->_bus->en.ops->set_state(&self->_bus->en, false);
+    self->ops->write_rs(self, false);
+    self->ops->write_en(self, true);
+    self->tmr->ops->delay_ms(self->tmr, 10);
+    self->ops->write_en(self, false);
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-static void _lcd_data_assert_seq(const struct lcd* self)
+static void hd44780_data_assert_seq(const struct hd44780* self)
 {
-    self->_bus->rs.ops->set_state(&self->_bus->rs, true);
-    self->_bus->en.ops->set_state(&self->_bus->en, true);
-    self->_delay->ops->delay_ms(self->_delay, 10);
-    self->_bus->en.ops->set_state(&self->_bus->en, false);
+    self->ops->write_rs(self, true);
+    self->ops->write_en(self, true);
+    self->tmr->ops->delay_ms(self->tmr, 10);
+    self->ops->write_en(self, false);
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-static void _lcd_send_nibble(const struct lcd* self, uint8_t nibble)
+static void hd44780_send_command(const struct hd44780* self, uint8_t command)
 {
-    self->_bus->d4.ops->set_state(&self->_bus->d4, (nibble >> 0) & 0x01);
-    self->_bus->d5.ops->set_state(&self->_bus->d5, (nibble >> 1) & 0x01);
-    self->_bus->d6.ops->set_state(&self->_bus->d6, (nibble >> 2) & 0x01);
-    self->_bus->d7.ops->set_state(&self->_bus->d7, (nibble >> 3) & 0x01);
+    self->ops->write_nibble(self, (command >> 4) & 0x0F);
+    hd44780_command_assert_seq(self);
+    self->ops->write_nibble(self, (command) & 0x0F);
+    hd44780_command_assert_seq(self);
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-static void _lcd_send_command(const struct lcd* self, uint8_t command)
+static void hd44780_send_char(const struct hd44780* self, char character)
 {
-    _lcd_send_nibble(self, (command >> 4) & 0x0F);
-    _lcd_command_assert_seq(self);
-    _lcd_send_nibble(self, command & 0x0F);
-    _lcd_command_assert_seq(self);
+    self->ops->write_nibble(self, (character >> 4) & 0x0F);
+    hd44780_data_assert_seq(self);
+    self->ops->write_nibble(self, character & 0x0F);
+    hd44780_data_assert_seq(self);
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-static void _lcd_send_char(const struct lcd* self, char character)
-{
-    _lcd_send_nibble(self, (character >> 4) & 0x0F);
-    _lcd_data_assert_seq(self);
-    _lcd_send_nibble(self, character & 0x0F);
-    _lcd_data_assert_seq(self);
-}
-
-/* ==============================================================================================
- */
-
-int8_t lcd_create(struct lcd* self)
-{
-    if (self == NULL || self->_bus == NULL || self->_delay == NULL)
-    {
-        return -EFAULT;
-    }
-    self->_initialized = false;
-    return 0;
-}
-
-/* ==============================================================================================
- */
-
-int8_t lcd_initialize(struct lcd* self)
+int8_t lcd_initialize(struct hd44780* self)
 {
     if (self == NULL)
     {
         return -EFAULT;
     }
-    self->_bus->rs.ops->set_state(&self->_bus->rs, false);
-    self->_bus->en.ops->set_state(&self->_bus->en, false);
+    self->ops->write_rs(self, false);
+    self->ops->write_en(self, false);
 
     /* Init. routine. First send only nibbles (4-bit mode not active yet) */
-    _lcd_send_nibble(self, 0x03);
-    _lcd_command_assert_seq(self);
-    self->_delay->ops->delay_ms(self->_delay, 5);
-    _lcd_send_nibble(self, 0x03);
-    _lcd_command_assert_seq(self);
-    self->_delay->ops->delay_us(self->_delay, 150);
-    _lcd_send_nibble(self, 0x03);
-    _lcd_command_assert_seq(self);
-    self->_delay->ops->delay_us(self->_delay, 150);
-    _lcd_send_nibble(self, 0x02);
-    _lcd_command_assert_seq(self);
-    self->_delay->ops->delay_us(self->_delay, 150);
+
+    self->ops->write_nibble(self, 0x03);
+    hd44780_command_assert_seq(self);
+    self->tmr->ops->delay_ms(self->tmr, 5);
+    self->ops->write_nibble(self, 0x03);
+    hd44780_command_assert_seq(self);
+    self->tmr->ops->delay_us(self->tmr, 150);
+    self->ops->write_nibble(self, 0x03);
+    hd44780_command_assert_seq(self);
+    self->tmr->ops->delay_us(self->tmr, 150);
+    self->ops->write_nibble(self, 0x02);
+    hd44780_command_assert_seq(self);
+    self->tmr->ops->delay_us(self->tmr, 150);
 
     /* Now send 8-bit commands */
-    _lcd_send_command(self, 0x28); /* Function set */
-    self->_delay->ops->delay_ms(self->_delay, 2);
-    _lcd_send_command(self, 0x08); /* Display off */
-    self->_delay->ops->delay_ms(self->_delay, 2);
-    _lcd_send_command(self, 0x01); /* Clear display */
-    self->_delay->ops->delay_ms(self->_delay, 2);
-    _lcd_send_command(self, 0x06); /* Entry mode */
-    self->_delay->ops->delay_ms(self->_delay, 2);
-    _lcd_send_command(self, 0x0C); /* Display on */
-    self->_delay->ops->delay_ms(self->_delay, 2);
-    _lcd_send_command(self, 0x01); /* Clear display */
-    self->_delay->ops->delay_ms(self->_delay, 2);
-    self->_initialized = true;
+    hd44780_send_command(self, 0x28); /* Function set */
+    self->tmr->ops->delay_ms(self->tmr, 2);
+    hd44780_send_command(self, 0x08); /* Display off */
+    self->tmr->ops->delay_ms(self->tmr, 2);
+    hd44780_send_command(self, 0x01); /* Clear display */
+    self->tmr->ops->delay_ms(self->tmr, 2);
+    hd44780_send_command(self, 0x06); /* Entry mode */
+    self->tmr->ops->delay_ms(self->tmr, 2);
+    hd44780_send_command(self, 0x0C); /* Display on */
+    self->tmr->ops->delay_ms(self->tmr, 2);
+    hd44780_send_command(self, 0x01); /* Clear display */
+    self->tmr->ops->delay_ms(self->tmr, 2);
+
+    self->was_initialized = true;
     return 0;
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-int8_t lcd_go_to_index(const struct lcd* self, uint8_t x, uint8_t y)
+int8_t lcd_go_to_index(const struct hd44780* self, uint8_t x, uint8_t y)
 {
     if (self == NULL)
     {
         return -EFAULT;
     }
+
     if (x > 15 || y > 1)
     {
         return -EINVAL;
     }
-    if (!self->_initialized)
+    if (!self->was_initialized)
     {
         return -ENOENT;
     }
+
     const uint8_t start[] = {0x80, 0x80 | 0xC0};
-    _lcd_send_command(self, start[y] + x);
+    hd44780_send_command(self, start[y] + x);
     return 0;
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-int8_t lcd_clear_display(const struct lcd* self)
+int8_t lcd_clear_display(const struct hd44780* self)
 {
     if (self == NULL)
     {
         return -EFAULT;
     }
-    if (!self->_initialized)
+    if (!self->was_initialized)
     {
         return -ENOENT;
     }
-    _lcd_send_command(self, 0x01);
+
+    hd44780_send_command(self, 0x01);
     return 0;
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
 
-int8_t lcd_print_string(const struct lcd* self, char* string)
+int8_t lcd_print_string(const struct hd44780* self, char* string)
 {
     if (self == NULL || string == NULL)
     {
         return -EFAULT;
     }
-    if (!self->_initialized)
+    if (!self->was_initialized)
     {
         return -ENOENT;
     }
+
     uint8_t char_index = 0;
     lcd_clear_display(self);
     while (*string != '\0')
@@ -181,17 +156,16 @@ int8_t lcd_print_string(const struct lcd* self, char* string)
         }
         else if (char_index == 32)
         {
-            self->_delay->ops->delay_ms(self->_delay, 500);
+            self->tmr->ops->delay_ms(self->tmr, 500);
             lcd_clear_display(self);
             lcd_go_to_index(self, 0, 0);
             char_index = 0;
         }
-        _lcd_send_char(self, *string);
+        hd44780_send_char(self, *string);
         string += 1;
         char_index += 1;
     }
     return 0;
 }
 
-/* ==============================================================================================
- */
+/* ========================================================================== */
