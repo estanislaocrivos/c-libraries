@@ -1,11 +1,10 @@
-#ifndef LCD_H
-#define LCD_H
+#ifndef HD44780_H
+#define HD44780_H
 
 /* ========================================================================== */
 
 #include "../../embedded-hal/inc/gpio.h"
 #include "../../embedded-hal/inc/timer.h"
-#include "../../inc/errno.h"
 
 /* ========================================================================== */
 
@@ -53,4 +52,4 @@ int8_t lcd_print_string(const struct lcd* self, char* string);
 
 /* ========================================================================== */
 
-#endif  // LCD_H
+#endif  // HD44780_H
