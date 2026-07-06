@@ -14,19 +14,22 @@ struct hd44780;
 
 struct hd44780_ops
 {
-    void (*write_nibble)(const struct hd44780* self, uint8_t nibble);
-    void (*write_rs)(const struct hd44780* self, bool state);
-    void (*write_en)(const struct hd44780* self, bool state);
-    void (*write_rw)(const struct hd44780* self, bool state);
+    void (*write_nibble)(
+        const struct hd44780* self, uint8_t nibble, bool command);
+};
+
+struct hd44780_private
+{
+    bool initialized;
 };
 
 struct hd44780
 {
     bool                            eight_bit_mode;
-    bool                            was_initialized;
     struct timer*                   tmr;
     void*                           ops_ctx;
     const struct hd44780_ops* const ops;
+    struct hd44780_private private;
 };
 
 /* ========================================================================== */
@@ -47,4 +50,4 @@ int8_t lcd_print_string(const struct hd44780* self, char* string);
 
 /* ========================================================================== */
 
-#endif  // HD44780_H
+#endif /* HD44780_H */

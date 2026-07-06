@@ -11,6 +11,7 @@
 
 /* ========================================================================== */
 
+#if 0
 static void hd44780_command_assert_seq(const struct hd44780* self)
 {
     self->ops->write_rs(self, false);
@@ -28,51 +29,42 @@ static void hd44780_data_assert_seq(const struct hd44780* self)
     self->tmr->ops->delay_ms(self->tmr, 10);
     self->ops->write_en(self, false);
 }
+#endif
 
 /* ========================================================================== */
 
 static void hd44780_send_command(const struct hd44780* self, uint8_t command)
 {
-    self->ops->write_nibble(self, (command >> 4) & 0x0F);
-    hd44780_command_assert_seq(self);
-    self->ops->write_nibble(self, (command) & 0x0F);
-    hd44780_command_assert_seq(self);
+    self->ops->write_nibble(self, (command >> 4) & 0x0F, true);
+    self->ops->write_nibble(self, (command) & 0x0F, true);
 }
 
 /* ========================================================================== */
 
 static void hd44780_send_char(const struct hd44780* self, char character)
 {
-    self->ops->write_nibble(self, (character >> 4) & 0x0F);
-    hd44780_data_assert_seq(self);
-    self->ops->write_nibble(self, character & 0x0F);
-    hd44780_data_assert_seq(self);
+    self->ops->write_nibble(self, (character >> 4) & 0x0F, false);
+    self->ops->write_nibble(self, character & 0x0F, false);
 }
 
 /* ========================================================================== */
 
 int8_t lcd_initialize(struct hd44780* self)
 {
-    if (self == NULL)
+    if (self == NULL || self->ops->write_nibble == NULL
+        || self->tmr->ops->delay_ms == NULL || self->tmr->ops->delay_us == NULL)
     {
         return -EFAULT;
     }
-    self->ops->write_rs(self, false);
-    self->ops->write_en(self, false);
 
     /* Init. routine. First send only nibbles (4-bit mode not active yet) */
-
-    self->ops->write_nibble(self, 0x03);
-    hd44780_command_assert_seq(self);
+    self->ops->write_nibble(self, 0x03, true);
     self->tmr->ops->delay_ms(self->tmr, 5);
-    self->ops->write_nibble(self, 0x03);
-    hd44780_command_assert_seq(self);
+    self->ops->write_nibble(self, 0x03, true);
     self->tmr->ops->delay_us(self->tmr, 150);
-    self->ops->write_nibble(self, 0x03);
-    hd44780_command_assert_seq(self);
+    self->ops->write_nibble(self, 0x03, true);
     self->tmr->ops->delay_us(self->tmr, 150);
-    self->ops->write_nibble(self, 0x02);
-    hd44780_command_assert_seq(self);
+    self->ops->write_nibble(self, 0x02, true);
     self->tmr->ops->delay_us(self->tmr, 150);
 
     /* Now send 8-bit commands */
@@ -89,7 +81,7 @@ int8_t lcd_initialize(struct hd44780* self)
     hd44780_send_command(self, 0x01); /* Clear display */
     self->tmr->ops->delay_ms(self->tmr, 2);
 
-    self->was_initialized = true;
+    self->private.initialized = true;
     return 0;
 }
 
@@ -106,7 +98,7 @@ int8_t lcd_go_to_index(const struct hd44780* self, uint8_t x, uint8_t y)
     {
         return -EINVAL;
     }
-    if (!self->was_initialized)
+    if (!self->private.initialized)
     {
         return -ENOENT;
     }
@@ -124,7 +116,7 @@ int8_t lcd_clear_display(const struct hd44780* self)
     {
         return -EFAULT;
     }
-    if (!self->was_initialized)
+    if (!self->private.initialized)
     {
         return -ENOENT;
     }
@@ -141,7 +133,7 @@ int8_t lcd_print_string(const struct hd44780* self, char* string)
     {
         return -EFAULT;
     }
-    if (!self->was_initialized)
+    if (!self->private.initialized)
     {
         return -ENOENT;
     }
