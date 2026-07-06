@@ -25,7 +25,6 @@ struct hd44780_private
 
 struct hd44780
 {
-    bool                            eight_bit_mode;
     struct timer*                   tmr;
     void*                           ops_ctx;
     const struct hd44780_ops* const ops;
