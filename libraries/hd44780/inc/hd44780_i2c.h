@@ -3,7 +3,6 @@
 
 /* ========================================================================== */
 
-#include "../../embedded-hal/inc/gpio.h"
 #include "../../embedded-hal/inc/i2c.h"
 #include "hd44780.h"
 
@@ -11,8 +10,7 @@
 
 struct hd44780_pcf8574_ctx
 {
-    struct i2c*  i2c_bus;
-    struct gpio* enable;
+    struct i2c* i2c_bus;
 };
 
 /* ========================================================================== */
