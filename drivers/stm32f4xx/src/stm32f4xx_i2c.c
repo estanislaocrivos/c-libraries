@@ -66,7 +66,9 @@ static int8_t wait_sr1(I2C_TypeDef* p, uint32_t flag)
  * dir: 0 = write, 1 = read. */
 static int8_t send_start_addr(I2C_TypeDef* p, uint16_t slave_addr, uint8_t dir)
 {
-    while (p->SR2 & I2C_SR2_BUSY) {}
+    while (p->SR2 & I2C_SR2_BUSY)
+    {
+    }
 
     p->CR1 |= I2C_CR1_START;
 
@@ -119,7 +121,7 @@ static int8_t initialize_ctx(struct i2c_ctx* ctx, struct i2c* s)
     p->CR1 &= ~I2C_CR1_SWRST;
 
     uint32_t pclk_mhz = ctx->pclk_hz / 1000000UL;
-    p->CR2             = pclk_mhz & 0x3FU;
+    p->CR2            = pclk_mhz & 0x3FU;
 
     if (s->frequency <= I2C_STANDARD_MAX_HZ)
     {
@@ -133,19 +135,20 @@ static int8_t initialize_ctx(struct i2c_ctx* ctx, struct i2c* s)
     }
     else
     {
-        /* Fast mode, 2:1 duty cycle (DUTY=0): Thigh=CCR*Tpclk, Tlow=2*CCR*Tpclk */
+        /* Fast mode, 2:1 duty cycle (DUTY=0): Thigh=CCR*Tpclk, Tlow=2*CCR*Tpclk
+         */
         uint32_t ccr = ctx->pclk_hz / (3U * s->frequency);
         if (ccr < 1U)
         {
             ccr = 1U;
         }
-        p->CCR   = I2C_CCR_FS | (ccr & 0xFFFU);
+        p->CCR = I2C_CCR_FS | (ccr & 0xFFFU);
         /* Max rise time in fast mode is 300 ns */
         p->TRISE = pclk_mhz * 3U / 10U + 1U;
     }
 
     p->OAR1 = (uint32_t)((s->own_address & 0x7FU) << 1);
-    p->CR1  |= I2C_CR1_PE | I2C_CR1_ACK;
+    p->CR1 |= I2C_CR1_PE | I2C_CR1_ACK;
 
     s->was_initialized = true;
     return 0;
@@ -247,7 +250,8 @@ static int8_t read_ctx(
 
     if (rx_payload_size == 1U)
     {
-        /* Disable ACK before clearing ADDR so the NACK is sent after the byte */
+        /* Disable ACK before clearing ADDR so the NACK is sent after the byte
+         */
         p->CR1 &= ~I2C_CR1_ACK;
         err = wait_sr1(p, I2C_SR1_ADDR);
         if (err)
@@ -265,7 +269,7 @@ static int8_t read_ctx(
             return err;
         }
         rx_payload[0] = (uint8_t)p->DR;
-        p->CR1        |= I2C_CR1_ACK;
+        p->CR1 |= I2C_CR1_ACK;
         return 0;
     }
 
@@ -358,12 +362,14 @@ static int8_t read_raw_ctx(
         return -EINVAL;
     }
 
-    I2C_TypeDef* p   = ctx->periph;
+    I2C_TypeDef* p = ctx->periph;
     int8_t       err;
 
     if (rx_payload_size == 1U)
     {
-        while (p->SR2 & I2C_SR2_BUSY) {}
+        while (p->SR2 & I2C_SR2_BUSY)
+        {
+        }
         p->CR1 &= ~I2C_CR1_ACK;
         p->CR1 |= I2C_CR1_START;
         err = wait_sr1(p, I2C_SR1_SB);
@@ -389,7 +395,7 @@ static int8_t read_raw_ctx(
             return err;
         }
         rx_payload[0] = (uint8_t)p->DR;
-        p->CR1        |= I2C_CR1_ACK;
+        p->CR1 |= I2C_CR1_ACK;
         return 0;
     }
 
@@ -425,7 +431,9 @@ static int8_t probe_ctx(const struct i2c_ctx* ctx, const struct i2c* s)
 {
     I2C_TypeDef* p = ctx->periph;
 
-    while (p->SR2 & I2C_SR2_BUSY) {}
+    while (p->SR2 & I2C_SR2_BUSY)
+    {
+    }
 
     p->CR1 |= I2C_CR1_START;
 
@@ -474,7 +482,8 @@ static int8_t i2c1_write(
     const uint8_t*    tx_payload,
     size_t            tx_payload_size)
 {
-    return write_ctx(&g_i2c1_ctx, self, reg_address, tx_payload, tx_payload_size);
+    return write_ctx(
+        &g_i2c1_ctx, self, reg_address, tx_payload, tx_payload_size);
 }
 
 static int8_t i2c1_read(
@@ -483,7 +492,8 @@ static int8_t i2c1_read(
     uint8_t*          rx_payload,
     size_t            rx_payload_size)
 {
-    return read_ctx(&g_i2c1_ctx, self, reg_address, rx_payload, rx_payload_size);
+    return read_ctx(
+        &g_i2c1_ctx, self, reg_address, rx_payload, rx_payload_size);
 }
 
 static int8_t i2c1_write_raw(
@@ -526,7 +536,8 @@ static int8_t i2c2_write(
     const uint8_t*    tx_payload,
     size_t            tx_payload_size)
 {
-    return write_ctx(&g_i2c2_ctx, self, reg_address, tx_payload, tx_payload_size);
+    return write_ctx(
+        &g_i2c2_ctx, self, reg_address, tx_payload, tx_payload_size);
 }
 
 static int8_t i2c2_read(
@@ -535,7 +546,8 @@ static int8_t i2c2_read(
     uint8_t*          rx_payload,
     size_t            rx_payload_size)
 {
-    return read_ctx(&g_i2c2_ctx, self, reg_address, rx_payload, rx_payload_size);
+    return read_ctx(
+        &g_i2c2_ctx, self, reg_address, rx_payload, rx_payload_size);
 }
 
 static int8_t i2c2_write_raw(
@@ -578,7 +590,8 @@ static int8_t i2c3_write(
     const uint8_t*    tx_payload,
     size_t            tx_payload_size)
 {
-    return write_ctx(&g_i2c3_ctx, self, reg_address, tx_payload, tx_payload_size);
+    return write_ctx(
+        &g_i2c3_ctx, self, reg_address, tx_payload, tx_payload_size);
 }
 
 static int8_t i2c3_read(
@@ -587,7 +600,8 @@ static int8_t i2c3_read(
     uint8_t*          rx_payload,
     size_t            rx_payload_size)
 {
-    return read_ctx(&g_i2c3_ctx, self, reg_address, rx_payload, rx_payload_size);
+    return read_ctx(
+        &g_i2c3_ctx, self, reg_address, rx_payload, rx_payload_size);
 }
 
 static int8_t i2c3_write_raw(
