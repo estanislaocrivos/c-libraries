@@ -23,7 +23,7 @@ struct hd44780_gpio_ctx
 /**
  * @brief Write a nibble to an HD44780 via parallel GPIO bus.
  * @param self Pointer to the hd44780 instance. ops_ctx must point to a valid
- * struct hd44780_pcf8574_ctx.
+ * struct hd44780_gpio_ctx.
  * @param nibble Lower 4 bits are written to D4-D7.
  * @param command true for command mode (RS=0), false for data mode (RS=1).
  */

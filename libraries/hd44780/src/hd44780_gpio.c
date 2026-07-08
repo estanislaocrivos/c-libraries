@@ -28,6 +28,7 @@ void hd44780_gpio_write_nibble(
     ctx->en->ops->set_state(ctx->en, true);
     self->tmr->ops->delay_us(self->tmr, 1);
     ctx->en->ops->set_state(ctx->en, false);
+    self->tmr->ops->delay_us(self->tmr, 1);
 }
 
 /* ========================================================================== */

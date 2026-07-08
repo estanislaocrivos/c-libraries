@@ -11,28 +11,6 @@
 
 /* ========================================================================== */
 
-#if 0
-static void hd44780_command_assert_seq(const struct hd44780* self)
-{
-    self->ops->write_rs(self, false);
-    self->ops->write_en(self, true);
-    self->tmr->ops->delay_ms(self->tmr, 10);
-    self->ops->write_en(self, false);
-}
-
-/* ========================================================================== */
-
-static void hd44780_data_assert_seq(const struct hd44780* self)
-{
-    self->ops->write_rs(self, true);
-    self->ops->write_en(self, true);
-    self->tmr->ops->delay_ms(self->tmr, 10);
-    self->ops->write_en(self, false);
-}
-#endif
-
-/* ========================================================================== */
-
 static void hd44780_send_command(const struct hd44780* self, uint8_t command)
 {
     self->ops->write_nibble(self, (command >> 4) & 0x0F, true);
