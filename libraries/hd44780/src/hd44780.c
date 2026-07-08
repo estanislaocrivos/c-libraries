@@ -122,6 +122,7 @@ int8_t lcd_clear_display(const struct hd44780* self)
     }
 
     hd44780_send_command(self, 0x01);
+    self->tmr->ops->delay_ms(self->tmr, 2);
     return 0;
 }
 

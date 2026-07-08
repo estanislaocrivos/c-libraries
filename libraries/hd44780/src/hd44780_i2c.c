@@ -6,9 +6,10 @@
 
 /* ========================================================================== */
 
-#define HD44780_EN_PIN_PCF8574_MASK 0x04
-#define HD44780_RW_PIN_PCF8574_MASK 0x02 /* Low for write (defult) */
-#define HD44780_RS_PIN_PCF8574_MASK 0x01
+#define HD44780_BACKLIGHT_PIN_PCF8574_MASK 0x08
+#define HD44780_EN_PIN_PCF8574_MASK        0x04
+#define HD44780_RW_PIN_PCF8574_MASK        0x02 /* Low for write (defult) */
+#define HD44780_RS_PIN_PCF8574_MASK        0x01
 
 /* ========================================================================== */
 
@@ -18,7 +19,7 @@ void hd44780_pcf8574_write_nibble(
     struct hd44780_pcf8574_ctx* ctx
         = (struct hd44780_pcf8574_ctx*)(self->ops_ctx);
 
-    uint8_t byte = (uint8_t)(nibble << 4);
+    uint8_t byte = (uint8_t)(nibble << 4) | HD44780_BACKLIGHT_PIN_PCF8574_MASK;
     if (!command)
     {
         byte |= HD44780_RS_PIN_PCF8574_MASK;
