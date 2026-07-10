@@ -38,7 +38,6 @@ int8_t udp_process_frame(
            IP_PLD_PROT_UDP_VAL,
            (uint8_t)(rx_frame[UDP_LENGTH_FRAME_OFST]),
            (uint8_t)(rx_frame[UDP_LENGTH_FRAME_OFST + 1])};
-
     struct slice frame_slice[]
         = {{.base = self->ip->mdata->src_ip, .len = 4},
            {.base = self->ip->mdata->dest_ip, .len = 4},
