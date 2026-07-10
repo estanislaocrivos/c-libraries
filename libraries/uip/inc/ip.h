@@ -48,6 +48,7 @@ struct ip_tx_metadata
     enum ip_version       version;
     enum ip_pld_prot_type pld_prot_type;
     uint8_t               dest_ip[4];
+    uint8_t               src_ip[4];
     const uint8_t*        payload;
     uint16_t              payload_size;
 };

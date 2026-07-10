@@ -189,7 +189,7 @@ int8_t ip_build_frame(
         }
     }
 
-    memcpy(tx_frame + IP_SRC_IP_FRAME_OFST, self->ip_addr, 4);
+    memcpy(tx_frame + IP_SRC_IP_FRAME_OFST, mdata->src_ip, 4);
     memcpy(tx_frame + IP_DEST_IP_FRAME_OFST, mdata->dest_ip, 4);
 
     tx_frame[IP_CHECKSUM_FRAME_OFST]     = 0;
