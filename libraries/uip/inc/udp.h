@@ -10,7 +10,8 @@
 
 struct udp
 {
-    uint16_t lost_frames;
+    uint16_t   lost_frames;
+    struct ip* ip;
 };
 
 struct udp_rx_metadata
@@ -24,7 +25,7 @@ struct udp_rx_metadata
 /* ========================================================================== */
 
 int8_t udp_process_frame(
-    const struct udp*       self,
+    struct udp*             self,
     const uint8_t*          rx_frame,
     uint16_t                rx_frame_size,
     struct udp_rx_metadata* mdata);
