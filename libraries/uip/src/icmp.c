@@ -18,7 +18,7 @@
 /* ========================================================================== */
 
 int8_t icmp_process_frame(
-    const struct icmp*       self,
+    struct icmp*             self,
     const uint8_t*           rx_frame,
     uint16_t                 rx_frame_size,
     struct icmp_rx_metadata* mdata)
@@ -30,11 +30,13 @@ int8_t icmp_process_frame(
 
     if (rx_frame_size < ICMP_HDR_SIZE)
     {
+        self->lost_frames += 1;
         return -EINVAL;
     }
 
     if (compute_inet_checksum(rx_frame, rx_frame_size) != 0)
     {
+        self->lost_frames += 1;
         return -EINVAL;
     }
 
