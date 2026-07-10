@@ -11,6 +11,8 @@
 
 #define UDP_HEADER_SIZE          8
 
+#define IP_PLD_PROT_UDP_VAL      (uint8_t)17
+
 #define UDP_SRC_PORT_FRAME_OFST  0 /* 2 bytes */
 #define UDP_DEST_PORT_FRAME_OFST 2 /* 2 bytes */
 #define UDP_LENGTH_FRAME_OFST    4 /* 2 bytes */
@@ -31,10 +33,18 @@ int8_t udp_process_frame(
         return -EFAULT;
     }
 
-    struct slice frame_slice = {.base = rx_frame, .len = rx_frame_size};
+    uint8_t udp_pseudo_header[4]
+        = {0,
+           IP_PLD_PROT_UDP_VAL,
+           (uint8_t)(rx_frame[UDP_LENGTH_FRAME_OFST]),
+           (uint8_t)(rx_frame[UDP_LENGTH_FRAME_OFST + 1])};
 
-    /* Add IP addrs. before checksum (pseudo header) */
-    if (compute_inet_checksum(&frame_slice, 1) != 0)
+    struct slice frame_slice[]
+        = {{.base = self->ip->mdata->src_ip, .len = 4},
+           {.base = self->ip->mdata->dest_ip, .len = 4},
+           {.base = udp_pseudo_header, .len = sizeof(udp_pseudo_header)},
+           {.base = rx_frame, .len = rx_frame_size}};
+    if (compute_inet_checksum(frame_slice, 4) != 0)
     {
         self->lost_frames += 1;
         return -EINVAL;
