@@ -41,11 +41,11 @@ int8_t udp_process_frame(
     uint16_t                rx_frame_size,
     struct udp_rx_metadata* mdata);
 
-int8_t udp_buid_frame(
+int8_t udp_build_frame(
     struct udp*             self,
-    struct udp_rx_metadata* mdata,
+    struct udp_tx_metadata* mdata,
     uint8_t*                tx_frame,
-    uint16_t                tx_frame_size);
+    uint16_t*               tx_frame_size);
 
 /* ========================================================================== */
 

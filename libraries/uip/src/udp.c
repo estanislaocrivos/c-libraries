@@ -7,6 +7,7 @@
 #include "ip.h"
 
 #include <stddef.h>
+#include <string.h>
 
 /* ========================================================================== */
 
@@ -77,12 +78,38 @@ int8_t udp_process_frame(
 
 /* ========================================================================== */
 
-int8_t udp_buid_frame(
+int8_t udp_build_frame(
     struct udp*             self,
-    struct udp_rx_metadata* mdata,
+    struct udp_tx_metadata* mdata,
     uint8_t*                tx_frame,
-    uint16_t                tx_frame_size)
+    uint16_t*               tx_frame_size)
 {
+    if (self == NULL || mdata == NULL || tx_frame == NULL
+        || tx_frame_size == NULL)
+    {
+        return -EFAULT;
+    }
+
+    uint16_t udp_len = UDP_HEADER_SIZE + mdata->payload_size;
+
+    tx_frame[UDP_SRC_PORT_FRAME_OFST]     = (uint8_t)(mdata->src_port_num >> 8);
+    tx_frame[UDP_SRC_PORT_FRAME_OFST + 1] = (uint8_t)(mdata->src_port_num);
+    tx_frame[UDP_DEST_PORT_FRAME_OFST] = (uint8_t)(mdata->dest_port_num >> 8);
+    tx_frame[UDP_DEST_PORT_FRAME_OFST + 1] = (uint8_t)(mdata->dest_port_num);
+    tx_frame[UDP_LENGTH_FRAME_OFST]        = (uint8_t)(udp_len >> 8);
+    tx_frame[UDP_LENGTH_FRAME_OFST + 1]    = (uint8_t)(udp_len);
+    tx_frame[UDP_CHECKSUM_FRAME_OFST]      = 0;
+    tx_frame[UDP_CHECKSUM_FRAME_OFST + 1]  = 0;
+
+    memcpy(
+        tx_frame + UDP_PAYLOAD_FRAME_OFST, mdata->payload, mdata->payload_size);
+
+    uint16_t checksum = compute_udp_checksum(
+        mdata->ip_mdata->src_ip, mdata->ip_mdata->dest_ip, tx_frame, udp_len);
+    tx_frame[UDP_CHECKSUM_FRAME_OFST]     = (uint8_t)(checksum >> 8);
+    tx_frame[UDP_CHECKSUM_FRAME_OFST + 1] = (uint8_t)(checksum);
+
+    *tx_frame_size = udp_len;
     return 0;
 }
 
