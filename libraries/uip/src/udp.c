@@ -31,8 +31,10 @@ int8_t udp_process_frame(
         return -EFAULT;
     }
 
+    struct slice frame_slice = {.base = rx_frame, .len = rx_frame_size};
+
     /* Add IP addrs. before checksum (pseudo header) */
-    if (compute_inet_checksum(rx_frame, rx_frame_size) != 0)
+    if (compute_inet_checksum(&frame_slice, 1) != 0)
     {
         self->lost_frames += 1;
         return -EINVAL;

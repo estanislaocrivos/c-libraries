@@ -34,7 +34,9 @@ int8_t icmp_process_frame(
         return -EINVAL;
     }
 
-    if (compute_inet_checksum(rx_frame, rx_frame_size) != 0)
+    struct slice frame_slice = {.base = rx_frame, .len = rx_frame_size};
+
+    if (compute_inet_checksum(&frame_slice, 1) != 0)
     {
         self->lost_frames += 1;
         return -EINVAL;
@@ -81,7 +83,9 @@ int8_t icmp_build_frame(
         memcpy(tx_frame + ICMP_DATA_OFST, mdata->payload, mdata->payload_size);
     }
 
-    uint16_t checksum = compute_inet_checksum(tx_frame, *tx_frame_size);
+    struct slice frame_slice = {.base = tx_frame, .len = *tx_frame_size};
+
+    uint16_t checksum                = compute_inet_checksum(&frame_slice, 1);
     tx_frame[ICMP_CHECKSUM_OFST]     = (uint8_t)(checksum >> 8);
     tx_frame[ICMP_CHECKSUM_OFST + 1] = (uint8_t)(checksum & 0xFF);
 
