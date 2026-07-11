@@ -466,10 +466,23 @@ int8_t enc28j60_transmit_packet(
 
     enc28j60_set_eth_bit(self, ECON1, 0x08, true);
 
-    bool txrts = true;
+    bool txrts  = true;
+    bool txerif = false;
     while (txrts)
     {
         enc28j60_get_bit(self, ECON1, 0x08, &txrts);
+        enc28j60_get_bit(self, EIR, 0x02, &txerif);
+        if (txerif)
+        {
+            /* Errata #12: reset transmitter, clear error flag, retry once */
+            enc28j60_set_eth_bit(self, ECON1, 0x80, true);
+            enc28j60_set_eth_bit(self, ECON1, 0x80, false);
+            enc28j60_set_eth_bit(self, EIR, 0x02, false);
+
+            /* Retry */
+            enc28j60_set_eth_bit(self, ECON1, 0x08, true);
+            txerif = false;
+        }
     }
 
     return 0;
