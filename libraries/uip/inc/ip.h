@@ -29,8 +29,7 @@ enum ip_version
 
 struct ip
 {
-    uint8_t                ip_addr[4];
-    struct ip_rx_metadata* mdata;
+    uint8_t ip_addr[4];
 };
 
 struct ip_rx_metadata
