@@ -42,6 +42,8 @@ struct arp_tx_metadata
     uint8_t          dest_mac_addr[6];
 };
 
+/* ========================================================================== */
+
 /**
  * @brief Process an ARP frame.
  * @param self Pointer to the arp object instance.

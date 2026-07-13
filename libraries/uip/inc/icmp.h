@@ -38,6 +38,8 @@ struct icmp_tx_metadata
     uint16_t       payload_size;
 };
 
+/* ========================================================================== */
+
 /**
  * @brief Process an ICMP frame. Verifies the Internet checksum over the entire
  * frame and extracts header fields and payload pointer.

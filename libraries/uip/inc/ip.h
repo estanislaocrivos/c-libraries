@@ -52,6 +52,8 @@ struct ip_tx_metadata
     uint16_t              payload_size;
 };
 
+/* ========================================================================== */
+
 /**
  * @brief Process an IPv4 frame.
  * @param self Pointer to the ip object instance.

@@ -13,6 +13,8 @@ struct slice
     uint16_t       len;
 };
 
+/* ========================================================================== */
+
 /**
  * @brief Compute the Internet checksum (RFC 1071) over a byte buffer. The
  * checksum field within the buffer must be zeroed by the caller before

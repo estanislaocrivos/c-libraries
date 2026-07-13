@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+/* ========================================================================== */
+
 uint16_t compute_inet_checksum(
     const struct slice* frame_slice, uint8_t slice_count)
 {
@@ -39,3 +41,5 @@ uint16_t compute_inet_checksum(
     /* Return the final one's complement */
     return (uint16_t)(~acc);
 }
+
+/* ========================================================================== */

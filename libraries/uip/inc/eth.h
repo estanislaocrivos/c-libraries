@@ -11,6 +11,8 @@
 #define MAX_ETH_FRAME_SIZE  1518
 #define MAX_ETH_HEADER_SIZE 14
 
+/* ========================================================================== */
+
 enum eth_payload_type
 {
     ETH_PLD_IPV4,
@@ -50,6 +52,8 @@ struct eth_tx_metadata
     const uint8_t*        payload;
     uint16_t              payload_size;
 };
+
+/* ========================================================================== */
 
 /**
  * @brief Process an ethernet frame.
