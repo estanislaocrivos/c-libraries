@@ -7,12 +7,65 @@
 
 /* ========================================================================== */
 
+enum enc28j60_mem_bank
+{
+    BANK_0  = 0x00,
+    BANK_1  = 0x01,
+    BANK_2  = 0x02,
+    BANK_3  = 0x03,
+    NO_BANK = 0xFF,
+};
+
+typedef uint16_t enc28j60_reg_t;
+
+#define MIREGADR             ((enc28j60_reg_t)(BANK_2 << 8) | 0x14)
+#define MIWRL                ((enc28j60_reg_t)(BANK_2 << 8) | 0x16)
+#define MIWRH                ((enc28j60_reg_t)(BANK_2 << 8) | 0x17)
+#define MISTAT               ((enc28j60_reg_t)(BANK_3 << 8) | 0x0A)
+
+#define MACON1               ((enc28j60_reg_t)(BANK_2 << 8) | 0x00)
+#define MACON3               ((enc28j60_reg_t)(BANK_2 << 8) | 0x02)
+#define MACON4               ((enc28j60_reg_t)(BANK_2 << 8) | 0x03)
+#define MABBIPG              ((enc28j60_reg_t)(BANK_2 << 8) | 0x04)
+#define MAIPGL               ((enc28j60_reg_t)(BANK_2 << 8) | 0x06)
+#define MAIPGH               ((enc28j60_reg_t)(BANK_2 << 8) | 0x07)
+#define MAADR1               ((enc28j60_reg_t)(BANK_3 << 8) | 0x04)
+#define MAADR2               ((enc28j60_reg_t)(BANK_3 << 8) | 0x05)
+#define MAADR3               ((enc28j60_reg_t)(BANK_3 << 8) | 0x02)
+#define MAADR4               ((enc28j60_reg_t)(BANK_3 << 8) | 0x03)
+#define MAADR5               ((enc28j60_reg_t)(BANK_3 << 8) | 0x00)
+#define MAADR6               ((enc28j60_reg_t)(BANK_3 << 8) | 0x01)
+
+#define ERDPTL               ((enc28j60_reg_t)(BANK_0 << 8) | 0x00)
+#define ERDPTH               ((enc28j60_reg_t)(BANK_0 << 8) | 0x01)
+#define EWRPTL               ((enc28j60_reg_t)(BANK_0 << 8) | 0x02)
+#define EWRPTH               ((enc28j60_reg_t)(BANK_0 << 8) | 0x03)
+#define ETXSTL               ((enc28j60_reg_t)(BANK_0 << 8) | 0x04)
+#define ETXSTH               ((enc28j60_reg_t)(BANK_0 << 8) | 0x05)
+#define ETXNDL               ((enc28j60_reg_t)(BANK_0 << 8) | 0x06)
+#define ETXNDH               ((enc28j60_reg_t)(BANK_0 << 8) | 0x07)
+#define ERXSTL               ((enc28j60_reg_t)(BANK_0 << 8) | 0x08)
+#define ERXSTH               ((enc28j60_reg_t)(BANK_0 << 8) | 0x09)
+#define ERXNDL               ((enc28j60_reg_t)(BANK_0 << 8) | 0x0A)
+#define ERXNDH               ((enc28j60_reg_t)(BANK_0 << 8) | 0x0B)
+#define ERXRDPTL             ((enc28j60_reg_t)(BANK_0 << 8) | 0x0C)
+#define ERXRDPTH             ((enc28j60_reg_t)(BANK_0 << 8) | 0x0D)
+#define EREVID               ((enc28j60_reg_t)(BANK_3 << 8) | 0x12)
+#define EPKTCNT              ((enc28j60_reg_t)(BANK_1 << 8) | 0x19)
+#define EIE                  ((enc28j60_reg_t)(NO_BANK << 8) | 0x1B)
+#define EIR                  ((enc28j60_reg_t)(NO_BANK << 8) | 0x1C)
+#define ESTAT                ((enc28j60_reg_t)(NO_BANK << 8) | 0x1D)
+#define ECON2                ((enc28j60_reg_t)(NO_BANK << 8) | 0x1E)
+#define ECON1                ((enc28j60_reg_t)(NO_BANK << 8) | 0x1F)
+
+/* ========================================================================== */
+
 #define ENC28J60_RXBUF_START 0x0000U
 #define ENC28J60_TXBUF_END   0x1FFFU
 
 /* ========================================================================== */
 
-enum ENC28J60_INSTRUC_OP_CODE
+enum enc28j60_instruction_opcode
 {
     READ_CTRL_REG   = 0x00,
     READ_BUF_MEM    = 0x01,
@@ -25,18 +78,14 @@ enum ENC28J60_INSTRUC_OP_CODE
 
 /* ========================================================================== */
 
-static enum ENC28J60_MEM_BANK current_bank = 0;
-
-/* ========================================================================== */
-
 static int8_t enc28j60_select_bank(
-    const struct enc28j60* self, enum ENC28J60_MEM_BANK bank)
+    struct enc28j60* self, enum enc28j60_mem_bank bank)
 {
     if (bank == NO_BANK)
     {
         return 0;
     }
-    if (bank == current_bank)
+    if (bank == self->private.current_mem_bank)
     {
         return 0;
     }
@@ -68,7 +117,7 @@ static int8_t enc28j60_select_bank(
     }
     self->spi_cs->ops->set_state(self->spi_cs, true);
 
-    current_bank = bank;
+    self->private.current_mem_bank = (uint8_t)bank;
     return 0;
 }
 
@@ -83,7 +132,7 @@ static int8_t enc28j60_write_register(
     }
 
     int8_t                 ret  = 0;
-    enum ENC28J60_MEM_BANK bank = (enum ENC28J60_MEM_BANK)(address >> 8);
+    enum enc28j60_mem_bank bank = (enum enc28j60_mem_bank)(address >> 8);
     enc28j60_select_bank(self, bank);
 
     uint8_t tx_payload[2] = {(uint8_t)((WRITE_CTRL_REG << 5) | address), value};
@@ -111,7 +160,7 @@ static int8_t enc28j60_read_eth_register(
     }
 
     int8_t                 ret  = 0;
-    enum ENC28J60_MEM_BANK bank = (enum ENC28J60_MEM_BANK)(address >> 8);
+    enum enc28j60_mem_bank bank = (enum enc28j60_mem_bank)(address >> 8);
     enc28j60_select_bank(self, bank);
 
     uint8_t tx_payload[] = {(uint8_t)((READ_CTRL_REG << 5) | address), 0x00};
@@ -142,7 +191,7 @@ static int8_t enc28j60_set_eth_bit(
         return -EFAULT;
     }
 
-    enc28j60_select_bank(self, (enum ENC28J60_MEM_BANK)(address >> 8));
+    enc28j60_select_bank(self, (enum enc28j60_mem_bank)(address >> 8));
 
     int8_t  ret = 0;
     uint8_t tx_payload[2];
@@ -181,7 +230,7 @@ static int8_t enc28j60_read_register(
     }
 
     int8_t                 ret  = 0;
-    enum ENC28J60_MEM_BANK bank = (enum ENC28J60_MEM_BANK)(address >> 8);
+    enum enc28j60_mem_bank bank = (enum enc28j60_mem_bank)(address >> 8);
     enc28j60_select_bank(self, bank);
 
     /* Need to exchange 3 bytes */
@@ -214,7 +263,7 @@ static int8_t enc28j60_set_bit(
         return -EFAULT;
     }
 
-    enc28j60_select_bank(self, (enum ENC28J60_MEM_BANK)(address >> 8));
+    enc28j60_select_bank(self, (enum enc28j60_mem_bank)(address >> 8));
 
     uint8_t value = 0;
     enc28j60_read_register(self, address, &value);
@@ -327,8 +376,8 @@ int8_t enc28j60_init(struct enc28j60* self)
     enc28j60_mac_init(self);
     enc28j60_phy_init(self);
     enc28j60_set_eth_bit(self, ECON1, 0x04, true);
-    self->erdpt           = ENC28J60_RXBUF_START;
-    self->was_initialized = true;
+    self->private.erdpt       = ENC28J60_RXBUF_START;
+    self->private.initialized = true;
     return 0;
 }
 
@@ -355,7 +404,7 @@ int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt)
     {
         return -EFAULT;
     }
-    if (!self->was_initialized)
+    if (!self->private.initialized)
     {
         return -EPERM;
     }
@@ -376,7 +425,7 @@ int8_t enc28j60_receive_packet(
     {
         return -EFAULT;
     }
-    if (!self->was_initialized)
+    if (!self->private.initialized)
     {
         return -EPERM;
     }
@@ -388,8 +437,9 @@ int8_t enc28j60_receive_packet(
         return -ENODATA;
     }
 
-    enc28j60_write_register(self, ERDPTL, (uint8_t)(self->erdpt & 0xFF));
-    enc28j60_write_register(self, ERDPTH, (uint8_t)(self->erdpt >> 8));
+    enc28j60_write_register(
+        self, ERDPTL, (uint8_t)(self->private.erdpt & 0xFF));
+    enc28j60_write_register(self, ERDPTH, (uint8_t)(self->private.erdpt >> 8));
 
     self->spi_cs->ops->set_state(self->spi_cs, false);
 
@@ -421,7 +471,7 @@ int8_t enc28j60_receive_packet(
     enc28j60_write_register(self, ERXRDPTL, (uint8_t)(erxrdpt & 0xFF));
     enc28j60_write_register(self, ERXRDPTH, (uint8_t)(erxrdpt >> 8));
 
-    self->erdpt = next_pkt_ptr;
+    self->private.erdpt = next_pkt_ptr;
 
     enc28j60_set_eth_bit(self, ECON2, 0x40, true);
 
@@ -437,7 +487,7 @@ int8_t enc28j60_transmit_packet(
     {
         return -EFAULT;
     }
-    if (!self->was_initialized)
+    if (!self->private.initialized)
     {
         return -EPERM;
     }
