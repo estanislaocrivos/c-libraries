@@ -189,14 +189,16 @@ int8_t ip_build_frame(
         }
     }
 
-    memcpy(tx_frame + IP_SRC_IP_FRAME_OFST, self->ip_addr, 4);
+    memcpy(tx_frame + IP_SRC_IP_FRAME_OFST, mdata->src_ip, 4);
     memcpy(tx_frame + IP_DEST_IP_FRAME_OFST, mdata->dest_ip, 4);
 
     tx_frame[IP_CHECKSUM_FRAME_OFST]     = 0;
     tx_frame[IP_CHECKSUM_FRAME_OFST + 1] = 0;
 
-    uint16_t checksum = compute_inet_checksum(tx_frame, IP_MIN_HDR_SIZE);
-    tx_frame[IP_CHECKSUM_FRAME_OFST]     = (uint8_t)(checksum >> 8);
+    struct slice frame_slice = {.base = tx_frame, .len = IP_MIN_HDR_SIZE};
+
+    uint16_t checksum                = compute_inet_checksum(&frame_slice, 1);
+    tx_frame[IP_CHECKSUM_FRAME_OFST] = (uint8_t)(checksum >> 8);
     tx_frame[IP_CHECKSUM_FRAME_OFST + 1] = (uint8_t)(checksum);
 
     memcpy(

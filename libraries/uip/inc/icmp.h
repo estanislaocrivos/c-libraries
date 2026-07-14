@@ -15,7 +15,7 @@
 
 struct icmp
 {
-    int unused;
+    uint16_t lost_frames;
 };
 
 struct icmp_rx_metadata
@@ -38,6 +38,8 @@ struct icmp_tx_metadata
     uint16_t       payload_size;
 };
 
+/* ========================================================================== */
+
 /**
  * @brief Process an ICMP frame. Verifies the Internet checksum over the entire
  * frame and extracts header fields and payload pointer.
@@ -50,7 +52,7 @@ struct icmp_tx_metadata
  * @return int8_t Returns 0 in case of success, -ERRNO otherwise.
  */
 int8_t icmp_process_frame(
-    const struct icmp*       self,
+    struct icmp*             self,
     const uint8_t*           rx_frame,
     uint16_t                 rx_frame_size,
     struct icmp_rx_metadata* mdata);
