@@ -124,7 +124,7 @@ static int8_t enc28j60_select_bank(
 /* ========================================================================== */
 
 static int8_t enc28j60_write_register(
-    const struct enc28j60* self, uint16_t address, uint8_t value)
+    struct enc28j60* self, uint16_t address, uint8_t value)
 {
     if (self == NULL)
     {
@@ -152,7 +152,7 @@ done:
 /* ========================================================================== */
 
 static int8_t enc28j60_read_eth_register(
-    const struct enc28j60* self, uint16_t address, uint8_t* value)
+    struct enc28j60* self, uint16_t address, uint8_t* value)
 {
     if (self == NULL)
     {
@@ -184,7 +184,7 @@ done:
 
 /* Set bit through hardware operations. Only available for ETH registers. */
 static int8_t enc28j60_set_eth_bit(
-    const struct enc28j60* self, uint16_t address, uint8_t mask, bool state)
+    struct enc28j60* self, uint16_t address, uint8_t mask, bool state)
 {
     if (self == NULL)
     {
@@ -222,7 +222,7 @@ done:
 /* ========================================================================== */
 
 static int8_t enc28j60_read_register(
-    const struct enc28j60* self, uint16_t address, uint8_t* value)
+    struct enc28j60* self, uint16_t address, uint8_t* value)
 {
     if (self == NULL)
     {
@@ -256,7 +256,7 @@ done:
 
 /* Set bit through software operations. Available for all registers. */
 static int8_t enc28j60_set_bit(
-    const struct enc28j60* self, uint16_t address, uint8_t mask, bool state)
+    struct enc28j60* self, uint16_t address, uint8_t mask, bool state)
 {
     if (self == NULL)
     {
@@ -284,7 +284,7 @@ static int8_t enc28j60_set_bit(
 /* ========================================================================== */
 
 static int8_t enc28j60_get_bit(
-    const struct enc28j60* self, uint16_t address, uint8_t mask, bool* state)
+    struct enc28j60* self, uint16_t address, uint8_t mask, bool* state)
 {
     uint8_t value = 0;
     enc28j60_read_register(self, address, &value);
@@ -295,7 +295,7 @@ static int8_t enc28j60_get_bit(
 
 /* ========================================================================== */
 
-static int8_t enc28j60_mac_init(const struct enc28j60* self)
+static int8_t enc28j60_mac_init(struct enc28j60* self)
 {
     enc28j60_set_bit(self, MACON1, 0x01, true);
     enc28j60_set_bit(self, MACON3, 0xF0, true);
@@ -314,7 +314,7 @@ static int8_t enc28j60_mac_init(const struct enc28j60* self)
     return 0;
 }
 
-static int8_t enc28j60_phy_init(const struct enc28j60* self)
+static int8_t enc28j60_phy_init(struct enc28j60* self)
 {
     /* Configure PHY for half-duplex operation */
     enc28j60_write_register(self, MIREGADR, 0x10);
@@ -330,7 +330,7 @@ static int8_t enc28j60_phy_init(const struct enc28j60* self)
     return 0;
 }
 
-static int8_t enc28j60_rxbuf_init(const struct enc28j60* self)
+static int8_t enc28j60_rxbuf_init(struct enc28j60* self)
 {
     enc28j60_write_register(
         self, ERXSTL, (uint8_t)(ENC28J60_RXBUF_START & 0xFF));
@@ -346,7 +346,7 @@ static int8_t enc28j60_rxbuf_init(const struct enc28j60* self)
     return 0;
 }
 
-static int8_t enc28j60_txbuf_init(const struct enc28j60* self)
+static int8_t enc28j60_txbuf_init(struct enc28j60* self)
 {
     enc28j60_write_register(
         self, ETXSTL, (uint8_t)((self->rx_buf_end_addr + 1) & 0xFF));
@@ -398,7 +398,7 @@ int8_t enc28j60_reset(const struct enc28j60* self)
     return 0;
 }
 
-int8_t enc28j60_get_epktcnt(const struct enc28j60* self, uint8_t* epktcnt)
+int8_t enc28j60_get_epktcnt(struct enc28j60* self, uint8_t* epktcnt)
 {
     if (self == NULL)
     {
@@ -450,15 +450,13 @@ int8_t enc28j60_receive_packet(
 
     /* Read first 6 bytes corresponding to next pkt pointer and receive status
      * vector */
-    uint8_t rx_buffer[6] = {};
+    uint8_t rx_buffer[6] = {0};
     self->spi_bus->ops->transfer(
         self->spi_bus, rx_buffer, rx_buffer, sizeof(rx_buffer));
 
-    uint16_t next_pkt_ptr = ((uint16_t)(rx_buffer[1]) << 8)
-                            | (uint16_t)rx_buffer[0];
+    uint16_t next_pkt_ptr = (uint16_t)((rx_buffer[1] << 8) | rx_buffer[0]);
 
-    uint16_t eth_pkt_size = ((uint16_t)(rx_buffer[3]) << 8)
-                            | (uint16_t)rx_buffer[2];
+    uint16_t eth_pkt_size = (uint16_t)((rx_buffer[3] << 8) | rx_buffer[2]);
 
     self->spi_bus->ops->transfer(self->spi_bus, buffer, buffer, eth_pkt_size);
 
