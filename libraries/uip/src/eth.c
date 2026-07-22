@@ -9,7 +9,6 @@
 /* ========================================================================== */
 
 #define MIN_ETH_PKT_SIZE              64
-#define MAX_ETH_PKT_SIZE              1518
 
 #define DEST_MAC_ADDR_FRAME_OFST      0
 #define SRC_MAC_ADDR_FRAME_OFST       6
@@ -145,8 +144,6 @@ int8_t eth_build_frame(
         }
     }
 
-    memcpy(
-        tx_frame + ETH_PAYLOAD_FRAME_OFST, mdata->payload, mdata->payload_size);
     *tx_frame_size = mdata->payload_size + ETH_PAYLOAD_FRAME_OFST;
     return 0;
 }
