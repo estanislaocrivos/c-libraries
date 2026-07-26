@@ -28,7 +28,7 @@ int8_t icmp_process_frame(
         return -EFAULT;
     }
 
-    if (rx_frame_size < ICMP_HDR_SIZE)
+    if (rx_frame_size < ICMP_HEADER_SIZE)
     {
         self->lost_frames += 1;
         return -EINVAL;
@@ -48,7 +48,7 @@ int8_t icmp_process_frame(
     mdata->seq_num = ((uint16_t)rx_frame[ICMP_SEQ_OFST] << 8)
                      | rx_frame[ICMP_SEQ_OFST + 1];
     mdata->payload      = rx_frame + ICMP_DATA_OFST;
-    mdata->payload_size = rx_frame_size - ICMP_HDR_SIZE;
+    mdata->payload_size = rx_frame_size - ICMP_HEADER_SIZE;
 
     return 0;
 }
@@ -66,7 +66,7 @@ int8_t icmp_build_frame(
         return -EFAULT;
     }
 
-    *tx_frame_size = ICMP_HDR_SIZE + mdata->payload_size;
+    *tx_frame_size = ICMP_HEADER_SIZE + mdata->payload_size;
 
     tx_frame[ICMP_TYPE_OFST]         = mdata->type;
     tx_frame[ICMP_CODE_OFST]         = mdata->code;
@@ -76,11 +76,6 @@ int8_t icmp_build_frame(
     tx_frame[ICMP_ID_OFST + 1]       = (uint8_t)(mdata->id & 0xFF);
     tx_frame[ICMP_SEQ_OFST]          = (uint8_t)(mdata->seq_num >> 8);
     tx_frame[ICMP_SEQ_OFST + 1]      = (uint8_t)(mdata->seq_num & 0xFF);
-
-    if (mdata->payload != NULL && mdata->payload_size > 0)
-    {
-        memcpy(tx_frame + ICMP_DATA_OFST, mdata->payload, mdata->payload_size);
-    }
 
     struct slice frame_slice     = {.base = tx_frame, .len = *tx_frame_size};
     uint16_t     checksum        = compute_inet_checksum(&frame_slice, 1);

@@ -7,9 +7,7 @@
 
 /* ========================================================================== */
 
-#define ICMP_HDR_SIZE     8
-#define ICMP_ECHO_REQUEST 8
-#define ICMP_ECHO_REPLY   0
+#define ICMP_HEADER_SIZE 8
 
 /* ========================================================================== */
 
@@ -46,7 +44,7 @@ struct icmp_tx_metadata
  * @param self Pointer to the icmp object instance.
  * @param rx_frame Pointer to the ICMP frame (without Ethernet and IP headers).
  * @param rx_frame_size Size of the ICMP frame in bytes. Must be >=
- * ICMP_HDR_SIZE.
+ * ICMP_HEADER_SIZE.
  * @param mdata Pointer to the rx metadata struct, where payload info will be
  * stored.
  * @return int8_t Returns 0 in case of success, -ERRNO otherwise.
@@ -65,7 +63,7 @@ int8_t icmp_process_frame(
  * seq_num, payload pointer and payload size.
  * @param tx_frame Pointer to the output buffer where the ICMP frame will be
  * written.
- * @param tx_frame_size Output parameter. Set to ICMP_HDR_SIZE + payload_size
+ * @param tx_frame_size Output parameter. Set to ICMP_HEADER_SIZE + payload_size
  * on success.
  * @return int8_t Returns 0 in case of success, -ERRNO otherwise.
  */

@@ -22,7 +22,7 @@
 #define IP_DEST_IP_FRAME_OFST  16 /* 4 bytes */
 #define IP_PAYLOAD_FRAME_OFST  20
 
-#define IP_MIN_HDR_SIZE        20 /* IHL = 5, no options */
+#define IP_MIN_HEADER_SIZE     20 /* IHL = 5, no options */
 
 #define IP_VERSION_MASK        (uint8_t)0xF0
 #define IP_IHL_MASK            (uint8_t)0x0F
@@ -49,7 +49,7 @@ int8_t ip_process_frame(
         return -EFAULT;
     }
 
-    if (rx_frame_size < IP_MIN_HDR_SIZE)
+    if (rx_frame_size < IP_MIN_HEADER_SIZE)
     {
         return -EINVAL;
     }
@@ -155,8 +155,8 @@ int8_t ip_build_frame(
 
     tx_frame[IP_DSCP_ECN_FRAME_OFST] = 0;
 
-    uint16_t tot_len                  = IP_MIN_HDR_SIZE + mdata->payload_size;
-    tx_frame[IP_TOTAL_LEN_FRAME_OFST] = (uint8_t)(tot_len >> 8);
+    uint16_t tot_len = IP_MIN_HEADER_SIZE + mdata->payload_size;
+    tx_frame[IP_TOTAL_LEN_FRAME_OFST]     = (uint8_t)(tot_len >> 8);
     tx_frame[IP_TOTAL_LEN_FRAME_OFST + 1] = (uint8_t)(tot_len);
     *tx_frame_size                        = tot_len;
 
@@ -195,13 +195,11 @@ int8_t ip_build_frame(
     tx_frame[IP_CHECKSUM_FRAME_OFST]     = 0;
     tx_frame[IP_CHECKSUM_FRAME_OFST + 1] = 0;
 
-    struct slice frame_slice = {.base = tx_frame, .len = IP_MIN_HDR_SIZE};
+    struct slice frame_slice = {.base = tx_frame, .len = IP_MIN_HEADER_SIZE};
 
     uint16_t checksum                = compute_inet_checksum(&frame_slice, 1);
     tx_frame[IP_CHECKSUM_FRAME_OFST] = (uint8_t)(checksum >> 8);
     tx_frame[IP_CHECKSUM_FRAME_OFST + 1] = (uint8_t)(checksum);
 
-    memcpy(
-        tx_frame + IP_PAYLOAD_FRAME_OFST, mdata->payload, mdata->payload_size);
     return 0;
 }
