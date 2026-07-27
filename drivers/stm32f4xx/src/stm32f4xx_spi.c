@@ -1,18 +1,25 @@
 #include "../inc/stm32f4xx_spi.h"
 
 #include "../../../libraries/inc/errno.h"
+#include "../inc/stm32f4xx_systick.h"
 #include "stm32f4xx.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 /* ========================================================================== */
 
-#define SPI_BR_MASK    (0x7U << 3)
-#define SPI_BR_MAX     7U
-#define SPI_DUMMY_BYTE 0xFFU
-#define SPI_MIN_DIV    2U
-#define SPI_MAX_DIV    256U
+#define SPI_BR_MASK         (0x7U << 3)
+#define SPI_BR_MAX          7U
+#define SPI_DUMMY_BYTE      0xFFU
+#define SPI_MIN_DIV         2U
+#define SPI_MAX_DIV         256U
+
+/* Generous margin: even at the slowest supported bit rate, one byte takes a
+ * few tens of microseconds. If a flag doesn't show up within 100ms, the
+ * peripheral or the remote device is stuck, not just slow. */
+#define SPI_FLAG_TIMEOUT_MS 100U
 
 /* ========================================================================== */
 
@@ -104,6 +111,24 @@ static inline uint8_t dr_read_byte(SPI_TypeDef* p)
 
 /* ========================================================================== */
 
+/* Polls SR until `flag` is set (or clear, if `set` is false), bounded by
+ * SPI_FLAG_TIMEOUT_MS so a stuck peripheral or an unresponsive remote device
+ * can't hang the caller forever. */
+static int8_t wait_flag(SPI_TypeDef* p, uint32_t flag, bool set)
+{
+    uint32_t start = stm32f4xx_get_tick_ms();
+    while (((p->SR & flag) != 0U) != set)
+    {
+        if ((stm32f4xx_get_tick_ms() - start) > SPI_FLAG_TIMEOUT_MS)
+        {
+            return -ETIMEDOUT;
+        }
+    }
+    return 0;
+}
+
+/* ========================================================================== */
+
 static int8_t initialize_ctx(struct spi_ctx* ctx, struct spi* s)
 {
     if (s == NULL)
@@ -171,19 +196,20 @@ static int8_t transmit_ctx(
     SPI_TypeDef* p = ctx->periph;
     for (size_t i = 0; i < size; ++i)
     {
-        while (!(p->SR & SPI_SR_TXE))
+        int8_t err = wait_flag(p, SPI_SR_TXE, true);
+        if (err)
         {
+            return err;
         }
         dr_write_byte(p, buffer[i]);
-        while (!(p->SR & SPI_SR_RXNE))
+        err = wait_flag(p, SPI_SR_RXNE, true);
+        if (err)
         {
+            return err;
         }
         (void)dr_read_byte(p);
     }
-    while (p->SR & SPI_SR_BSY)
-    {
-    }
-    return 0;
+    return wait_flag(p, SPI_SR_BSY, false);
 }
 
 /* ========================================================================== */
@@ -194,19 +220,20 @@ static int8_t receive_ctx(const struct spi_ctx* ctx, uint8_t* byte)
     {
         return -EFAULT;
     }
-    SPI_TypeDef* p = ctx->periph;
-    while (!(p->SR & SPI_SR_TXE))
+    SPI_TypeDef* p   = ctx->periph;
+    int8_t       err = wait_flag(p, SPI_SR_TXE, true);
+    if (err)
     {
+        return err;
     }
     dr_write_byte(p, SPI_DUMMY_BYTE);
-    while (!(p->SR & SPI_SR_RXNE))
+    err = wait_flag(p, SPI_SR_RXNE, true);
+    if (err)
     {
+        return err;
     }
     *byte = dr_read_byte(p);
-    while (p->SR & SPI_SR_BSY)
-    {
-    }
-    return 0;
+    return wait_flag(p, SPI_SR_BSY, false);
 }
 
 /* ========================================================================== */
@@ -228,19 +255,20 @@ static int8_t transfer_ctx(
     SPI_TypeDef* p = ctx->periph;
     for (size_t i = 0; i < size; ++i)
     {
-        while (!(p->SR & SPI_SR_TXE))
+        int8_t err = wait_flag(p, SPI_SR_TXE, true);
+        if (err)
         {
+            return err;
         }
         dr_write_byte(p, tx_buffer[i]);
-        while (!(p->SR & SPI_SR_RXNE))
+        err = wait_flag(p, SPI_SR_RXNE, true);
+        if (err)
         {
+            return err;
         }
         rx_buffer[i] = dr_read_byte(p);
     }
-    while (p->SR & SPI_SR_BSY)
-    {
-    }
-    return 0;
+    return wait_flag(p, SPI_SR_BSY, false);
 }
 
 /* ========================================================================== */
@@ -310,14 +338,13 @@ static int8_t enable_rx_interrupt_ctx(struct spi_ctx* ctx, bool enable)
 
 static int8_t flush_tx_ctx(const struct spi_ctx* ctx)
 {
-    SPI_TypeDef* p = ctx->periph;
-    while (!(p->SR & SPI_SR_TXE))
+    SPI_TypeDef* p   = ctx->periph;
+    int8_t       err = wait_flag(p, SPI_SR_TXE, true);
+    if (err)
     {
+        return err;
     }
-    while (p->SR & SPI_SR_BSY)
-    {
-    }
-    return 0;
+    return wait_flag(p, SPI_SR_BSY, false);
 }
 
 /* ========================================================================== */
