@@ -66,10 +66,10 @@ int8_t udp_process_frame(
         return -EINVAL;
     }
 
-    mdata->src_port_num = ((uint16_t)(rx_frame[UDP_SRC_PORT_FRAME_OFST]) << 8)
-                          | (uint16_t)(rx_frame[UDP_SRC_PORT_FRAME_OFST + 1]);
-    mdata->dest_port_num = ((uint16_t)(rx_frame[UDP_DEST_PORT_FRAME_OFST]) << 8)
-                           | (uint16_t)(rx_frame[UDP_DEST_PORT_FRAME_OFST + 1]);
+    mdata->src_port_num = (uint16_t)((rx_frame[UDP_SRC_PORT_FRAME_OFST]) << 8)
+                          | (rx_frame[UDP_SRC_PORT_FRAME_OFST + 1]);
+    mdata->dest_port_num = (uint16_t)((rx_frame[UDP_DEST_PORT_FRAME_OFST]) << 8)
+                           | (rx_frame[UDP_DEST_PORT_FRAME_OFST + 1]);
     mdata->payload      = rx_frame + UDP_PAYLOAD_FRAME_OFST;
     mdata->payload_size = rx_frame[UDP_LENGTH_FRAME_OFST] - UDP_HEADER_SIZE;
     return 0;
@@ -99,9 +99,6 @@ int8_t udp_build_frame(
     tx_frame[UDP_LENGTH_FRAME_OFST + 1]    = (uint8_t)(udp_len);
     tx_frame[UDP_CHECKSUM_FRAME_OFST]      = 0;
     tx_frame[UDP_CHECKSUM_FRAME_OFST + 1]  = 0;
-
-    memcpy(
-        tx_frame + UDP_PAYLOAD_FRAME_OFST, mdata->payload, mdata->payload_size);
 
     uint16_t checksum = compute_udp_checksum(
         mdata->ip_mdata->src_ip, mdata->ip_mdata->dest_ip, tx_frame, udp_len);

@@ -52,5 +52,8 @@ jobs:
       - name: Install Ceedling
         run: gem install ceedling
 
+      - name: Install gcovr
+        run: pip install gcovr
+
       - name: Run Unit Tests
         run: ceedling test:all
