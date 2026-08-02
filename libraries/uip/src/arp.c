@@ -8,25 +8,27 @@
 
 /* ========================================================================== */
 
+/* Used as switch/case labels below: must stay object-like macros, a const
+ * variable is not a compile-time constant expression in C. */
 #define ARP_REQUEST_OPCODE_VAL     ((uint16_t)0x0001)
 #define ARP_REPLY_OPCODE_VAL       ((uint16_t)0x0002)
 #define ARP_REV_REQUEST_OPCODE_VAL ((uint16_t)0x0003)
 #define ARP_REV_REPLY_OPCODE_VAL   ((uint16_t)0x0004)
 
-#define HARD_TYPE_VAL              ((uint16_t)0x0001)
-#define PROT_TYPE_VAL              ((uint16_t)0x0800)
-#define HARD_SIZE_VAL              6
-#define PROT_SIZE_VAL              4
+static const uint16_t HARD_TYPE_VAL = 0x0001;
+static const uint16_t PROT_TYPE_VAL = 0x0800;
+static const uint8_t  HARD_SIZE_VAL = 6;
+static const uint8_t  PROT_SIZE_VAL = 4;
 
-#define HARD_TYPE_FRAME_OFST       0
-#define PROT_TYPE_FRAME_OFST       2
-#define HARD_SIZE_FRAME_OFST       4
-#define PROT_SIZE_FRAME_OFST       5
-#define OPCODE_FRAME_OFST          6
-#define SRC_MAC_ADDR_FRAME_OFST    8
-#define SRC_IP_ADDR_FRAME_OFST     14
-#define DEST_MAC_ADDR_FRAME_OFST   18
-#define DEST_IP_ADDR_FRAME_OFST    24
+static const uint8_t HARD_TYPE_FRAME_OFST     = 0;
+static const uint8_t PROT_TYPE_FRAME_OFST     = 2;
+static const uint8_t HARD_SIZE_FRAME_OFST     = 4;
+static const uint8_t PROT_SIZE_FRAME_OFST     = 5;
+static const uint8_t OPCODE_FRAME_OFST        = 6;
+static const uint8_t SRC_MAC_ADDR_FRAME_OFST  = 8;
+static const uint8_t SRC_IP_ADDR_FRAME_OFST   = 14;
+static const uint8_t DEST_MAC_ADDR_FRAME_OFST = 18;
+static const uint8_t DEST_IP_ADDR_FRAME_OFST  = 24;
 
 /* ========================================================================== */
 

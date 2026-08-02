@@ -8,7 +8,10 @@
 
 /* ========================================================================== */
 
-#define ETH_HEADER_SIZE  14
+static const uint8_t ETH_HEADER_SIZE = 14;
+
+/* Sizes a static buffer in main.c: must stay a macro. A const object is not
+ * a compile-time constant expression usable as an array dimension in C. */
 #define MAX_ETH_PKT_SIZE 1518
 
 /* ========================================================================== */
