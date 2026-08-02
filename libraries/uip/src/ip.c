@@ -9,19 +9,20 @@
 
 /* ========================================================================== */
 
-static const uint8_t IP_VERSION_IHL_FRAME_OFST
-    = 0; /* Version (bits 7-4) + IHL (bits 3-0) */
-static const uint8_t IP_DSCP_ECN_FRAME_OFST
-    = 1; /* DSCP (bits 7-2) + ECN (bits 1-0) */
-static const uint8_t IP_TOTAL_LEN_FRAME_OFST = 2; /* 2 bytes */
-static const uint8_t IP_ID_FRAME_OFST        = 4; /* 2 bytes */
-static const uint8_t IP_FLAGS_FRAG_FRAME_OFST
-    = 6; /* Flags (bits 7-5) + Fragment offset (bits 4-0 + next byte) */
+static const uint8_t IP_VERSION_IHL_FRAME_OFST = 0; /* Version (bits 7-4) + IHL
+                                                       (bits 3-0) */
+static const uint8_t IP_DSCP_ECN_FRAME_OFST = 1; /* DSCP (bits 7-2) + ECN (bits
+                                                    1-0) */
+static const uint8_t IP_TOTAL_LEN_FRAME_OFST  = 2; /* 2 bytes */
+static const uint8_t IP_ID_FRAME_OFST         = 4; /* 2 bytes */
+static const uint8_t IP_FLAGS_FRAG_FRAME_OFST = 6; /* Flags (bits 7-5) +
+                                                      Fragment offset (bits 4-0
+                                                      + next byte) */
 static const uint8_t IP_TTL_FRAME_OFST      = 8;
 static const uint8_t IP_PROT_FRAME_OFST     = 9;
 static const uint8_t IP_CHECKSUM_FRAME_OFST = 10; /* 2 bytes */
-static const uint8_t IP_SRC_IP_FRAME_OFST  = 12; /* 4 bytes */
-static const uint8_t IP_DEST_IP_FRAME_OFST = 16; /* 4 bytes */
+static const uint8_t IP_SRC_IP_FRAME_OFST   = 12; /* 4 bytes */
+static const uint8_t IP_DEST_IP_FRAME_OFST  = 16; /* 4 bytes */
 
 static const uint8_t IP_MIN_HEADER_SIZE = 20; /* IHL = 5, no options */
 
