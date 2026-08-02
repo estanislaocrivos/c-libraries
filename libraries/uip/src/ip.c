@@ -9,32 +9,36 @@
 
 /* ========================================================================== */
 
-#define IP_VERSION_IHL_FRAME_OFST 0 /* Version (bits 7-4) + IHL (bits 3-0) */
-#define IP_DSCP_ECN_FRAME_OFST    1 /* DSCP (bits 7-2) + ECN (bits 1-0) */
-#define IP_TOTAL_LEN_FRAME_OFST   2 /* 2 bytes */
-#define IP_ID_FRAME_OFST          4 /* 2 bytes */
-#define IP_FLAGS_FRAG_FRAME_OFST \
-    6 /* Flags (bits 7-5) + Fragment offset (bits 4-0 + next byte) */
-#define IP_TTL_FRAME_OFST      8
-#define IP_PROT_FRAME_OFST     9
-#define IP_CHECKSUM_FRAME_OFST 10 /* 2 bytes */
-#define IP_SRC_IP_FRAME_OFST   12 /* 4 bytes */
-#define IP_DEST_IP_FRAME_OFST  16 /* 4 bytes */
-#define IP_PAYLOAD_FRAME_OFST  20
+static const uint8_t IP_VERSION_IHL_FRAME_OFST = 0; /* Version (bits 7-4) + IHL
+                                                       (bits 3-0) */
+static const uint8_t IP_DSCP_ECN_FRAME_OFST = 1; /* DSCP (bits 7-2) + ECN (bits
+                                                    1-0) */
+static const uint8_t IP_TOTAL_LEN_FRAME_OFST  = 2; /* 2 bytes */
+static const uint8_t IP_ID_FRAME_OFST         = 4; /* 2 bytes */
+static const uint8_t IP_FLAGS_FRAG_FRAME_OFST = 6; /* Flags (bits 7-5) +
+                                                      Fragment offset (bits 4-0
+                                                      + next byte) */
+static const uint8_t IP_TTL_FRAME_OFST      = 8;
+static const uint8_t IP_PROT_FRAME_OFST     = 9;
+static const uint8_t IP_CHECKSUM_FRAME_OFST = 10; /* 2 bytes */
+static const uint8_t IP_SRC_IP_FRAME_OFST   = 12; /* 4 bytes */
+static const uint8_t IP_DEST_IP_FRAME_OFST  = 16; /* 4 bytes */
 
-#define IP_MIN_HEADER_SIZE     20 /* IHL = 5, no options */
+static const uint8_t IP_MIN_HEADER_SIZE = 20; /* IHL = 5, no options */
 
-#define IP_VERSION_MASK        (uint8_t)0xF0
-#define IP_IHL_MASK            (uint8_t)0x0F
+static const uint8_t IP_VERSION_MASK = 0xF0;
+static const uint8_t IP_IHL_MASK     = 0x0F;
 
-#define IP_VER_4_VAL           (uint8_t)4
-#define IP_VER_6_VAL           (uint8_t)6
+/* Used as switch/case labels below: must stay object-like macros, a const
+ * variable is not a compile-time constant expression in C. */
+#define IP_VER_4_VAL         (uint8_t)4
+#define IP_VER_6_VAL         (uint8_t)6
 
-#define IP_PLD_PROT_UDP_VAL    (uint8_t)17
-#define IP_PLD_PROT_TCP_VAL    (uint8_t)6
-#define IP_PLD_PROT_ICMP_VAL   (uint8_t)1
+#define IP_PLD_PROT_UDP_VAL  (uint8_t)17
+#define IP_PLD_PROT_TCP_VAL  (uint8_t)6
+#define IP_PLD_PROT_ICMP_VAL (uint8_t)1
 
-#define IP_IHL_NO_OPTS_VAL     (uint8_t)5
+static const uint8_t IP_IHL_NO_OPTS_VAL = 5;
 
 /* ========================================================================== */
 

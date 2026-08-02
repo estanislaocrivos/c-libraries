@@ -10,16 +10,19 @@
 
 /* ========================================================================== */
 
-#define UDP_HEADER_SIZE          8
+/* UDP_HEADER_SIZE comes from udp.h (const, shared with the caller's offset
+ * arithmetic in main.c). IP_PLD_PROT_UDP_VAL mirrors ip.c's macro of the same
+ * name: kept as a macro there because it's used as a switch/case label, so
+ * it stays a macro here too for consistency even though this use doesn't
+ * require it. */
+#define IP_PLD_PROT_UDP_VAL (uint8_t)17
 
-#define IP_PLD_PROT_UDP_VAL      (uint8_t)17
-
-#define UDP_SRC_PORT_FRAME_OFST  0 /* 2 bytes */
-#define UDP_DEST_PORT_FRAME_OFST 2 /* 2 bytes */
-#define UDP_LENGTH_FRAME_OFST    4 /* 2 bytes */
-#define UDP_CHECKSUM_FRAME_OFST  6 /* 2 bytes */
-#define UDP_PAYLOAD_FRAME_OFST \
-    8 /* Payload size = UDP_LENGTH_FRAME_OFST - UDP_HEADER_SIZE  bytes */
+static const uint8_t UDP_SRC_PORT_FRAME_OFST  = 0; /* 2 bytes */
+static const uint8_t UDP_DEST_PORT_FRAME_OFST = 2; /* 2 bytes */
+static const uint8_t UDP_LENGTH_FRAME_OFST    = 4; /* 2 bytes */
+static const uint8_t UDP_CHECKSUM_FRAME_OFST  = 6; /* 2 bytes */
+/* Payload size = UDP_LENGTH_FRAME_OFST - UDP_HEADER_SIZE bytes */
+static const uint8_t UDP_PAYLOAD_FRAME_OFST = 8;
 
 /* ========================================================================== */
 

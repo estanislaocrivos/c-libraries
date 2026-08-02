@@ -8,13 +8,15 @@
 
 /* ========================================================================== */
 
-#define MIN_ETH_PKT_SIZE              64
+static const uint16_t MIN_ETH_PKT_SIZE = 64;
 
-#define DEST_MAC_ADDR_FRAME_OFST      0
-#define SRC_MAC_ADDR_FRAME_OFST       6
-#define ETH_TYPE_FRAME_OFST           12
-#define ETH_PAYLOAD_FRAME_OFST        14
+static const uint8_t DEST_MAC_ADDR_FRAME_OFST = 0;
+static const uint8_t SRC_MAC_ADDR_FRAME_OFST  = 6;
+static const uint8_t ETH_TYPE_FRAME_OFST      = 12;
+static const uint8_t ETH_PAYLOAD_FRAME_OFST   = 14;
 
+/* Used as switch/case labels below: must stay object-like macros, a const
+ * variable is not a compile-time constant expression in C. */
 #define ETH_TYPE_ARP_REQUEST_OR_REPLY 0x0806
 #define ETH_TYPE_IPV4                 0x0800
 #define ETH_TYPE_IPV6                 0x08DD

@@ -8,12 +8,12 @@
 
 /* ========================================================================== */
 
-#define ICMP_TYPE_OFST     0
-#define ICMP_CODE_OFST     1
-#define ICMP_CHECKSUM_OFST 2
-#define ICMP_ID_OFST       4
-#define ICMP_SEQ_OFST      6
-#define ICMP_DATA_OFST     8
+static const uint8_t ICMP_TYPE_OFST     = 0;
+static const uint8_t ICMP_CODE_OFST     = 1;
+static const uint8_t ICMP_CHECKSUM_OFST = 2;
+static const uint8_t ICMP_ID_OFST       = 4;
+static const uint8_t ICMP_SEQ_OFST      = 6;
+static const uint8_t ICMP_DATA_OFST     = 8;
 
 /* ========================================================================== */
 
