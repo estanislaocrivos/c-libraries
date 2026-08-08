@@ -1,13 +1,15 @@
-#include "../inc/usart_driver.h"
+#include "../inc/atmegaxx0_1_usart.h"
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 static void*                usart0_callback_context;
 static void*                usart1_callback_context;
 static serial_rx_callback_t usart0_callback;
 static serial_rx_callback_t usart1_callback;
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 static inline int8_t usart0_initialize(const struct serial_port* port)
 {
@@ -65,7 +67,8 @@ int8_t usart_initialize(const struct serial_port* port)
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 static inline void _usart0_transmit_byte(const uint8_t* byte)
 {
@@ -83,7 +86,8 @@ static inline void _usart1_transmit_byte(const uint8_t* byte)
     UDR1 = *byte;
 }
 
-int8_t usart_transmit(const struct serial_port* port, const uint8_t* buffer, size_t size)
+int8_t usart_transmit(
+    const struct serial_port* port, const uint8_t* buffer, size_t size)
 {
     if (port == NULL || buffer == NULL)
     {
@@ -119,7 +123,8 @@ int8_t usart_transmit(const struct serial_port* port, const uint8_t* buffer, siz
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 static inline uint8_t _usart0_receive_byte(void)
 {
@@ -159,11 +164,13 @@ int8_t usart_receive(const struct serial_port* port, uint8_t* byte)
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
-int8_t usart_set_rx_callback(const struct serial_port* port,
-                             serial_rx_callback_t      callback,
-                             void*                     callback_context)
+int8_t usart_set_rx_callback(
+    const struct serial_port* port,
+    serial_rx_callback_t      callback,
+    void*                     callback_context)
 {
     if (port == NULL || callback == NULL || callback_context == NULL)
     {
@@ -187,7 +194,8 @@ int8_t usart_set_rx_callback(const struct serial_port* port,
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 int8_t usart_enable_rx_interrupt(const struct serial_port* port, bool enable)
 {
@@ -225,7 +233,8 @@ int8_t usart_enable_rx_interrupt(const struct serial_port* port, bool enable)
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 int8_t usart_clear_buffers(const struct serial_port* port)
 {
@@ -249,7 +258,8 @@ int8_t usart_clear_buffers(const struct serial_port* port)
     return 0;
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
 
 ISR(USART0_RX_vect)
 {
@@ -269,4 +279,5 @@ ISR(USART1_RX_vect)
     }
 }
 
-/* ============================================================================================== */
+/* ==============================================================================================
+ */
